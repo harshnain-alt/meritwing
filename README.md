@@ -13,7 +13,7 @@ who have real venture or project experience but find it hard to describe their o
 
 > **Prototype status:** the three-step onboarding, resume reading, AI follow-up questions and the
 > review screen work. **AI application drafting is not built yet.** The app says so on screen and
-> never shows simulated AI output. The follow-up questions need an Anthropic API key on the server
+> never shows simulated AI output. The follow-up questions need a Google Gemini API key on the server
 > (see [Environment variables](#environment-variables)); without one, the app explains that they
 > aren't set up and lets the student continue.
 
@@ -36,7 +36,7 @@ who have real venture or project experience but find it hard to describe their o
   text is listed under *Lines we couldn't place*.
 - **Searchable dropdowns** for State / Union Territory (all 36) and business school (129
   institutions from NIRF 2025 plus verified additions, with free entry for any other school).
-- **AI follow-up questions** after step 3 (*A few quick questions*): Claude reads the project
+- **AI follow-up questions** after step 3 (*A few quick questions*): Google Gemini reads the project
   description, what the student personally did, any results, the resume sections and the job
   description, and asks **at most three** short questions about the student's own contribution —
   or none when nothing important is missing. Each question has an *I don't know / Skip* option;
@@ -75,12 +75,15 @@ who have real venture or project experience but find it hard to describe their o
   the size (max 5 MB) and that the file really is a PDF, extracts the text in memory with
   [unpdf](https://github.com/unjs/unpdf) (Mozilla pdf.js), and returns it. The file is **not
   saved** to disk or storage, and neither the file nor its text is logged.
-- **AI follow-up questions** send, from the app's server to the configured AI provider (Anthropic by default): the resume's
+- **AI follow-up questions** send, from the app's server to the configured AI provider (Google Gemini by default; requests set `store: false`, so the interaction isn't saved for later retrieval through the API): the resume's
   education, experience, skills and additional sections, the project details, any results and the
   job description. The student's **name, email and phone are not sent**; email addresses and phone
   numbers inside the text are replaced with placeholders first. The API key stays on the server,
   and neither the request nor the response is logged (only an error type and status on failure).
-  Without a configured key, nothing is sent.
+  Without a configured key, nothing is sent. **On the Gemini free tier, Google's terms allow it to
+  use submitted content and responses to improve its products, and human reviewers may read them**;
+  Step 3 tells students this before they continue. A paid Gemini project (billing enabled) is not used
+  for product improvement.
 - All answers live only in the open browser tab and are cleared on refresh or with *Clear my data*.
 - On Vercel, request bodies are limited to 4.5 MB, so PDFs between 4.5 MB and 5 MB are rejected
   there; the app then suggests pasting the text instead.
@@ -105,18 +108,20 @@ See [`.env.example`](.env.example). All are **server-side only** — never prefi
 
 | Variable | Required | Purpose |
 |---|---|---|
-| `AI_PROVIDER` | No | AI provider for follow-up questions; defaults to `anthropic` (the only one built in) |
-| `ANTHROPIC_API_KEY` | For the Anthropic provider | Anthropic API key from the Anthropic Console; the account needs API credit (a claude.ai subscription doesn't include it) |
-| `ANTHROPIC_MODEL` | No | Claude model for the questions; defaults to `claude-opus-5-5` |
+| `AI_PROVIDER` | No | `gemini` (default) or `anthropic`. Only the selected provider is called; there is no fallback |
+| `GEMINI_API_KEY` | For Gemini | API key from Google AI Studio |
+| `GEMINI_MODEL` | No | Gemini model for the questions; defaults to `gemini-3.8-flash`, which has a free tier. `gemini-3.5-flash-lite` is a free-tier alternative if the daily free quota runs out |
+| `ANTHROPIC_API_KEY` | Only if `AI_PROVIDER=anthropic` | Anthropic API key; the account needs API credit |
+| `ANTHROPIC_MODEL` | No | Claude model when using Anthropic; defaults to `claude-opus-5-5` |
 
 - **Locally:** create `.env.local` in this folder (ignored by Git) with
-  `ANTHROPIC_API_KEY=…`, then restart `npm run dev`.
-- **On Vercel:** Project → Settings → Environment Variables → add `ANTHROPIC_API_KEY` for
+  `GEMINI_API_KEY=…`, then restart `npm run dev`.
+- **On Vercel:** Project → Settings → Environment Variables → add `GEMINI_API_KEY` (and `GEMINI_MODEL` only if you change the model) for
   Production (and Preview), mark it Sensitive, then redeploy.
 
 Everything else works without a key; the questions screen then explains that AI questions aren't
-set up yet, or why the provider rejected the request (for example no credit), and lets the
-student continue.
+set up yet, or why the provider rejected the request (for example an invalid key, a used-up free
+quota or a busy model), and lets the student continue. Requests are never retried automatically.
 
 ### Switching AI provider
 
@@ -155,7 +160,8 @@ npx vercel --prod
 
 Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS 4 · unpdf for PDF text extraction ·
 jsPDF for resume PDF download (loaded only when used) ·
-Anthropic TypeScript SDK (behind a provider interface) with Zod-validated structured output for follow-up questions.
+Google Gen AI SDK (`@google/genai`, Interactions API) and the Anthropic TypeScript SDK behind a provider
+interface, with Zod-validated structured output for follow-up questions.
 
 ## Data sources
 

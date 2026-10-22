@@ -203,8 +203,8 @@ function SetupSteps(): ReactNode {
     <div className="mt-3 space-y-3">
       <p>
         The server picks its AI provider from <span className={code}>AI_PROVIDER</span> (default{" "}
-        <span className={code}>anthropic</span>, currently the only one built in). The provider needs its own key and
-        an account with API access; see the project README for the variables.
+        <span className={code}>gemini</span>; <span className={code}>anthropic</span> is also built in). Each provider
+        needs its own key; see the project README for the variables.
       </p>
       <div>
         <p className="font-semibold text-ink">Running locally</p>
@@ -214,8 +214,8 @@ function SetupSteps(): ReactNode {
             <span className={code}>.env.local</span> (it is ignored by Git).
           </li>
           <li>
-            For Anthropic, add the line <span className={code}>ANTHROPIC_API_KEY=</span> followed by your key from the
-            Anthropic Console. Optionally add <span className={code}>ANTHROPIC_MODEL=</span> to choose a model.
+            For Gemini, add the line <span className={code}>GEMINI_API_KEY=</span> followed by your key from Google AI
+            Studio. Optionally add <span className={code}>GEMINI_MODEL=</span> to choose a model.
           </li>
           <li>
             Stop and restart <span className={code}>npm run dev</span>.
@@ -227,8 +227,8 @@ function SetupSteps(): ReactNode {
         <ol className="mt-1 list-decimal space-y-1 pl-5">
           <li>Open the meritwing project → Settings → Environment Variables.</li>
           <li>
-            Add the provider&apos;s key (for Anthropic, <span className={code}>ANTHROPIC_API_KEY</span>) for Production,
-            and Preview if you use it. Mark it Sensitive.
+            Add the provider&apos;s key (for Gemini, <span className={code}>GEMINI_API_KEY</span>) for Production, and
+            Preview if you use it. Mark it Sensitive.
           </li>
           <li>Redeploy the latest deployment so the new variable is used.</li>
         </ol>

@@ -51,6 +51,12 @@ export function InternshipStep({ data, errors, onDescription, onChange }: Intern
           error={errors.company}
         />
       </div>
+      <p className="rounded-lg border border-line bg-surface px-4 py-3 text-xs leading-relaxed text-muted">
+        <span className="font-semibold text-ink">About the follow-up questions:</span> to prepare them, Meritwing sends
+        your project details, your resume sections and this job description to Google Gemini. Your name, email and
+        phone are not sent. On Gemini&apos;s free tier, Google may use what is sent to improve its products, and people
+        may review it, so leave out anything sensitive. You can skip the questions and still use everything else.
+      </p>
     </div>
   );
 }
