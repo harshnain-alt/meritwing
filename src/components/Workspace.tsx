@@ -6,10 +6,14 @@ import { bulletsForResume, NO_BULLETS, toWritten, type BulletsState } from "@/co
 import { DraftView } from "@/components/steps/DraftView";
 import { ExperienceStep } from "@/components/steps/ExperienceStep";
 import { InternshipStep } from "@/components/steps/InternshipStep";
+import { EXPLAIN_BATCH, JobsView, NO_JOBS, type JobsState } from "@/components/steps/JobsView";
+import { NO_PROFILE, ProfileView, type PreferenceErrors, type ProfileState } from "@/components/steps/ProfileView";
 import { NO_CLARIFY, QuestionsView, type Answer, type ClarifyState } from "@/components/steps/QuestionsView";
 import { StartStep } from "@/components/steps/StartStep";
 import {
   DRAFT_VIEW,
+  JOBS_VIEW,
+  PROFILE_VIEW,
   QUESTIONS_VIEW,
   emptyApplication,
   hasErrors,
@@ -34,7 +38,17 @@ import {
   type ClarifyError,
   type ClarifyInput,
 } from "@/lib/clarify";
+import type { JobExplanation } from "@/lib/jobs/explain";
+import type { JobListing, JobPreferences, JobSearchResult } from "@/lib/jobs/types";
 import { suggestJobDetails } from "@/lib/jobParser";
+import {
+  buildProfileInput,
+  EMPTY_PREFERENCES,
+  profileFingerprint,
+  profileFromOwnWords,
+  type ProfileFact,
+  type ProfileResult,
+} from "@/lib/profile";
 import { computeChecks, unresolvedChecks, type ResumeCheck } from "@/lib/resumeChecks";
 import { detailsFromResume } from "@/lib/resumeExtract";
 import { parseResumeText } from "@/lib/resumeParser";
@@ -42,27 +56,37 @@ import { buildPreview } from "@/lib/resumePreview";
 
 const COPY: Record<View, { eyebrow: string; title: string; intro: string }> = {
   1: {
-    eyebrow: "Step 1 of 3",
+    eyebrow: "Step 1 of 5",
     title: "Let’s start",
     intro: "Add your name and resume. We’ll fill in what we can from it, so you don’t type it twice.",
   },
   2: {
-    eyebrow: "Step 2 of 3",
+    eyebrow: "Step 2 of 5",
     title: "What did you do?",
-    intro: "Tell us in your own words. We’ll help organise it.",
+    intro: "Tell us about your venture or project in your own words: what it was, what you personally did, and any results.",
+  },
+  profile: {
+    eyebrow: "Step 3 of 5",
+    title: "Confirm your profile",
+    intro: "Check what we read about you, then tell us what kind of role you’re looking for.",
+  },
+  jobs: {
+    eyebrow: "Step 4 of 5",
+    title: "Matching openings",
+    intro: "Current openings from employer careers boards that match your preferences. Choose one to tailor your resume for it.",
   },
   3: {
-    eyebrow: "Step 3 of 3",
-    title: "Which internship?",
-    intro: "Paste the description of the internship you want. We’ll pick out the title and company.",
+    eyebrow: "Step 5 of 5 · Tailor",
+    title: "Check the job description",
+    intro: "This is the job you’ll tailor your resume for. Check the description, or paste one you found elsewhere.",
   },
   questions: {
-    eyebrow: "Follow-up",
+    eyebrow: "Tailor · Follow-up",
     title: "A few quick questions",
     intro: "These help us understand your own part in the project. Answer what you can; numbers are optional.",
   },
   draft: {
-    eyebrow: "Your draft",
+    eyebrow: "Tailor · Your draft",
     title: "Your draft workspace",
     intro: "Check your facts beside the preview. Edit anything that isn’t right.",
   },
@@ -83,6 +107,21 @@ function answeredFollowUps(clarify: ClarifyState): BulletsInput["followUps"] {
     return { question: q.question, answer: a && !a.skipped ? a.text.trim() : "" };
   });
   return [...clarify.asked.map((a) => ({ question: a.question, answer: a.answer?.trim() ?? "" })), ...latest].filter((f) => f.answer);
+}
+
+const BACK: Record<View, View> = { 1: 1, 2: 1, profile: 2, jobs: PROFILE_VIEW, 3: JOBS_VIEW, questions: 3, draft: QUESTIONS_VIEW };
+
+/** What still needs choosing on the profile step before jobs can be searched. */
+function preferenceErrors(profile: ProfileState, confirmedFacts: ProfileFact[], prefs: JobPreferences): PreferenceErrors {
+  const e: PreferenceErrors = {};
+  if (profile.status !== "ready") e.confirm = "Your profile isn’t ready yet. Wait for it, or use your own words.";
+  else if (!confirmedFacts.length && profile.confirmed) e.facts = "Keep or add at least one profile item.";
+  else if (!profile.confirmed) e.confirm = "Confirm your profile items.";
+  if (!prefs.employmentType) e.employmentType = "Choose internship, full-time or either.";
+  if (!prefs.roles.length) e.roles = "Choose at least one role.";
+  if (!prefs.locations.length) e.locations = "Choose at least one location, or anywhere in India.";
+  if (!prefs.workplace) e.workplace = "Choose on-site, remote or either.";
+  return e;
 }
 
 /** Undo details that were filled from a resume and haven't been edited since. */
@@ -116,6 +155,17 @@ export function Workspace() {
   const [bullets, setBullets] = useState<BulletsState>(NO_BULLETS);
   const bulletsBusy = useRef(false);
   const bulletsAbort = useRef<AbortController | null>(null);
+  const [profile, setProfile] = useState<ProfileState>(NO_PROFILE);
+  const [prefs, setPrefs] = useState<JobPreferences>(EMPTY_PREFERENCES);
+  const [prefsAttempted, setPrefsAttempted] = useState(false);
+  const [jobs, setJobs] = useState<JobsState>(NO_JOBS);
+  const [explainError, setExplainError] = useState<ClarifyError | null>(null);
+  // The opening the student chose, and the description it filled in, so their own edits are never replaced silently.
+  const [selectedJob, setSelectedJob] = useState<{ job: JobListing; description: string } | null>(null);
+  // Views the student has reached, so the progress bar can link back to them.
+  const [visited, setVisited] = useState<View[]>([1]);
+  // One controller for every profile, search and explanation request, so Clear my data can stop them all.
+  const requests = useRef(new Set<AbortController>());
 
   const headingRef = useRef<HTMLHeadingElement>(null);
   const isFirstRender = useRef(true);
@@ -140,6 +190,20 @@ export function Workspace() {
   const bulletsOutdated = Boolean(bullets.written) && bullets.written!.fingerprint !== currentBulletsFingerprint;
   const projectBullets = bulletsForResume(bullets, currentBulletsFingerprint);
   const preview = useMemo(() => buildPreview(data, checks, projectBullets), [data, checks, projectBullets]);
+
+  const profileInput = useMemo(() => buildProfileInput(data), [data]);
+  const currentProfileFingerprint = useMemo(() => profileFingerprint(profileInput), [profileInput]);
+  const profileOutdated = profile.status === "ready" && profile.fingerprint !== currentProfileFingerprint;
+  const confirmedFacts = useMemo(
+    () => (profile.confirmed ? profile.facts.filter((f) => f.text.trim()).map((f) => ({ ...f, text: f.text.trim() })) : []),
+    [profile],
+  );
+  const factsKey = JSON.stringify(confirmedFacts.map((f) => [f.id, f.text]));
+  const prefsKey = JSON.stringify(prefs);
+  const jobsOutdated = jobs.status === "ready" && jobs.prefsKey !== prefsKey;
+  const explanationsOutdated = Object.keys(jobs.explanations).length > 0 && jobs.factsKey !== factsKey;
+  const prefErrors = preferenceErrors(profile, confirmedFacts, prefs);
+  const hasOwnDescription = Boolean(data.internship.description.trim()) && data.internship.description !== selectedJob?.description;
 
   const stepErrors = {
     1: validateStart(data.about, data.resume),
@@ -216,7 +280,123 @@ export function Workspace() {
 
   function goTo(next: View) {
     if (next === DRAFT_VIEW) setReachedDraft(true);
+    setVisited((v) => (v.includes(next) ? v : [...v, next]));
     setView(next);
+  }
+
+  /** Runs one request with an abort controller that Clear my data can cancel. */
+  async function postJson(url: string, body: unknown): Promise<{ ok: boolean; status: number; json: { result?: unknown; error?: { message?: string } } | null } | null> {
+    const controller = new AbortController();
+    requests.current.add(controller);
+    try {
+      const res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body), signal: controller.signal });
+      return { ok: res.ok, status: res.status, json: await res.json().catch(() => null) };
+    } catch (err) {
+      if ((err as Error).name === "AbortError") return null;
+      return { ok: false, status: 0, json: null };
+    } finally {
+      requests.current.delete(controller);
+    }
+  }
+
+  /** Reads the candidate profile from the resume and venture details with AI. */
+  async function requestProfile() {
+    if (profile.status === "loading") return;
+    const fingerprint = currentProfileFingerprint;
+    setProfile((p) => ({ ...p, status: "loading", error: null }));
+    const res = await postJson("/api/profile", profileInput);
+    if (!res) return;
+    const result = res.json?.result as ProfileResult | undefined;
+    if (!res.ok || !result) {
+      const error = (res.json?.error as ClarifyError | undefined) ?? {
+        code: "unavailable",
+        retryable: true,
+        message: res.status === 0 ? "We couldn't reach the server. Check your connection and try again." : "Something went wrong. Try again.",
+      };
+      setProfile((p) => ({ ...p, status: "error", error }));
+      return;
+    }
+    setProfile({ status: "ready", fingerprint, facts: result.facts, suggestedRoles: result.suggestedRoles, found: result.found, removed: result.removed, ownWords: false, confirmed: false, error: null });
+    // Fill only preferences the student hasn't chosen, and only from what their text states.
+    setPrefs((p) => ({
+      ...p,
+      employmentType: p.employmentType || result.found.employmentType?.value || "",
+      locations: p.locations.length ? p.locations : (result.found.locations?.values ?? []),
+      workplace: p.workplace || result.found.workplace?.value || "",
+    }));
+  }
+
+  function useOwnWords() {
+    setProfile({ ...NO_PROFILE, status: "ready", fingerprint: currentProfileFingerprint, facts: profileFromOwnWords(data), ownWords: true });
+  }
+
+  function openProfile() {
+    goTo(PROFILE_VIEW);
+    if (profile.status === "idle") void requestProfile();
+  }
+
+  /** Searches the employer boards with exactly the student's preferences, then explains the first few matches. */
+  async function runSearch(searchPrefs: JobPreferences = prefs) {
+    const key = JSON.stringify(searchPrefs);
+    setExplainError(null);
+    setJobs({ ...NO_JOBS, status: "loading", prefsKey: key });
+    const res = await postJson("/api/jobs/search", searchPrefs);
+    if (!res) return;
+    const result = res.json?.result as JobSearchResult | undefined;
+    if (!res.ok || !result) {
+      setJobs((j) => ({ ...j, status: "error", error: res.json?.error?.message ?? "The job boards couldn't be searched. Check your connection and try again." }));
+      return;
+    }
+    setJobs({ ...NO_JOBS, status: "ready", prefsKey: key, result });
+    if (confirmedFacts.length && result.jobs.length) void explain(result.jobs.slice(0, EXPLAIN_BATCH), result);
+  }
+
+  /** Asks AI how the confirmed profile relates to these openings. */
+  async function explain(targets: JobListing[], result: JobSearchResult | null = jobs.result) {
+    if (!targets.length || !result) return;
+    if (!confirmedFacts.length) {
+      setExplainError({ code: "invalid_input", retryable: false, message: "Confirm at least one profile item first." });
+      return;
+    }
+    setExplainError(null);
+    const key = factsKey;
+    setJobs((j) => ({
+      ...j,
+      factsKey: key,
+      // Notes made for a different profile are dropped rather than mixed with new ones.
+      explanations: { ...(j.factsKey === key ? j.explanations : {}), ...Object.fromEntries(targets.map((t) => [t.id, { status: "loading" as const }])) },
+    }));
+    const res = await postJson("/api/jobs/explain", {
+      facts: confirmedFacts.slice(0, 20).map((f) => ({ id: f.id, text: f.text.slice(0, 300) })),
+      jobs: targets.map((t) => ({ id: t.id, title: t.title, company: t.company, description: t.description.slice(0, 4000) })),
+    });
+    if (!res) return;
+    const value = res.json?.result as Record<string, JobExplanation> | undefined;
+    if (!res.ok || !value) {
+      const message = res.json?.error?.message ?? "Something went wrong. Try again.";
+      setExplainError((res.json?.error as ClarifyError | undefined) ?? { code: "unavailable", retryable: true, message });
+      setJobs((j) => ({ ...j, explanations: { ...j.explanations, ...Object.fromEntries(targets.map((t) => [t.id, { status: "error" as const, message }])) } }));
+      return;
+    }
+    setJobs((j) =>
+      j.factsKey !== key
+        ? j
+        : {
+            ...j,
+            explanations: {
+              ...j.explanations,
+              ...Object.fromEntries(targets.map((t) => [t.id, value[t.id] ? { status: "ready" as const, value: value[t.id] } : { status: "error" as const, message: "No notes were returned." }])),
+            },
+          },
+    );
+  }
+
+  /** Uses the chosen opening's own description for tailoring. */
+  function selectJob(job: JobListing) {
+    const description = job.description.trim();
+    setSelectedJob({ job, description });
+    update("internship", { description, title: job.title, company: job.company, suggestedTitle: job.title, suggestedCompany: job.company });
+    goTo(3);
   }
 
   /** Validates the given step; shows its errors if it fails. */
@@ -373,19 +553,32 @@ export function Workspace() {
   }
 
   function handleContinue() {
-    if (view === DRAFT_VIEW) return;
+    if (view === DRAFT_VIEW || view === JOBS_VIEW) return;
     if (view === QUESTIONS_VIEW) {
       if (clarify.status !== "loading") goTo(DRAFT_VIEW);
+      return;
+    }
+    if (view === PROFILE_VIEW) {
+      setPrefsAttempted(true);
+      const first = Object.keys(prefErrors)[0];
+      if (first) {
+        const target = first === "confirm" || first === "facts" ? (profile.status === "ready" ? "profile-confirm" : "profile-heading") : first;
+        setTimeout(() => document.getElementById(target)?.focus(), 0);
+        return;
+      }
+      goTo(JOBS_VIEW);
+      if (jobs.status !== "loading" && (jobs.status !== "ready" || jobsOutdated)) void runSearch();
       return;
     }
     const resume = view === 1 ? prepareStart() : undefined;
     if (!check(view, resume)) return;
     if (view === 3) openQuestions();
-    else goTo((view + 1) as StepId);
+    else if (view === 2) openProfile();
+    else goTo(2);
   }
 
   function handleBack() {
-    setView(view === DRAFT_VIEW ? QUESTIONS_VIEW : view === QUESTIONS_VIEW ? 3 : ((view - 1) as StepId));
+    setView(BACK[view]);
   }
 
   function handleReturnToDraft() {
@@ -412,6 +605,15 @@ export function Workspace() {
     bulletsAbort.current = null;
     bulletsBusy.current = false;
     setBullets(NO_BULLETS);
+    requests.current.forEach((c) => c.abort());
+    requests.current.clear();
+    setProfile(NO_PROFILE);
+    setPrefs(EMPTY_PREFERENCES);
+    setPrefsAttempted(false);
+    setJobs(NO_JOBS);
+    setExplainError(null);
+    setSelectedJob(null);
+    setVisited([1]);
     setData(emptyApplication);
     setAttempted(NOT_ATTEMPTED);
     setConfirmed(false);
@@ -429,7 +631,9 @@ export function Workspace() {
 
   const copy = COPY[view];
   const primaryLabel =
-    view === 3
+    view === PROFILE_VIEW
+      ? "Find matching jobs"
+      : view === 3
       ? "Create my application draft"
       : view === QUESTIONS_VIEW
         ? clarify.status === "error"
@@ -440,7 +644,11 @@ export function Workspace() {
   return (
     <div className={`mx-auto w-full px-4 pb-16 sm:px-6 ${view === DRAFT_VIEW ? "max-w-6xl" : "max-w-2xl"}`}>
       <div className={`pt-6 sm:pt-8 ${view === DRAFT_VIEW ? "max-w-2xl" : ""}`}>
-        <StepIndicator current={view} onSelect={setView} />
+        <StepIndicator
+          current={view}
+          onSelect={setView}
+          reachable={(step) => visited.includes(step) || (step === 3 && (visited.includes(QUESTIONS_VIEW) || visited.includes(DRAFT_VIEW)))}
+        />
       </div>
 
       <div className="mt-8 flex flex-col gap-4 sm:mt-10 sm:flex-row sm:items-end sm:justify-between">
@@ -540,8 +748,51 @@ export function Workspace() {
             onChange={(f, v) => update("experience", { [f]: v })}
           />
         )}
+        {view === PROFILE_VIEW && (
+          <ProfileView
+            profile={profile}
+            outdated={profileOutdated}
+            prefs={prefs}
+            errors={prefsAttempted ? prefErrors : {}}
+            onRetry={() => void requestProfile()}
+            onUseOwnWords={useOwnWords}
+            onFact={(id, text) => setProfile((p) => ({ ...p, confirmed: false, facts: p.facts.map((f) => (f.id === id ? { ...f, text } : f)) }))}
+            onRemoveFact={(id) => setProfile((p) => ({ ...p, confirmed: false, facts: p.facts.filter((f) => f.id !== id) }))}
+            onAddFact={() =>
+              setProfile((p) => {
+                const n = 1 + Math.max(0, ...p.facts.filter((f) => f.id.startsWith("S")).map((f) => Number(f.id.slice(1))));
+                return { ...p, confirmed: false, facts: [...p.facts, { id: `S${n}`, text: "", evidence: "", source: "student", kind: "experience" }] };
+              })
+            }
+            onConfirm={(c) => setProfile((p) => ({ ...p, confirmed: c }))}
+            onPrefs={(patch) => setPrefs((p) => ({ ...p, ...patch }))}
+            onSkipSearch={() => goTo(3)}
+          />
+        )}
+        {view === JOBS_VIEW && (
+          <JobsView
+            jobs={jobs}
+            prefs={prefs}
+            outdated={jobsOutdated}
+            explanationsOutdated={explanationsOutdated}
+            selectedJobId={selectedJob?.job.id ?? null}
+            hasOwnDescription={hasOwnDescription}
+            onSearch={() => void runSearch()}
+            onExplain={(ids) => void explain((jobs.result?.jobs ?? []).filter((j) => ids.includes(j.id)))}
+            onSelect={selectJob}
+            onEditPreferences={() => setView(PROFILE_VIEW)}
+            onPasteOwn={() => goTo(3)}
+            onIncludeCityNotStated={() => {
+              const next = { ...prefs, includeCityNotStated: true };
+              setPrefs(next);
+              void runSearch(next);
+            }}
+            explainError={explainError}
+          />
+        )}
         {view === 3 && (
           <InternshipStep
+            source={selectedJob && data.internship.description === selectedJob.description ? selectedJob.job : null}
             data={data.internship}
             errors={visibleErrors(3)}
             onDescription={(description) =>
@@ -615,7 +866,7 @@ export function Workspace() {
           ) : (
             <span />
           )}
-          {view !== DRAFT_VIEW && (
+          {view !== DRAFT_VIEW && view !== JOBS_VIEW && (
             <div className="ml-auto flex flex-wrap justify-end gap-2">
               {reachedDraft && typeof view === "number" && view !== 3 && (
                 <button

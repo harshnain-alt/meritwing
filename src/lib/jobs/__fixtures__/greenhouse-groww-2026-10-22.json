@@ -1,0 +1,126 @@
+{
+ "recorded": "2026-10-22",
+ "note": "Real response from https://boards-api.greenhouse.io/v1/boards/groww/jobs, recorded for tests only. Never shown as live results.",
+ "jobs": [
+  {
+   "id": 4970739101,
+   "title": "Assistant Manager - Internal Audit",
+   "company_name": "Groww",
+   "location": {
+    "name": "Bengaluru-VTP, India"
+   },
+   "absolute_url": "https://job-boards.eu.greenhouse.io/groww/jobs/4970739101",
+   "first_published": "2026-09-14T03:49:28-04:00",
+   "updated_at": "2026-09-14T03:52:53-04:00",
+   "application_deadline": null
+  },
+  {
+   "id": 4880153101,
+   "title": "Associate - Content (Digest)",
+   "company_name": "Groww",
+   "location": {
+    "name": "Bengaluru-VTP, India"
+   },
+   "absolute_url": "https://job-boards.eu.greenhouse.io/groww/jobs/4880153101",
+   "first_published": "2026-06-03T02:46:08-04:00",
+   "updated_at": "2026-08-27T07:35:34-04:00",
+   "application_deadline": null
+  },
+  {
+   "id": 4979964101,
+   "title": "Creative Illustrator ",
+   "company_name": "Groww",
+   "location": {
+    "name": "Bengaluru-VTP, India"
+   },
+   "absolute_url": "https://job-boards.eu.greenhouse.io/groww/jobs/4979964101",
+   "first_published": "2026-10-08T02:22:36-04:00",
+   "updated_at": "2026-10-08T02:42:18-04:00",
+   "application_deadline": null
+  },
+  {
+   "id": 5000706101,
+   "title": "Finance Content Creator",
+   "company_name": "Groww",
+   "location": {
+    "name": "Bengaluru, India"
+   },
+   "absolute_url": "https://job-boards.eu.greenhouse.io/groww/jobs/5000706101",
+   "first_published": "2026-10-09T03:18:37-04:00",
+   "updated_at": "2026-10-09T03:18:37-04:00",
+   "application_deadline": null
+  },
+  {
+   "id": 5000618101,
+   "title": "Manager - Compliance (PMS)",
+   "company_name": "Groww",
+   "location": {
+    "name": "Bengaluru-VTP, India"
+   },
+   "absolute_url": "https://job-boards.eu.greenhouse.io/groww/jobs/5000618101",
+   "first_published": "2026-10-12T01:47:03-04:00",
+   "updated_at": "2026-10-12T01:47:03-04:00",
+   "application_deadline": null
+  },
+  {
+   "id": 4714065101,
+   "title": "Portfolio Specialist - Wealth",
+   "company_name": "Groww",
+   "location": {
+    "name": "Bengaluru-VTP, India"
+   },
+   "absolute_url": "https://job-boards.eu.greenhouse.io/groww/jobs/4714065101",
+   "first_published": "2026-03-17T06:24:17-04:00",
+   "updated_at": "2026-10-21T02:58:44-04:00",
+   "application_deadline": null
+  },
+  {
+   "id": 4980317101,
+   "title": "Procurement Specialist",
+   "company_name": "Groww",
+   "location": {
+    "name": "Bengaluru-VTP, India"
+   },
+   "absolute_url": "https://job-boards.eu.greenhouse.io/groww/jobs/4980317101",
+   "first_published": "2026-10-14T11:07:00-04:00",
+   "updated_at": "2026-10-14T11:07:00-04:00",
+   "application_deadline": null
+  },
+  {
+   "id": 4714061101,
+   "title": "Product Research Specialist (W from Groww)",
+   "company_name": "Groww",
+   "location": {
+    "name": "Bengaluru-VTP, India"
+   },
+   "absolute_url": "https://job-boards.eu.greenhouse.io/groww/jobs/4714061101",
+   "first_published": "2026-02-16T12:43:45-05:00",
+   "updated_at": "2026-10-06T06:31:05-04:00",
+   "application_deadline": null
+  },
+  {
+   "id": 4528370101,
+   "title": "Relationship Manager",
+   "company_name": "Groww",
+   "location": {
+    "name": "India"
+   },
+   "absolute_url": "https://job-boards.eu.greenhouse.io/groww/jobs/4528370101",
+   "first_published": "2026-09-09T07:03:10-04:00",
+   "updated_at": "2026-09-09T07:05:30-04:00",
+   "application_deadline": null
+  },
+  {
+   "id": 4956817101,
+   "title": "Video Editor Intern",
+   "company_name": "Groww",
+   "location": {
+    "name": "Bengaluru-VTP, India"
+   },
+   "absolute_url": "https://job-boards.eu.greenhouse.io/groww/jobs/4956817101",
+   "first_published": "2026-09-04T06:29:58-04:00",
+   "updated_at": "2026-09-17T08:11:44-04:00",
+   "application_deadline": null
+  }
+ ]
+}

@@ -2,31 +2,55 @@
 
 **Your experience. Your next move.**
 
-Meritwing helps business-school students turn what they personally did in a venture or project
-into relevant internship application content — for operations, supply chain, growth, marketing
-or any other function.
+Meritwing helps business-school students find current openings that fit what they have actually
+done in a venture or project, then tailor their resume for the one they choose — for operations,
+supply chain, growth, marketing or any other function.
 
-**Target user:** MBA, PGDM and other business-school students in India applying for internships,
-who have real venture or project experience but find it hard to describe their own contribution.
+**Target user:** MBA, PGDM and other business-school students in India looking for internships or
+full-time roles, who have real venture or project experience but find it hard to describe their own
+contribution.
 
 **Live prototype:** <https://meritwing.vercel.app>
 
-> **Prototype status:** the three-step onboarding, resume reading, AI follow-up questions, AI-written
-> resume bullets for the project and the review screen work. A requirement-to-experience map and a
-> suitability answer are **not built yet**, and the app never shows simulated AI output. The AI features
-> need a Google Gemini API key on the server (see [Environment variables](#environment-variables));
-> without one, the app explains that they aren't set up and lets the student continue.
+> **Prototype status:** resume reading, the venture step, a confirmed candidate profile, job
+> preferences, real openings from employer careers boards with transparent matching, AI follow-up
+> questions, AI-written resume bullets and the review screen work. Job coverage is limited to the
+> employer boards listed in [Job sources](#job-sources); it is not every job online. The app never
+> shows simulated jobs or AI output. The AI features need a Google Gemini API key on the server (see
+> [Environment variables](#environment-variables)); without one, the app explains that they aren't
+> set up and lets the student continue with their own words.
 
 ## What works today
 
-- **Three-step onboarding**, with progress, Back/Continue and inputs kept between steps:
-  1. **Let's start** — full name, plus upload a resume (PDF), paste resume text, or continue
+- **Five-stage flow**, with progress, Back/Continue and inputs kept between steps:
+  1. **Resume** — full name, plus upload a resume (PDF), paste resume text, or continue
      without a resume. Optional *Additional details*: email, phone, State / Union Territory,
      business school, programme and graduation year.
-  2. **What did you do?** — project or venture name, what the project was about, and what you
-     personally did. Optional results, with whether they were yours or shared with the team.
-  3. **Which internship?** — paste the job description; title and company are suggested from it
-     and stay editable.
+  2. **Your venture** — venture or project name, what it was about, and what you personally did.
+     Optional results, with whether they were yours or shared with the team.
+  3. **Profile** — Gemini proposes short profile items from the resume and venture details, each
+     showing the exact words it came from. The server drops items whose quoted words aren't in the
+     student's text or that add to them (numbers, tools, leadership, changed quantities, or more than
+     one new word). The student edits, removes or adds items and confirms them. If AI isn't available
+     they can use their own lines unchanged. Then the student chooses job preferences: internship,
+     full-time or either; roles (operations, supply chain & procurement, growth, marketing, sales,
+     strategy, product, finance, analytics, people, customer success); cities or anywhere in India; and
+     on-site or remote. Preferences are pre-filled only when the student's own text states them, with
+     the words shown.
+  4. **Jobs** — current openings from the employer boards, filtered by plain rules on each listing's
+     own words (see [How matching works](#how-matching-works)). Each opening shows role, company,
+     location, employment type and workplace (or "not stated"), posting date when the board gives one,
+     retrieval time, and links to the original posting and application. For the first openings,
+     Gemini explains *why it may fit* — each reason cites a confirmed profile item and quotes the
+     listing — and lists requirements quoted from the listing that the profile doesn't show. No scores
+     or percentages. The page says which boards were searched, how many listings each rule left out,
+     and which sources weren't searched. When nothing matches it says so and never widens the search
+     on its own.
+  5. **Tailor** — choosing an opening fills the job description with the employer's own text
+     (credited and linked), then the existing follow-up questions, draft review, AI bullets, Copy as
+     text and Download PDF work as before. *Paste a job description instead* keeps the original route
+     for a job found elsewhere, and choosing a listing never silently replaces a description the
+     student typed.
 - **Resume reading** (no AI): text is extracted from text-based PDFs up to 5 MB, sorted into
   sections by simple rules, and used to fill empty details (never overwriting what the student
   typed). Scanned or unreadable PDFs fall back to pasting text. Students can check and edit
@@ -36,7 +60,7 @@ who have real venture or project experience but find it hard to describe their o
   text is listed under *Lines we couldn't place*.
 - **Searchable dropdowns** for State / Union Territory (all 36) and business school (129
   institutions from NIRF 2025 plus verified additions, with free entry for any other school).
-- **AI follow-up questions** after step 3 (*A few quick questions*): Google Gemini reads the project
+- **AI follow-up questions** after the job description (*A few quick questions*): Google Gemini reads the project
   description, what the student personally did, any results, the resume sections and the job
   description, and asks **at most three** short questions about the student's own contribution —
   or none when nothing important is missing. Each question has an *I don't know / Skip* option;
@@ -75,10 +99,68 @@ who have real venture or project experience but find it hard to describe their o
 - **Clear my data** removes everything entered and read in the session.
 - Responsive layout that works on mobile.
 
+## Job sources
+
+Meritwing reads the **public careers boards** of the employers in
+[`src/data/employers.json`](src/data/employers.json), through the documented, key-free
+[Greenhouse Job Board API](https://docs.greenhouse.io/job-board.html) and
+[Lever Postings API](https://github.com/lever/postings-api). These APIs list only published
+openings, and openings whose Greenhouse application deadline has passed are left out. Boards are
+read by the app's server and cached for 20 minutes; nothing about the student is sent to them.
+
+**Connected (checked 22 Oct 2026, each had India-based openings):** Meesho, CRED, Zeta, FamPay,
+Mindtickle and Pocket FM (Lever); Groww, InMobi, Glance, Druva, and the Indian offices of Stripe,
+Agoda, Airbnb, Deliveroo, Coinbase and Figma (Greenhouse). **Listed but disabled:** Paytm (Lever),
+whose board took over 50 seconds to download.
+
+**To add an employer:** find the board token in its careers URL (`boards.greenhouse.io/<token>` or
+`jobs.lever.co/<token>`), check that `https://boards-api.greenhouse.io/v1/boards/<token>/jobs` or
+`https://api.lever.co/v0/postings/<token>?mode=json` returns its jobs, and add an entry to
+`employers.json`. Set `enabled` to `false` with a `disabledReason` to keep it listed but not searched.
+
+**Not connected:**
+
+| Source | Why | What enabling it would need |
+|---|---|---|
+| Adzuna API | No credentials, and Adzuna's documentation doesn't confirm India support | An Adzuna developer key (free tier is for evaluation; commercial use needs a licence), then a check that `/jobs/in/` returns Indian listings |
+| LinkedIn via Apify | The app has no Apify token. Actors that read public LinkedIn job listings without a login exist (e.g. `curious_coder/linkedin-jobs-scraper`, about $0.001–0.002 per job; Apify's free plan includes $5 of monthly credit), but runs take longer than a page request and LinkedIn's terms restrict automated collection | An Apify API token on the server, a spending limit, background runs with cached results, and a decision on LinkedIn's terms. LinkedIn logins are never requested |
+| Naukri, Internshala, Unstop, Indeed | No permitted public API (Naukri's terms prohibit scraping) | — |
+
+## How matching works
+
+Every rule is a plain check on the employer's own words, applied in this order, and the page counts
+how many listings each rule left out:
+
+1. **India-based:** a location naming India, an Indian state or a major Indian city.
+2. **Open:** not past a stated application deadline.
+3. **Type:** *internship* when the title or the employer's employment type says intern; *full-time*
+   when the employer says full time, permanent or trainee. Listings that state neither are shown for
+   full-time searches, labelled "Type not stated".
+4. **Function:** one of the chosen functions' keywords in the job title (ranked first) or team name,
+   e.g. operations: "operations", "fulfilment", "last mile"; supply chain: "procurement",
+   "logistics", "sourcing". Phrases such as "people operations" don't count as operations. The full
+   keyword lists are in [`src/lib/jobs/taxonomy.ts`](src/lib/jobs/taxonomy.ts).
+5. **Workplace:** remote-only searches need a remote listing; on-site searches leave remote ones out.
+6. **Location:** a chosen city (with aliases such as Bangalore, Gurugram), or anywhere in India.
+   Listings naming no city are left out unless the student chooses to include them.
+7. **Level:** technical or specialist titles (engineer, designer, editor…) and senior titles (senior,
+   lead, head, director…) are left out; "Chief of Staff" is kept.
+8. **Duplicates:** the same company, title and location (or the same link) appear once.
+
+Results show openings whose title names the student's interest first, then the newest. Fit notes
+come from Gemini and are labelled *AI interpretation*; every reason must cite a confirmed profile
+item and quote the listing, and every unmet requirement must be quoted from the listing, or the
+server drops it.
+
 ## Unfinished or not yet built
 
-- **Requirement-to-experience map and suitability answer** — *not implemented. Nothing in the app
-  simulates them.*
+- **Job coverage** is limited to the employer boards above, mostly technology and consumer
+  companies. Internships are scarce on them: on 22 Oct 2026 only about five India-based internships
+  were listed across all boards, none in operations, supply chain, growth or marketing. Most Indian
+  business-school internships are posted on LinkedIn, Naukri, Internshala, Unstop or campus portals,
+  which aren't connected.
+- Many Greenhouse boards don't state employment type or workplace; the app says "not stated" rather
+  than guessing.
 - AI bullets cover the **project entry only**. Resume experience lines are shown in the student's own
   words, so some read like notes.
 - The bullet checks are word-based rules. They catch invented numbers, names, common tool words,
@@ -111,6 +193,11 @@ who have real venture or project experience but find it hard to describe their o
 - **AI resume bullets** send the same information plus the student's answered follow-up questions,
   under the same rules: no name or contact details, nothing logged, and only when the student asks
   for bullets after confirming their facts.
+- **Profile reading** sends the resume sections and venture details; **fit notes** send only the
+  confirmed profile items and the public listings. Same rules: no name or contact details, nothing
+  logged.
+- **Job searches** send nothing about the student anywhere: the server downloads the employers'
+  public boards and filters them itself, using only the chosen preferences.
 - All answers live only in the open browser tab and are cleared on refresh or with *Clear my data*.
 - On Vercel, request bodies are limited to 4.5 MB, so PDFs between 4.5 MB and 5 MB are rejected
   there; the app then suggests pasting the text instead.
@@ -155,9 +242,10 @@ free quota or a busy model), and let the student continue. Requests are never re
 
 The follow-up questions and the resume bullets use AI, and all provider-specific code lives in
 `src/lib/ai/providers/`. Each feature's prompt, output shape (a Zod schema) and server-side checks
-are provider-neutral: `src/lib/ai/clarifyPrompt.ts` (at most three new questions) and
-`src/lib/ai/bulletsPrompt.ts` (up to five bullets, with the grounding checks). Both API routes share
-`src/lib/ai/route.ts`.
+are provider-neutral: `src/lib/ai/clarifyPrompt.ts` (at most three new questions),
+`src/lib/ai/bulletsPrompt.ts` (up to five bullets, with the grounding checks), `profilePrompt.ts`
+(profile items with quoted evidence) and `matchPrompt.ts` (fit notes and unmet requirements). The AI
+routes share `src/lib/ai/route.ts`.
 
 To add another provider:
 
@@ -204,7 +292,10 @@ interface, with Zod-validated structured output for follow-up questions and resu
 ## Project structure
 
 ```
-src/app/                      page, layout, the PDF extraction route, /api/clarify and /api/bullets
+src/app/                      page, layout, the PDF extraction route, /api/profile, /api/jobs/search,
+                              /api/jobs/explain, /api/clarify and /api/bullets
+src/data/employers.json       the employer careers boards searched for jobs (configurable)
+src/lib/jobs/                 board readers, matching rules and filters, job types
 src/components/               workspace, steps, bullets panel, searchable dropdown, resume preview
 src/lib/                      validation, resume parsing and checks, preview builder, bullet facts
 src/lib/ai/                   AI provider interface, shared route handling, prompts, checks, providers/

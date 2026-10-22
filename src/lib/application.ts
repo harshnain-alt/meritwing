@@ -113,19 +113,34 @@ export const emptyApplication: ApplicationData = {
   },
 };
 
+/** The steps with forms that are validated: resume, venture, and the job description to tailor for. */
 export const STEPS = [
-  { id: 1, label: "Let’s start" },
-  { id: 2, label: "What did you do?" },
-  { id: 3, label: "Which internship?" },
+  { id: 1, label: "Resume" },
+  { id: 2, label: "Your venture" },
+  { id: 3, label: "Job description" },
 ] as const;
 
 export type StepId = (typeof STEPS)[number]["id"];
 
-/** The three steps, then follow-up questions, then the draft view where facts are checked. */
-export type View = StepId | "questions" | "draft";
+/**
+ * Resume and venture, then the confirmed profile and preferences, matching jobs, the chosen
+ * job's description, follow-up questions, and the draft view where facts are checked.
+ */
+export type View = StepId | "profile" | "jobs" | "questions" | "draft";
 
+export const PROFILE_VIEW = "profile";
+export const JOBS_VIEW = "jobs";
 export const QUESTIONS_VIEW = "questions";
 export const DRAFT_VIEW = "draft";
+
+/** The progress bar: each stage and the views it covers, in order. */
+export const PROGRESS: { id: View; label: string; covers: View[] }[] = [
+  { id: 1, label: "Resume", covers: [1] },
+  { id: 2, label: "Your venture", covers: [2] },
+  { id: PROFILE_VIEW, label: "Profile", covers: [PROFILE_VIEW] },
+  { id: JOBS_VIEW, label: "Jobs", covers: [JOBS_VIEW] },
+  { id: 3, label: "Tailor", covers: [3, QUESTIONS_VIEW, DRAFT_VIEW] },
+];
 
 // Fixed range keeps the page free of the current date, so it prerenders identically.
 export const GRAD_YEARS = Array.from({ length: 2034 - 2018 + 1 }, (_, i) => String(2018 + i));

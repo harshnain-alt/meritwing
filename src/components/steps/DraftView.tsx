@@ -134,7 +134,7 @@ export function DraftView({
               onRefresh={onRefreshQuestions}
             />
 
-            <SummaryCard title="Internship" onEdit={() => onEdit(3)}>
+            <SummaryCard title="Job" onEdit={() => onEdit(3)}>
               <Item label="Title" value={internship.title} />
               <Item label="Company" value={internship.company} />
               <Item label="Description" value={internship.description} clamp />

@@ -1,0 +1,30 @@
+{
+  "about": "Employers whose public Greenhouse or Lever job boards Meritwing searches. Each board was checked on the date shown and had India-based openings then. To add an employer, find the board token in its careers URL (boards.greenhouse.io/<token> or jobs.lever.co/<token>), check that https://boards-api.greenhouse.io/v1/boards/<token>/jobs or https://api.lever.co/v0/postings/<token>?mode=json returns its jobs, and add an entry. Set enabled to false, with a reason, to keep an employer listed but not searched.",
+  "employers": [
+    { "name": "Meesho", "ats": "lever", "token": "meesho", "sector": "E-commerce", "enabled": true, "checked": "2026-10-22" },
+    { "name": "CRED", "ats": "lever", "token": "cred", "sector": "Fintech", "enabled": true, "checked": "2026-10-22" },
+    { "name": "Zeta", "ats": "lever", "token": "zeta", "sector": "Fintech", "enabled": true, "checked": "2026-10-22" },
+    { "name": "FamPay", "ats": "lever", "token": "fampay", "sector": "Fintech", "enabled": true, "checked": "2026-10-22" },
+    { "name": "Mindtickle", "ats": "lever", "token": "mindtickle", "sector": "SaaS", "enabled": true, "checked": "2026-10-22" },
+    { "name": "Pocket FM", "ats": "lever", "token": "pocketfm", "sector": "Media", "enabled": true, "checked": "2026-10-22" },
+    { "name": "Groww", "ats": "greenhouse", "token": "groww", "sector": "Fintech", "enabled": true, "checked": "2026-10-22" },
+    { "name": "InMobi", "ats": "greenhouse", "token": "inmobi", "sector": "Advertising technology", "enabled": true, "checked": "2026-10-22" },
+    { "name": "Glance", "ats": "greenhouse", "token": "glance", "sector": "Consumer technology", "enabled": true, "checked": "2026-10-22" },
+    { "name": "Druva", "ats": "greenhouse", "token": "druva", "sector": "SaaS", "enabled": true, "checked": "2026-10-22" },
+    { "name": "Stripe", "ats": "greenhouse", "token": "stripe", "sector": "Payments (global, India offices)", "enabled": true, "checked": "2026-10-22" },
+    { "name": "Agoda", "ats": "greenhouse", "token": "agoda", "sector": "Travel (global, India offices)", "enabled": true, "checked": "2026-10-22" },
+    { "name": "Airbnb", "ats": "greenhouse", "token": "airbnb", "sector": "Travel (global, India offices)", "enabled": true, "checked": "2026-10-22" },
+    { "name": "Deliveroo", "ats": "greenhouse", "token": "deliveroo", "sector": "Food delivery (global, India offices)", "enabled": true, "checked": "2026-10-22" },
+    { "name": "Coinbase", "ats": "greenhouse", "token": "coinbase", "sector": "Fintech (global, India offices)", "enabled": true, "checked": "2026-10-22" },
+    { "name": "Figma", "ats": "greenhouse", "token": "figma", "sector": "Software (global, India offices)", "enabled": true, "checked": "2026-10-22" },
+    {
+      "name": "Paytm",
+      "ats": "lever",
+      "token": "paytm",
+      "sector": "Fintech",
+      "enabled": false,
+      "checked": "2026-10-22",
+      "disabledReason": "Its board is over 2 MB and took more than 50 seconds to download, longer than a search can wait."
+    }
+  ]
+}
