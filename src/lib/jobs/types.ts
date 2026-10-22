@@ -37,6 +37,12 @@ export type JobListing = {
   workplace: Workplace;
   /** ISO date the board says the opening was first published or created, or null if not given. */
   postedAt: string | null;
+  /** Pay as the board states it (e.g. "US$200,000 – US$230,000 per year"), or null when the board gives none. */
+  salary: string | null;
+  /** The smallest "N years of experience" the listing states, or null. */
+  requiredYears: number | null;
+  /** That requirement in the listing's terms, e.g. "3–5 years" or "2+ years", or null. */
+  experience: string | null;
   /** The employer's own page for the opening. */
   url: string;
   applyUrl: string;

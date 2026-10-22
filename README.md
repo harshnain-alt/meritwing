@@ -37,7 +37,16 @@ contribution.
      strategy, product, finance, analytics, people, customer success); cities or anywhere in India; and
      on-site or remote. Preferences are pre-filled only when the student's own text states them, with
      the words shown.
-  4. **Jobs** — current openings from the employer boards, filtered by plain rules on each listing's
+  4. **Jobs** — a job board: a compact profile summary with *Edit profile*; search (title, company
+     or keyword) and filters for role, location, internship/full-time and on-site/remote, which
+     search again straight away; and clean cards with title, company, location, work arrangement,
+     employment type, stated experience, salary only when the board states it, posting date, a
+     one-line reason it matches, and three buttons. **Apply now** opens the employer's application
+     page (Lever) or job page (Greenhouse, where applications are made) in a new tab; Meritwing never
+     submits anything. **View details** opens a panel with why it matches (the evidence, plus AI fit
+     notes prepared on opening), missing qualifications, responsibilities and requirements in the
+     employer's own words, and the source. **Tailor my resume** uses that job's description in the
+     resume workflow below. Openings come from the employer boards, filtered by plain rules on each listing's
      own words (see [How matching works](#how-matching-works)). Each opening shows role, company,
      location, employment type and workplace (or "not stated"), posting date when the board gives one,
      retrieval time, and links to the original posting and application. For the first openings,
@@ -171,7 +180,7 @@ asks for that the profile doesn't show: an experience requirement above the prof
 and (with AI fit notes) quoted requirements. Fit notes come from Gemini and are labelled
 *AI interpretation*; every reason must cite a confirmed profile item and quote at least four words of
 the listing, and every unmet requirement must be quoted from the listing, or the server drops it.
-AI fit notes are requested for the three highest-ranked openings, and on request for others.
+AI fit notes are prepared when the student opens an opening's details, not for every result.
 
 ## Unfinished or not yet built
 

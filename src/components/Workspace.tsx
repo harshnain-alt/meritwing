@@ -6,7 +6,7 @@ import { bulletsForResume, NO_BULLETS, toWritten, type BulletsState } from "@/co
 import { DraftView } from "@/components/steps/DraftView";
 import { ExperienceStep } from "@/components/steps/ExperienceStep";
 import { InternshipStep } from "@/components/steps/InternshipStep";
-import { EXPLAIN_BATCH, JobsView, NO_JOBS, type JobsState } from "@/components/steps/JobsView";
+import { JobsView, NO_JOBS, type JobsState } from "@/components/steps/JobsView";
 import { NO_PROFILE, ProfileView, type PreferenceErrors, type ProfileState } from "@/components/steps/ProfileView";
 import { NO_CLARIFY, QuestionsView, type Answer, type ClarifyState } from "@/components/steps/QuestionsView";
 import { StartStep } from "@/components/steps/StartStep";
@@ -73,8 +73,8 @@ const COPY: Record<View, { eyebrow: string; title: string; intro: string }> = {
   },
   jobs: {
     eyebrow: "Step 4 of 5",
-    title: "Matching openings",
-    intro: "Current openings from employer careers boards that match your preferences. Choose one to tailor your resume for it.",
+    title: "Jobs for you",
+    intro: "Current openings from employer careers boards, ranked by evidence from your profile. Apply on the employer’s site, or tailor your resume first.",
   },
   3: {
     eyebrow: "Step 5 of 5 · Tailor",
@@ -167,6 +167,8 @@ export function Workspace() {
   const [visited, setVisited] = useState<View[]>([1]);
   // One controller for every profile, search and explanation request, so Clear my data can stop them all.
   const requests = useRef(new Set<AbortController>());
+  const searchSeq = useRef(0);
+  const filterTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const headingRef = useRef<HTMLHeadingElement>(null);
   const isFirstRender = useRef(true);
@@ -344,29 +346,41 @@ export function Workspace() {
     if (profile.status === "idle") void requestProfile();
   }
 
-  /** Searches the employer boards with exactly the student's preferences, then explains the first few matches. */
+  /**
+   * Searches the employer boards with exactly the student's preferences. Earlier results stay on
+   * screen while it runs, and AI fit notes already prepared are kept. Only the latest search counts.
+   */
   async function runSearch(searchPrefs: JobPreferences = prefs) {
     const key = JSON.stringify(searchPrefs);
+    const seq = ++searchSeq.current;
     setExplainError(null);
-    setJobs({ ...NO_JOBS, status: "loading", prefsKey: key });
+    setJobs((j) => ({ ...j, status: "loading", prefsKey: key, error: null }));
     const res = await postJson("/api/jobs/search", searchPrefs);
-    if (!res) return;
+    if (!res || seq !== searchSeq.current) return;
     const result = res.json?.result as JobSearchResult | undefined;
     if (!res.ok || !result) {
       setJobs((j) => ({ ...j, status: "error", error: res.json?.error?.message ?? "The job boards couldn't be searched. Check your connection and try again." }));
       return;
     }
-    setJobs({ ...NO_JOBS, status: "ready", prefsKey: key, result });
-    // AI fit notes for the openings with the most evidence first.
-    const top = rankJobs(result.jobs, confirmedFacts, {}, new Date(result.searchedAt)).slice(0, EXPLAIN_BATCH).map((r) => r.job);
-    if (confirmedFacts.length && top.length) void explain(top, result);
+    setJobs((j) => ({ ...j, status: "ready", prefsKey: key, result }));
+  }
+
+  /** Filters on the jobs page search straight away (after a short pause), but only with complete preferences. */
+  function changeFilters(patch: Partial<JobPreferences>) {
+    const next = { ...prefs, ...patch };
+    setPrefs(next);
+    if (filterTimer.current) clearTimeout(filterTimer.current);
+    if (!next.roles.length || !next.locations.length || !next.employmentType || !next.workplace) return;
+    filterTimer.current = setTimeout(() => void runSearch(next), 450);
   }
 
   /** Asks AI how the confirmed profile relates to these openings. */
   async function explain(targets: JobListing[], result: JobSearchResult | null = jobs.result) {
     if (!targets.length || !result) return;
     if (!confirmedFacts.length) {
-      setExplainError({ code: "invalid_input", retryable: false, message: "Confirm at least one profile item first." });
+      const message = "Confirm at least one profile item first (Edit profile).";
+      setExplainError({ code: "invalid_input", retryable: false, message });
+      setJobs((j) => ({ ...j, explanations: { ...j.explanations, ...Object.fromEntries(targets.map((t) => [t.id, { status: "error" as const, message }])) } }));
       return;
     }
     setExplainError(null);
@@ -657,8 +671,8 @@ export function Workspace() {
         : "Continue";
 
   return (
-    <div className={`mx-auto w-full px-4 pb-16 sm:px-6 ${view === DRAFT_VIEW ? "max-w-6xl" : "max-w-2xl"}`}>
-      <div className={`pt-6 sm:pt-8 ${view === DRAFT_VIEW ? "max-w-2xl" : ""}`}>
+    <div className={`mx-auto w-full px-4 pb-16 sm:px-6 ${view === DRAFT_VIEW ? "max-w-6xl" : view === JOBS_VIEW ? "max-w-4xl" : "max-w-2xl"}`}>
+      <div className={`pt-6 sm:pt-8 ${view === DRAFT_VIEW || view === JOBS_VIEW ? "max-w-2xl" : ""}`}>
         <StepIndicator
           current={view}
           onSelect={setView}
@@ -789,21 +803,24 @@ export function Workspace() {
             jobs={jobs}
             ranked={ranked}
             prefs={prefs}
-            outdated={jobsOutdated}
+            prefsError={
+              !prefs.roles.length ? "Choose at least one role to search." : !prefs.locations.length ? "Choose at least one location to search." : null
+            }
+            profile={{
+              name: data.about.fullName.trim(),
+              education: [data.about.school, data.about.programme].map((s) => s.trim()).filter(Boolean).join(", "),
+              items: confirmedFacts,
+            }}
             explanationsOutdated={explanationsOutdated}
             selectedJobId={selectedJob?.job.id ?? null}
             hasOwnDescription={hasOwnDescription}
+            explainError={explainError}
+            onPrefs={changeFilters}
             onSearch={() => void runSearch()}
             onExplain={(ids) => void explain((jobs.result?.jobs ?? []).filter((j) => ids.includes(j.id)))}
             onSelect={selectJob}
-            onEditPreferences={() => setView(PROFILE_VIEW)}
+            onEditProfile={() => setView(PROFILE_VIEW)}
             onPasteOwn={() => goTo(3)}
-            onIncludeCityNotStated={() => {
-              const next = { ...prefs, includeCityNotStated: true };
-              setPrefs(next);
-              void runSearch(next);
-            }}
-            explainError={explainError}
           />
         )}
         {view === 3 && (

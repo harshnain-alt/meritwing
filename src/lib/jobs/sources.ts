@@ -30,6 +30,8 @@ export type RawListing = {
   team: string;
   workplaceRaw?: string;
   postedAt: string | null;
+  /** Pay exactly as the board states it, or null. */
+  salary: string | null;
   /** Greenhouse application deadline, if set (ISO). */
   deadline: string | null;
   url: string;
@@ -74,6 +76,29 @@ export function htmlToText(html: string): string {
     .trim();
 }
 
+const INTERVAL: Record<string, string> = {
+  "per-year-salary": "per year",
+  "per-month-salary": "per month",
+  "per-week-salary": "per week",
+  "per-day-wage": "per day",
+  "per-hour-wage": "per hour",
+  "one-time": "one-time",
+};
+
+/** A pay range in the board's own currency and interval, e.g. "US$200,000 – US$230,000 per year". */
+export function formatPay(min: number | undefined, max: number | undefined, currency: string | undefined, interval: string): string | null {
+  if (!currency || (min === undefined && max === undefined)) return null;
+  let fmt: (n: number) => string;
+  try {
+    const nf = new Intl.NumberFormat("en-IN", { style: "currency", currency, maximumFractionDigits: 0 });
+    fmt = (n) => nf.format(n);
+  } catch {
+    fmt = (n) => `${currency} ${n.toLocaleString("en-IN")}`;
+  }
+  const range = min !== undefined && max !== undefined && min !== max ? `${fmt(min)} – ${fmt(max)}` : fmt((min ?? max)!);
+  return interval ? `${range} ${interval}` : range;
+}
+
 type LeverPosting = {
   id: string;
   text: string;
@@ -86,6 +111,7 @@ type LeverPosting = {
   descriptionPlain?: string;
   lists?: { text: string; content: string }[];
   additionalPlain?: string;
+  salaryRange?: { min?: number; max?: number; currency?: string; interval?: string };
 };
 
 type GreenhouseJob = {
@@ -99,6 +125,8 @@ type GreenhouseJob = {
   application_deadline?: string | null;
   departments?: { name: string }[];
   content?: string;
+  metadata?: { name: string; value: unknown }[] | null;
+  pay_input_ranges?: { min_cents?: number; max_cents?: number; currency_type?: string }[];
 };
 
 export function fromLever(employer: Employer, postings: LeverPosting[]): RawListing[] {
@@ -115,6 +143,7 @@ export function fromLever(employer: Employer, postings: LeverPosting[]): RawList
       team: [c.department, c.team].filter(Boolean).join(" · "),
       workplaceRaw: p.workplaceType,
       postedAt: typeof p.createdAt === "number" ? new Date(p.createdAt).toISOString() : null,
+      salary: p.salaryRange ? formatPay(p.salaryRange.min, p.salaryRange.max, p.salaryRange.currency, INTERVAL[p.salaryRange.interval ?? ""] ?? "") : null,
       deadline: null,
       url: p.hostedUrl,
       applyUrl: p.applyUrl ?? p.hostedUrl,
@@ -127,22 +156,31 @@ export function fromLever(employer: Employer, postings: LeverPosting[]): RawList
 
 export function fromGreenhouse(employer: Employer, jobs: GreenhouseJob[]): RawListing[] {
   const boardUrl = `https://boards.greenhouse.io/${employer.token}`;
-  return jobs.map((j) => ({
-    id: `greenhouse:${employer.token}:${j.id}`,
-    title: j.title.trim(),
-    company: employer.name,
-    locations: j.location?.name ? j.location.name.split(/\s*;\s*/) : [],
-    commitment: "",
-    team: (j.departments ?? []).map((d) => d.name).join(" · "),
-    postedAt: j.first_published ?? null,
-    deadline: j.application_deadline ?? null,
-    url: j.absolute_url,
-    applyUrl: j.absolute_url,
-    description: j.content ? htmlToText(j.content) : "",
-    detailUrl: `https://boards-api.greenhouse.io/v1/boards/${employer.token}/jobs/${j.id}`,
-    platform: "Greenhouse",
-    boardUrl,
-  }));
+  return jobs.map((j) => {
+    // Some employers record the employment type as a custom field.
+    const typeField = (j.metadata ?? []).find((m) => /employment type/i.test(m.name))?.value;
+    const pay = j.pay_input_ranges?.[0];
+    return {
+      id: `greenhouse:${employer.token}:${j.id}`,
+      title: j.title.trim(),
+      company: employer.name,
+      locations: j.location?.name ? j.location.name.split(/\s*;\s*/) : [],
+      commitment: typeof typeField === "string" ? typeField : "",
+      team: (j.departments ?? []).map((d) => d.name).join(" · "),
+      postedAt: j.first_published ?? null,
+      salary: pay
+        ? formatPay(pay.min_cents !== undefined ? pay.min_cents / 100 : undefined, pay.max_cents !== undefined ? pay.max_cents / 100 : undefined, pay.currency_type, "")
+        : null,
+      deadline: j.application_deadline ?? null,
+      url: j.absolute_url,
+      // Greenhouse applications are made on the job page itself.
+      applyUrl: j.absolute_url,
+      description: j.content ? htmlToText(j.content) : "",
+      detailUrl: `https://boards-api.greenhouse.io/v1/boards/${employer.token}/jobs/${j.id}`,
+      platform: "Greenhouse" as const,
+      boardUrl,
+    };
+  });
 }
 
 async function getJson(url: string, fetcher: Fetcher, timeoutMs: number): Promise<unknown> {
@@ -162,7 +200,7 @@ export async function readBoard(employer: Employer, fetcher: Fetcher = fetch, no
         ? fromLever(employer, (await getJson(`https://api.lever.co/v0/postings/${employer.token}?mode=json`, fetcher, BOARD_TIMEOUT_MS)) as LeverPosting[])
         : fromGreenhouse(
             employer,
-            ((await getJson(`https://boards-api.greenhouse.io/v1/boards/${employer.token}/jobs`, fetcher, BOARD_TIMEOUT_MS)) as { jobs: GreenhouseJob[] }).jobs,
+            ((await getJson(`https://boards-api.greenhouse.io/v1/boards/${employer.token}/jobs?pay_transparency=true`, fetcher, BOARD_TIMEOUT_MS)) as { jobs: GreenhouseJob[] }).jobs,
           );
     cache.set(key, { at: now, listings });
     return { employer, ok: true, listings };

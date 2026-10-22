@@ -1,3 +1,4 @@
+import { experienceLabel, requiredYears } from "@/lib/jobs/evidence";
 import { EMPLOYERS, readBoard, withDescriptions, type Employer, type Fetcher, type RawListing } from "@/lib/jobs/sources";
 import {
   ANYWHERE_IN_INDIA,
@@ -135,6 +136,9 @@ export async function searchJobs(
     employmentTypeText: k.listing.commitment,
     workplace: k.workplace,
     postedAt: k.listing.postedAt,
+    salary: k.listing.salary,
+    requiredYears: requiredYears(described[i].description),
+    experience: experienceLabel(described[i].description),
     url: k.listing.url,
     applyUrl: k.listing.applyUrl,
     source: { platform: k.listing.platform, employer: k.listing.company, boardUrl: k.listing.boardUrl },

@@ -49,15 +49,31 @@ export function termsIn(text: string): Set<string> {
   return new Set(TERMS.filter((t) => t.phrases.some((p) => hasPhrase(cleaned, p))).map((t) => t.id));
 }
 export const termLabel = (id: string) => TERMS.find((t) => t.id === id)?.label ?? id;
+/** Labels of the generic areas (reporting, coordination…), for leaving them out of short summaries. */
+export const GENERIC_LABELS = new Set(TERMS.filter((t) => t.generic).map((t) => t.label));
+
+const YEARS = /(\d{1,2})\s*(\+|plus)?\s*(?:(?:-|–|to)\s*(\d{1,2})\s*\+?)?\s*(?:years?|yrs?)\b/gi;
+
+/** Every "N years" / "N–M years" stated near the word experience, smallest first. */
+function experienceMentions(text: string): { min: number; max: number | null }[] {
+  const found: { min: number; max: number | null }[] = [];
+  for (const m of text.matchAll(YEARS)) {
+    const around = text.slice(Math.max(0, m.index - 80), m.index + m[0].length + 80);
+    if (/experience/i.test(around)) found.push({ min: Number(m[1]), max: m[3] ? Number(m[3]) : null });
+  }
+  return found.sort((a, b) => a.min - b.min);
+}
 
 /** The smallest "N years" figure stated near the word experience, or null. */
 export function requiredYears(text: string): number | null {
-  const found: number[] = [];
-  for (const m of text.matchAll(/(\d{1,2})\s*(?:\+|plus)?\s*(?:(?:-|–|to)\s*\d{1,2}\s*\+?)?\s*(?:years?|yrs?)\b/gi)) {
-    const around = text.slice(Math.max(0, m.index - 80), m.index + m[0].length + 80);
-    if (/experience/i.test(around)) found.push(Number(m[1]));
-  }
-  return found.length ? Math.min(...found) : null;
+  return experienceMentions(text)[0]?.min ?? null;
+}
+
+/** That requirement in the listing's own terms: "3–5 years", "2+ years", or null. */
+export function experienceLabel(text: string): string | null {
+  const e = experienceMentions(text)[0];
+  if (!e) return null;
+  return e.max !== null && e.max > e.min ? `${e.min}–${e.max} years` : `${e.min}+ years`;
 }
 
 const MONTHS = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
@@ -100,10 +116,15 @@ const listedSkillFacts = (facts: ProfileFact[]) => facts.filter((f) => f.kind ==
  * only the role counts, so an employer's name or industry is never read as the student's skill.
  */
 export function workText(fact: ProfileFact): string {
-  RANGE.lastIndex = 0;
-  if (!RANGE.test(fact.text)) return fact.text;
-  RANGE.lastIndex = 0;
-  return fact.text.split(",")[0].replace(/\s+(at|with|for)\s+.*$/i, "");
+  // A statement can drop the dates its quoted words had ("Worked as Operations Trainee at Example Logistics").
+  const dated = (s: string) => {
+    RANGE.lastIndex = 0;
+    const found = RANGE.test(s);
+    RANGE.lastIndex = 0;
+    return found;
+  };
+  const jobLine = dated(fact.text) || dated(fact.evidence) || /^(worked|working|interned|served|employed) as\b/i.test(fact.text);
+  return jobLine ? fact.text.split(",")[0].replace(/\s+(at|with|for)\s+.*$/i, "") : fact.text;
 }
 
 const isGeneric = (id: string) => TERMS.find((t) => t.id === id)?.generic === true;

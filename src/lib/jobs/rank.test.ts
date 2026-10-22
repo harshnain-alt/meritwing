@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, test } from "node:test";
 import fixture from "@/lib/jobs/__fixtures__/bengaluru-listings-2026-10-22.json";
-import { jobEvidence, profileMonths, requiredYears, workText } from "@/lib/jobs/evidence";
+import { experienceLabel, jobEvidence, profileMonths, requiredYears, workText } from "@/lib/jobs/evidence";
 import { rankJobs } from "@/lib/jobs/rank";
 import type { JobListing } from "@/lib/jobs/types";
 import type { ProfileFact } from "@/lib/profile";
@@ -83,11 +83,20 @@ describe("evidence rules", () => {
   test("an employer's name in a job line isn't read as the student's work", () => {
     assert.equal(workText(fact("F1", "Operations Trainee, Example Logistics, Jun 2023 - Apr 2024")), "Operations Trainee");
     assert.equal(workText(fact("F1", "Worked as Analyst at Example Logistics from Jun 2023 to Apr 2024")), "Worked as Analyst");
+    // The statement lost its dates; its quoted words still show it's a job line.
+    assert.equal(
+      workText({ ...fact("F1", "Worked as Operations Trainee at Example Logistics."), evidence: "Operations Trainee, Example Logistics, Jun 2023 - Apr 2024" }),
+      "Worked as Operations Trainee",
+    );
+    assert.equal(workText(fact("F1", "Worked as Intern at Example Logistics.")), "Worked as Intern");
   });
   test("experience requirements and dated experience are read from the text", () => {
     assert.equal(requiredYears("We need 3-5 years of relevant experience."), 3);
     assert.equal(requiredYears("Minimum 2+ years experience in procurement"), 2);
     assert.equal(requiredYears("A 5 year plan for our brand"), null);
+    assert.equal(experienceLabel("0-1 years of post qualification experience"), "0–1 years");
+    assert.equal(experienceLabel("Minimum 2+ years experience"), "2+ years");
+    assert.equal(experienceLabel("5 years of experience in sales"), "5+ years");
     assert.equal(profileMonths([fact("F1", "Intern, Example Co, Jun 2023 - Apr 2024")], NOW), 11);
   });
   test("AI fit notes add linked items to the ranking", () => {

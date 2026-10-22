@@ -103,7 +103,7 @@ describe("searchJobs", () => {
     const off: Employer = { name: "Off Co", ats: "lever", token: "off-co-test", sector: "Test", enabled: false, checked: "2026-10-22", disabledReason: "Too slow." };
     const growwTest: Employer = { ...GROWW, token: "groww-search-test" };
     const fetcher = async (url: string) => {
-      if (url.endsWith("/boards/groww-search-test/jobs")) return Response.json(groww);
+      if (url.includes("/boards/groww-search-test/jobs?")) return Response.json(groww);
       if (url.includes("/boards/groww-search-test/jobs/")) return Response.json({ content: "&lt;p&gt;Compare vendor quotes.&lt;/p&gt;" });
       return new Response("nope", { status: 500 });
     };
