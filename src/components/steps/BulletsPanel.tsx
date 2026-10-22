@@ -83,8 +83,8 @@ export function BulletsPanel({ state, outdated, confirmed, projectName, role, on
         </div>
         <p className="mt-1 text-sm text-muted">
           AI rewords your confirmed facts and follow-up answers as bullets for {role}. It can&apos;t add anything: a
-          bullet with a number, tool, name or claim you didn&apos;t give is removed. Review and edit each one before
-          adding it.
+          bullet with a number, tool, name or claim you didn&apos;t give, or one that changes a quantity, how often
+          or who did it, is removed. Review and edit each one before adding it.
         </p>
       </div>
 
@@ -141,7 +141,8 @@ export function BulletsPanel({ state, outdated, confirmed, projectName, role, on
           {w.removed > 0 && (
             <p className="text-sm text-ink-soft">
               {w.removed === 1 ? "One suggested bullet was" : `${w.removed} suggested bullets were`} removed because{" "}
-              {w.removed === 1 ? "it" : "they"} included details that aren&apos;t in your facts
+              {w.removed === 1 ? "it" : "they"} added details that aren&apos;t in your facts or changed what your facts
+              say
               {w.removedTerms.length ? ` (${w.removedTerms.map((t) => `“${t}”`).join(", ")})` : ""}.
             </p>
           )}

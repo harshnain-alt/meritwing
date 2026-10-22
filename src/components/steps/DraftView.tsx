@@ -1,4 +1,4 @@
-import { useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Checkbox } from "@/components/Field";
 import { ResumePreview } from "@/components/ResumePreview";
 import {
@@ -306,21 +306,46 @@ function Version({ label, text }: { label: string; text: string }) {
   );
 }
 
+/** Loads the PDF code, trying once more after a short pause if the first load fails (e.g. a dropped connection). */
+async function loadPdfModule() {
+  try {
+    return await import("@/lib/resumePdf");
+  } catch {
+    await new Promise((r) => setTimeout(r, 800));
+    return import("@/lib/resumePdf");
+  }
+}
+
+type PdfStatus =
+  | { kind: "idle" }
+  | { kind: "copied" }
+  | { kind: "manual" }
+  | { kind: "pdf-working" }
+  /** text: the preview text the PDF was made from, so a link to an outdated PDF is never shown. */
+  | { kind: "pdf-ready"; fileName: string; url: string; text: string; replaced: { from: string; to: string }[] }
+  | { kind: "pdf-failed"; stage: "load" | "create" };
+
 /**
  * Copy as text and Download PDF for the preview. Both use exactly the preview's content.
- * Copy falls back to a selectable box where the clipboard is blocked.
+ * Copy falls back to a selectable box where the clipboard is blocked. The browser can't tell
+ * the page whether a download was saved (some browsers block downloads started after async
+ * work), so the PDF stays available through a link the student can click to save it again.
  */
 function PreviewActions({ model, confirmed, aiBullets }: { model: ResumePreviewModel; confirmed: boolean; aiBullets: boolean }) {
-  const [status, setStatus] = useState<
-    | { kind: "idle" }
-    | { kind: "copied" }
-    | { kind: "manual" }
-    | { kind: "pdf-working" }
-    | { kind: "pdf-done"; fileName: string; replaced: { from: string; to: string }[] }
-    | { kind: "pdf-failed" }
-  >({ kind: "idle" });
+  const [status, setStatus] = useState<PdfStatus>({ kind: "idle" });
   const boxRef = useRef<HTMLTextAreaElement>(null);
   const text = previewToText(model);
+  const readyUrl = status.kind === "pdf-ready" ? status.url : null;
+  const ready = status.kind === "pdf-ready" && status.text === text ? status : null;
+
+  // Load the PDF code in the background while the student reviews, so the click doesn't wait on the network.
+  useEffect(() => {
+    import("@/lib/resumePdf").catch(() => {});
+  }, []);
+  // Release the previous PDF when a new one replaces it or the view closes.
+  useEffect(() => () => {
+    if (readyUrl) URL.revokeObjectURL(readyUrl);
+  }, [readyUrl]);
 
   async function copy() {
     try {
@@ -336,21 +361,28 @@ function PreviewActions({ model, confirmed, aiBullets }: { model: ResumePreviewM
   async function downloadPdf() {
     if (status.kind === "pdf-working") return;
     setStatus({ kind: "pdf-working" });
+    let createResumePdf;
     try {
-      const { createResumePdf } = await import("@/lib/resumePdf");
-      const pdf = await createResumePdf(model);
-      const url = URL.createObjectURL(pdf.blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = pdf.fileName;
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      setTimeout(() => URL.revokeObjectURL(url), 10_000);
-      setStatus({ kind: "pdf-done", fileName: pdf.fileName, replaced: pdf.replaced });
+      ({ createResumePdf } = await loadPdfModule());
     } catch {
-      setStatus({ kind: "pdf-failed" });
+      setStatus({ kind: "pdf-failed", stage: "load" });
+      return;
     }
+    let pdf;
+    try {
+      pdf = await createResumePdf(model);
+    } catch {
+      setStatus({ kind: "pdf-failed", stage: "create" });
+      return;
+    }
+    const url = URL.createObjectURL(pdf.blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = pdf.fileName;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setStatus({ kind: "pdf-ready", fileName: pdf.fileName, url, text, replaced: pdf.replaced });
   }
 
   const button =
@@ -371,20 +403,47 @@ function PreviewActions({ model, confirmed, aiBullets }: { model: ResumePreviewM
       <div role="status" className="text-sm text-muted">
         {status.kind === "copied" && <p>Copied your resume text.</p>}
         {status.kind === "pdf-working" && <p>Preparing your PDF…</p>}
-        {status.kind === "pdf-done" && (
+        {ready && (
           <>
-            <p>Downloaded {status.fileName}.</p>
-            {status.replaced.length > 0 && (
+            <p className="text-ink">
+              Your PDF is ready: {ready.fileName}. Your browser should save it to your downloads.
+            </p>
+            <p className="mt-1">
+              Not in your downloads?{" "}
+              <a
+                href={ready.url}
+                download={ready.fileName}
+                className="font-semibold text-accent underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+              >
+                Save the PDF
+              </a>
+            </p>
+            {ready.replaced.length > 0 && (
               <p className="mt-1 text-ink">
                 Some characters can&apos;t be shown in the PDF and were replaced:{" "}
-                {status.replaced.map((r) => `${r.from} → ${r.to}`).join(", ")}. Edit your text if that matters.
+                {ready.replaced.map((r) => `${r.from} → ${r.to}`).join(", ")}. Edit your text if that matters.
               </p>
             )}
           </>
         )}
-        {status.kind === "pdf-failed" && <p className="text-danger">The PDF couldn&apos;t be created. Try again, or use Copy as text.</p>}
-        {(status.kind === "idle" || status.kind === "manual") && <p>{reminder}</p>}
+        {(status.kind === "idle" || status.kind === "manual" || (status.kind === "pdf-ready" && !ready)) && <p>{reminder}</p>}
       </div>
+      {status.kind === "pdf-failed" && (
+        <div role="alert" className="rounded-lg border border-danger/25 bg-danger-soft px-4 py-3 text-sm">
+          <p className="font-semibold text-ink">
+            {status.stage === "load" ? "The PDF tool didn't load" : "The PDF couldn't be created"}
+          </p>
+          <p className="mt-0.5 text-ink-soft">
+            {status.stage === "load"
+              ? "This usually means the connection dropped. "
+              : "Something in the preview couldn't be turned into a PDF. "}
+            Your information and edits are still here. Try again, or use Copy as text.
+          </p>
+          <button type="button" onClick={downloadPdf} className={`mt-2 ${button}`}>
+            Try again
+          </button>
+        </div>
+      )}
       {status.kind === "manual" && (
         <div>
           <label htmlFor="copy-fallback" className="text-sm text-ink">

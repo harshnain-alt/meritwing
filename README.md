@@ -54,18 +54,24 @@ who have real venture or project experience but find it hard to describe their o
   *Based on*) and is marked *Your own work* or *Team achievement*; results the student marked as shared
   are always team bullets. Without numbers, bullets stay qualitative. The server then **drops any bullet
   containing a number, capitalised name or tool, common tool word (e.g. "dashboard") or leadership
-  claim ("led", "supervised") that isn't in the student's own facts**, and tells the student what was
-  removed. The resume and job description are background only, so a skill listed on the resume (e.g.
+  claim ("led", "supervised") that isn't in the student's own facts**, or that **changes their meaning**:
+  a number attached to a different thing ("quotes from three wholesalers each month" written as "three
+  monthly price quotes"), a frequency the facts don't state, a widened scope ("placed orders" written as
+  "placed every order") or an ownership claim ("independently") the student didn't make. The student is
+  told what was removed. The resume and job description are background only, so a skill listed on the resume (e.g.
   Excel) is never claimed for the project. Nothing reaches the resume until the student reviews, edits
   or excludes bullets and chooses *Add to my resume*; they can switch back to their own wording at any
   time. If their facts or answers change afterwards, the bullets are marked *Outdated* and the resume
   shows their own wording until they write them again or keep them.
-- **Copy as text** copies the preview as plain text, and **Download PDF** saves a resume-only A4
+- **Copy as text** copies the preview as plain text, and **Download PDF** creates a resume-only A4
   PDF of it, generated in the browser: real, selectable text; every line wrapped inside the
   margins; a section heading never left alone at the bottom of a page, and each bullet kept on one
   page. Characters the standard PDF fonts can't show (for example ₹ or Devanagari) are replaced
   (₹ becomes "Rs.") and the student is told which ones. Both use exactly what the preview shows,
-  including any AI bullets the student added and edited.
+  including any AI bullets the student added and edited. A page can't tell whether the browser
+  actually saved a download, so after creating the PDF the app says it is ready and keeps a
+  *Save the PDF* link until the preview changes; if the PDF code fails to load or the PDF can't be
+  created, it says which, with *Try again*, and nothing the student entered is lost.
 - **Clear my data** removes everything entered and read in the session.
 - Responsive layout that works on mobile.
 
@@ -75,8 +81,10 @@ who have real venture or project experience but find it hard to describe their o
   simulates them.*
 - AI bullets cover the **project entry only**. Resume experience lines are shown in the student's own
   words, so some read like notes.
-- The bullet checks catch invented numbers, names, common tool words and leadership claims, but not
-  every possible overstatement (for example a stronger verb for the same task). That is why the
+- The bullet checks are word-based rules. They catch invented numbers, names, common tool words,
+  leadership and ownership claims, and changes to quantities, frequency and scope, but not every
+  possible overstatement (for example a stronger verb for the same task), and they can occasionally
+  remove a fair rewording (for example a synonym for the thing a number counts). That is why the
   student reviews every bullet; their own edits aren't checked.
 - Resume and job-description extraction use simple rules, so unusual layouts may need manual
   correction (every extracted value is editable).
@@ -118,7 +126,8 @@ npm run dev
 
 Then open <http://localhost:3000>.
 
-Other scripts: `npm run lint`, `npx tsc --noEmit`, `npm run build`, `npm start`.
+Other scripts: `npm test` (regression checks for the bullet rules; no AI requests), `npm run lint`,
+`npx tsc --noEmit`, `npm run build`, `npm start`.
 
 ## Environment variables
 
