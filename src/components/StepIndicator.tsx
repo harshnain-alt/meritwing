@@ -1,7 +1,7 @@
 import { STEPS, type View } from "@/lib/application";
 
 type StepIndicatorProps = {
-  /** 1–3 for the steps; 4 (the draft view) shows every step as done. */
+  /** 1–3 for the steps; the questions and draft views show every step as done. */
   current: View;
   onSelect: (step: View) => void;
 };
@@ -12,7 +12,7 @@ export function StepIndicator({ current, onSelect }: StepIndicatorProps) {
       <ol className="grid grid-cols-3 gap-2 sm:gap-3">
         {STEPS.map((step) => {
           const isCurrent = step.id === current;
-          const isDone = step.id < current;
+          const isDone = typeof current !== "number" || step.id < current;
           const content = (
             <>
               <span className={`block h-1 rounded-full ${isCurrent || isDone ? "bg-accent" : "bg-line"}`} />

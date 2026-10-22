@@ -11,9 +11,11 @@ who have real venture or project experience but find it hard to describe their o
 
 **Live prototype:** <https://meritwing.vercel.app>
 
-> **Prototype status:** the three-step onboarding, resume reading and the review screen work.
-> **AI drafting is not connected yet.** The app says so on screen and never shows simulated AI
-> output.
+> **Prototype status:** the three-step onboarding, resume reading, AI follow-up questions and the
+> review screen work. **AI application drafting is not built yet.** The app says so on screen and
+> never shows simulated AI output. The follow-up questions need an Anthropic API key on the server
+> (see [Environment variables](#environment-variables)); without one, the app explains that they
+> aren't set up and lets the student continue.
 
 ## What works today
 
@@ -31,7 +33,16 @@ who have real venture or project experience but find it hard to describe their o
   everything that was read; the original text is kept unchanged.
 - **Searchable dropdowns** for State / Union Territory (all 36) and business school (129
   institutions from NIRF 2025 plus verified additions, with free entry for any other school).
-- **Draft workspace** after step 3: an honest "drafting isn't connected" notice, fact checks where
+- **AI follow-up questions** after step 3 (*A few quick questions*): Claude reads the project
+  description, what the student personally did, any results, the resume sections and the job
+  description, and asks **at most three** short questions about the student's own contribution —
+  or none when nothing important is missing. Each question has an *I don't know / Skip* option;
+  numbers are never required. Answers are shown back as an editable summary, kept separate from
+  notes labelled *AI interpretation*, which are never added to the student's facts. If the student
+  edits their information afterwards, the questions are marked *Outdated* and can be refreshed
+  (earlier answers are sent along so questions aren't repeated). Failures show Retry where it can
+  help, and the student can always continue without questions.
+- **Draft workspace** after the questions: an honest "drafting isn't connected" notice, fact checks where
   the resume and the answers disagree, a summary with Edit links, and a **resume layout preview**
   built only from the student's own wording, labelled *Unconfirmed* until they confirm the facts.
 - **Clear my data** removes everything entered and read in the session.
@@ -39,9 +50,8 @@ who have real venture or project experience but find it hard to describe their o
 
 ## Unfinished or not yet built
 
-- **AI analysis and drafting** — requirement-to-experience map, clarification questions (at most
-  three, with "I don't know" / skip), tailored resume bullets and a suitability answer.
-  *Not implemented. Nothing in the app simulates it.*
+- **AI application drafting** — requirement-to-experience map, tailored resume bullets and a
+  suitability answer. *Not implemented. Nothing in the app simulates it.*
 - The resume layout preview is **not AI-written**: it arranges the student's own words, so some
   lines read like notes.
 - Resume and job-description extraction use simple rules, so unusual layouts may need manual
@@ -56,7 +66,12 @@ who have real venture or project experience but find it hard to describe their o
   the size (max 5 MB) and that the file really is a PDF, extracts the text in memory with
   [unpdf](https://github.com/unjs/unpdf) (Mozilla pdf.js), and returns it. The file is **not
   saved** to disk or storage, and neither the file nor its text is logged.
-- **No AI service or third party** receives resume content in this version.
+- **AI follow-up questions** send, from the app's server to the Anthropic API: the resume's
+  education, experience, skills and additional sections, the project details, any results and the
+  job description. The student's **name, email and phone are not sent**; email addresses and phone
+  numbers inside the text are replaced with placeholders first. The API key stays on the server,
+  and neither the request nor the response is logged (only an error type and status on failure).
+  Without a configured key, nothing is sent.
 - All answers live only in the open browser tab and are cleared on refresh or with *Clear my data*.
 - On Vercel, request bodies are limited to 4.5 MB, so PDFs between 4.5 MB and 5 MB are rejected
   there; the app then suggests pasting the text instead.
@@ -76,9 +91,21 @@ Other scripts: `npm run lint`, `npx tsc --noEmit`, `npm run build`, `npm start`.
 
 ## Environment variables
 
-None are required for the current version. See [`.env.example`](.env.example). When AI drafting
-is added, its API key must be a **server-side** variable (never `NEXT_PUBLIC_…`), set in the
-hosting provider's settings and never committed.
+See [`.env.example`](.env.example). Both are **server-side only** — never prefix them with
+`NEXT_PUBLIC_`, never commit them.
+
+| Variable | Required | Purpose |
+|---|---|---|
+| `ANTHROPIC_API_KEY` | For AI follow-up questions | Anthropic API key from the Anthropic Console |
+| `ANTHROPIC_MODEL` | No | Claude model for the questions; defaults to `claude-opus-5-5` |
+
+- **Locally:** create `.env.local` in this folder (ignored by Git) with
+  `ANTHROPIC_API_KEY=…`, then restart `npm run dev`.
+- **On Vercel:** Project → Settings → Environment Variables → add `ANTHROPIC_API_KEY` for
+  Production (and Preview), mark it Sensitive, then redeploy.
+
+Everything else works without a key; the questions screen then explains that AI questions aren't
+set up yet.
 
 ## Deployment
 
@@ -98,7 +125,8 @@ npx vercel --prod
 
 ## Tech stack
 
-Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS 4 · unpdf for PDF text extraction.
+Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS 4 · unpdf for PDF text extraction ·
+Anthropic TypeScript SDK with Zod-validated structured output for follow-up questions.
 
 ## Data sources
 
@@ -110,7 +138,7 @@ Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS 4 · unpdf for
 ## Project structure
 
 ```
-src/app/                      page, layout and the PDF extraction route
+src/app/                      page, layout, the PDF extraction route and /api/clarify
 src/components/               workspace, steps, searchable dropdown, resume preview
 src/lib/                      validation, resume parsing and checks, preview builder
 data/                         business-school sources and notes

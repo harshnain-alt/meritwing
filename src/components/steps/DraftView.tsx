@@ -9,6 +9,7 @@ import {
 } from "@/lib/application";
 import { choiceFor, type ResumeCheck } from "@/lib/resumeChecks";
 import type { ResumePreviewModel } from "@/lib/resumePreview";
+import { OutdatedNotice, RelevantNotes, type Answer, type ClarifyState } from "@/components/steps/QuestionsView";
 
 type DraftViewProps = {
   data: ApplicationData;
@@ -19,13 +20,32 @@ type DraftViewProps = {
   onConfirm: (confirmed: boolean) => void;
   onResolve: (check: ResumeCheck, choice: CheckChoice) => void;
   onEdit: (step: StepId) => void;
+  clarify: ClarifyState;
+  clarifyOutdated: boolean;
+  onAnswer: (id: string, answer: Answer) => void;
+  onEarlierAnswer: (index: number, answer: string | null) => void;
+  onRefreshQuestions: () => void;
 };
 
 /**
  * Shown after the three steps. Drafting is not connected yet, so this shows only the
  * student's own information, with fact checks beside a layout preview of their wording.
  */
-export function DraftView({ data, checks, unresolved, preview, confirmed, onConfirm, onResolve, onEdit }: DraftViewProps) {
+export function DraftView({
+  data,
+  checks,
+  unresolved,
+  preview,
+  confirmed,
+  onConfirm,
+  onResolve,
+  onEdit,
+  clarify,
+  clarifyOutdated,
+  onAnswer,
+  onEarlierAnswer,
+  onRefreshQuestions,
+}: DraftViewProps) {
   const { about, experience, resume, internship } = data;
   const role = [internship.title.trim(), internship.company.trim()].filter(Boolean).join(" at ") || "this internship";
   const decisions = checks.filter((c) => c.needsDecision);
@@ -44,11 +64,11 @@ export function DraftView({ data, checks, unresolved, preview, confirmed, onConf
           <path d="M10 2a8 8 0 1 0 0 16 8 8 0 0 0 0-16Zm0 4.25a1 1 0 1 1 0 2 1 1 0 0 1 0-2Zm1 8.25H9v-5h2v5Z" />
         </svg>
         <div>
-          <p className="font-semibold text-ink">Drafting isn&apos;t connected yet</p>
+          <p className="font-semibold text-ink">Application drafting isn&apos;t connected yet</p>
           <p className="mt-0.5 text-[15px] text-ink-soft">
-            Nothing here has been written or changed by AI. When drafting is connected, Meritwing will match your
-            experience to {role}, ask at most three short questions only if essential facts are missing (you can
-            answer &ldquo;I don&apos;t know&rdquo; or skip), and give you editable application content.
+            Only the follow-up questions and the notes marked &ldquo;AI interpretation&rdquo; come from AI. Everything
+            else here is your own information, unchanged. Writing tailored application content for {role} is the
+            next step.
           </p>
         </div>
       </div>
@@ -92,6 +112,14 @@ export function DraftView({ data, checks, unresolved, preview, confirmed, onConf
               <Item label="Results" value={experience.results} />
               {experience.results.trim() && <Item label="Whose results" value={attribution} />}
             </SummaryCard>
+
+            <FollowUps
+              clarify={clarify}
+              outdated={clarifyOutdated}
+              onAnswer={onAnswer}
+              onEarlierAnswer={onEarlierAnswer}
+              onRefresh={onRefreshQuestions}
+            />
 
             <SummaryCard title="Internship" onEdit={() => onEdit(3)}>
               <Item label="Title" value={internship.title} />
@@ -248,5 +276,102 @@ function Version({ label, text }: { label: string; text: string }) {
       <p className="text-xs font-semibold uppercase tracking-wide text-muted">{label}</p>
       <p className="mt-1 whitespace-pre-wrap break-words text-sm leading-relaxed text-ink">{text}</p>
     </div>
+  );
+}
+
+/** The student's own follow-up answers (facts once confirmed), kept apart from the AI's reading. */
+function FollowUps({
+  clarify,
+  outdated,
+  onAnswer,
+  onEarlierAnswer,
+  onRefresh,
+}: {
+  clarify: ClarifyState;
+  outdated: boolean;
+  onAnswer: (id: string, answer: Answer) => void;
+  onEarlierAnswer: (index: number, answer: string | null) => void;
+  onRefresh: () => void;
+}) {
+  const button =
+    "rounded-lg border border-line-strong bg-surface px-3.5 py-2 text-sm font-semibold text-ink hover:bg-canvas focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
+
+  if (clarify.status !== "ready" || !clarify.result) {
+    return (
+      <section className="rounded-xl border border-line bg-surface px-5 py-4">
+        <h3 className="font-semibold text-ink">Follow-up questions</h3>
+        <p className="mt-1 text-sm text-muted">
+          {clarify.status === "loading"
+            ? "Preparing questions…"
+            : clarify.status === "error"
+              ? `Not prepared: ${clarify.error?.message ?? "something went wrong."}`
+              : "No follow-up questions have been prepared yet."}
+        </p>
+        {clarify.status !== "loading" && (
+          <button type="button" onClick={onRefresh} className={`mt-3 ${button}`}>
+            {clarify.status === "error" ? "Try again" : "Get follow-up questions"}
+          </button>
+        )}
+      </section>
+    );
+  }
+
+  const items = [
+    ...clarify.asked.map((a, index) => ({
+      key: `earlier-${index}`,
+      question: a.question,
+      answer: { text: a.answer ?? "", skipped: a.answer === null },
+      set: (next: Answer) => onEarlierAnswer(index, next.skipped ? null : next.text),
+    })),
+    ...clarify.result.questions.map((q) => ({
+      key: q.id,
+      question: q.question,
+      answer: clarify.answers[q.id] ?? { text: "", skipped: false },
+      set: (next: Answer) => onAnswer(q.id, next),
+    })),
+  ];
+
+  return (
+    <section aria-labelledby="followups-heading" className="space-y-3 rounded-xl border border-line bg-surface px-5 py-4">
+      <div>
+        <h3 id="followups-heading" className="font-semibold text-ink">
+          Your follow-up answers
+        </h3>
+        <p className="mt-0.5 text-xs text-muted">Your own words. They count as facts once you confirm below.</p>
+      </div>
+      {outdated && <OutdatedNotice onRefresh={onRefresh} />}
+      {items.length === 0 ? (
+        <p className="text-sm text-muted">No follow-up questions were needed.</p>
+      ) : (
+        <ul className="space-y-4">
+          {items.map((item) => (
+            <li key={item.key}>
+              <label htmlFor={`summary-${item.key}`} className="text-sm font-medium text-ink">
+                {item.question}
+              </label>
+              <textarea
+                id={`summary-${item.key}`}
+                rows={2}
+                value={item.answer.text}
+                disabled={item.answer.skipped}
+                placeholder={item.answer.skipped ? "Skipped" : "No answer yet"}
+                onChange={(e) => item.set({ text: e.target.value, skipped: false })}
+                className="mt-1.5 block w-full resize-y rounded-lg border border-line bg-surface px-3 py-2 text-sm leading-relaxed text-ink placeholder:text-faint focus:border-accent focus:outline-none focus:ring-3 focus:ring-accent/15 disabled:bg-canvas disabled:text-faint"
+              />
+              <label className="mt-1.5 inline-flex cursor-pointer items-center gap-2 text-xs text-ink-soft">
+                <input
+                  type="checkbox"
+                  checked={item.answer.skipped}
+                  onChange={(e) => item.set({ text: item.answer.text, skipped: e.target.checked })}
+                  className="size-3.5 rounded accent-accent"
+                />
+                I don&apos;t know / Skip
+              </label>
+            </li>
+          ))}
+        </ul>
+      )}
+      <RelevantNotes points={clarify.result.relevant} />
+    </section>
   );
 }

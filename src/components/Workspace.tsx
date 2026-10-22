@@ -5,9 +5,11 @@ import { StepIndicator } from "@/components/StepIndicator";
 import { DraftView } from "@/components/steps/DraftView";
 import { ExperienceStep } from "@/components/steps/ExperienceStep";
 import { InternshipStep } from "@/components/steps/InternshipStep";
+import { NO_CLARIFY, QuestionsView, type Answer, type ClarifyState } from "@/components/steps/QuestionsView";
 import { StartStep } from "@/components/steps/StartStep";
 import {
   DRAFT_VIEW,
+  QUESTIONS_VIEW,
   emptyApplication,
   hasErrors,
   validateExperience,
@@ -22,6 +24,14 @@ import {
   type StepId,
   type View,
 } from "@/lib/application";
+import {
+  buildClarifyInput,
+  CLARIFY_LIMITS,
+  clarifyFingerprint,
+  overLimit,
+  type ClarifyError,
+  type ClarifyInput,
+} from "@/lib/clarify";
 import { suggestJobDetails } from "@/lib/jobParser";
 import { computeChecks, unresolvedChecks, type ResumeCheck } from "@/lib/resumeChecks";
 import { detailsFromResume } from "@/lib/resumeExtract";
@@ -44,7 +54,12 @@ const COPY: Record<View, { eyebrow: string; title: string; intro: string }> = {
     title: "Which internship?",
     intro: "Paste the description of the internship you want. We’ll pick out the title and company.",
   },
-  4: {
+  questions: {
+    eyebrow: "Follow-up",
+    title: "A few quick questions",
+    intro: "These help us understand your own part in the project. Answer what you can; numbers are optional.",
+  },
+  draft: {
     eyebrow: "Your draft",
     title: "Your draft workspace",
     intro: "Check your facts beside the preview. Edit anything that isn’t right.",
@@ -83,6 +98,10 @@ export function Workspace() {
   // Buttons stay disabled until React has hydrated, so the form can never be
   // submitted natively by the browser.
   const hydrated = useSyncExternalStore(noopSubscribe, () => true, () => false);
+  const [clarify, setClarify] = useState<ClarifyState>(NO_CLARIFY);
+  // Guards against duplicate question requests from repeated clicks.
+  const clarifyBusy = useRef(false);
+  const clarifyAbort = useRef<AbortController | null>(null);
 
   const headingRef = useRef<HTMLHeadingElement>(null);
   const isFirstRender = useRef(true);
@@ -99,6 +118,9 @@ export function Workspace() {
   const checks = useMemo(() => computeChecks(data), [data]);
   const unresolved = unresolvedChecks(data, checks).length;
   const preview = useMemo(() => buildPreview(data, checks), [data, checks]);
+  const currentFingerprint = useMemo(() => clarifyFingerprint(buildClarifyInput(data)), [data]);
+  // Questions prepared from information that has since changed.
+  const clarifyOutdated = clarify.status === "ready" && clarify.fingerprint !== currentFingerprint;
 
   const stepErrors = {
     1: validateStart(data.about, data.resume),
@@ -198,10 +220,99 @@ export function Workspace() {
     return r;
   }
 
+  /** Asks the server for follow-up questions. Earlier questions are sent so they aren't repeated. */
+  async function requestClarify() {
+    if (clarifyBusy.current) return;
+    // Questions from earlier rounds: for the model (all of them) and for the summary (answered or skipped).
+    const lastRound = (clarify.result?.questions ?? []).map((q) => {
+      const a = clarify.answers[q.id];
+      return { question: q.question, answer: a && !a.skipped && a.text.trim() ? a.text.trim() : null, touched: Boolean(a) };
+    });
+    const asked = [
+      ...clarify.asked,
+      ...lastRound.filter((q) => q.touched).map(({ question, answer }) => ({ question, answer })),
+    ];
+    const previous: ClarifyInput["previous"] = [
+      ...clarify.asked,
+      ...lastRound.map(({ question, answer }) => ({ question, answer })),
+    ].slice(-CLARIFY_LIMITS.previous);
+
+    const input = buildClarifyInput(data, previous);
+    const fingerprint = clarifyFingerprint(input);
+    const tooLong = overLimit(input);
+    if (tooLong) {
+      setClarify((c) => ({ ...c, status: "error", fingerprint, error: { code: "too_long", message: tooLong, retryable: false } }));
+      return;
+    }
+
+    clarifyBusy.current = true;
+    const controller = new AbortController();
+    clarifyAbort.current = controller;
+    setClarify((c) => ({ ...c, status: "loading", fingerprint, error: null }));
+    try {
+      const res = await fetch("/api/clarify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(input),
+        signal: controller.signal,
+      });
+      const json = await res.json().catch(() => null);
+      if (!res.ok || !json?.result) {
+        const error: ClarifyError = json?.error ?? {
+          code: "unavailable",
+          retryable: true,
+          message: res.status === 504 ? "The AI service took too long to answer. Try again." : "Something went wrong. Try again.",
+        };
+        setClarify((c) => ({ ...c, status: "error", error }));
+        return;
+      }
+      setClarify({ status: "ready", fingerprint, result: json.result, answers: {}, error: null, asked });
+    } catch (err) {
+      if ((err as Error).name === "AbortError") return;
+      setClarify((c) => ({
+        ...c,
+        status: "error",
+        error: { code: "unavailable", retryable: true, message: "We couldn't reach the server. Check your connection and try again." },
+      }));
+    } finally {
+      if (clarifyAbort.current === controller) {
+        clarifyAbort.current = null;
+        clarifyBusy.current = false;
+      }
+    }
+  }
+
+  /** Opens the questions screen, fetching questions unless current ones still fit the information. */
+  function openQuestions() {
+    goTo(QUESTIONS_VIEW);
+    const current = clarify.status === "ready" && clarify.fingerprint === currentFingerprint;
+    if (clarify.status !== "loading" && !current) void requestClarify();
+  }
+
+  function setAnswer(id: string, answer: Answer) {
+    setConfirmed(false);
+    setClarify((c) => ({ ...c, answers: { ...c.answers, [id]: answer } }));
+  }
+
+  function setEarlierAnswer(index: number, answer: string | null) {
+    setConfirmed(false);
+    setClarify((c) => ({ ...c, asked: c.asked.map((a, i) => (i === index ? { ...a, answer } : a)) }));
+  }
+
   function handleContinue() {
     if (view === DRAFT_VIEW) return;
+    if (view === QUESTIONS_VIEW) {
+      if (clarify.status !== "loading") goTo(DRAFT_VIEW);
+      return;
+    }
     const resume = view === 1 ? prepareStart() : undefined;
-    if (check(view, resume)) goTo((view + 1) as View);
+    if (!check(view, resume)) return;
+    if (view === 3) openQuestions();
+    else goTo((view + 1) as StepId);
+  }
+
+  function handleBack() {
+    setView(view === DRAFT_VIEW ? QUESTIONS_VIEW : view === QUESTIONS_VIEW ? 3 : ((view - 1) as StepId));
   }
 
   function handleReturnToDraft() {
@@ -220,6 +331,10 @@ export function Workspace() {
   }
 
   function handleClear() {
+    clarifyAbort.current?.abort();
+    clarifyAbort.current = null;
+    clarifyBusy.current = false;
+    setClarify(NO_CLARIFY);
     setData(emptyApplication);
     setAttempted(NOT_ATTEMPTED);
     setConfirmed(false);
@@ -236,7 +351,14 @@ export function Workspace() {
   }
 
   const copy = COPY[view];
-  const primaryLabel = view === 3 ? "Create my application draft" : "Continue";
+  const primaryLabel =
+    view === 3
+      ? "Create my application draft"
+      : view === QUESTIONS_VIEW
+        ? clarify.status === "error"
+          ? "Continue without questions"
+          : "Continue to draft"
+        : "Continue";
 
   return (
     <div className={`mx-auto w-full px-4 pb-16 sm:px-6 ${view === DRAFT_VIEW ? "max-w-6xl" : "max-w-2xl"}`}>
@@ -361,6 +483,15 @@ export function Workspace() {
             onChange={(f, v) => update("internship", { [f]: v })}
           />
         )}
+        {view === QUESTIONS_VIEW && (
+          <QuestionsView
+            clarify={clarify}
+            outdated={clarifyOutdated}
+            onAnswer={setAnswer}
+            onRetry={() => void requestClarify()}
+            onEdit={setView}
+          />
+        )}
         {view === DRAFT_VIEW && (
           <DraftView
             data={data}
@@ -375,6 +506,11 @@ export function Workspace() {
               }))
             }
             onEdit={setView}
+            clarify={clarify}
+            clarifyOutdated={clarifyOutdated}
+            onAnswer={setAnswer}
+            onEarlierAnswer={setEarlierAnswer}
+            onRefreshQuestions={openQuestions}
           />
         )}
 
@@ -383,10 +519,10 @@ export function Workspace() {
             view === DRAFT_VIEW ? "max-w-2xl" : ""
           }`}
         >
-          {view > 1 ? (
+          {view !== 1 ? (
             <button
               type="button"
-              onClick={() => setView((view - 1) as View)}
+              onClick={handleBack}
               className="rounded-lg border border-line-strong bg-surface px-4 py-2.5 text-sm font-semibold text-ink hover:bg-canvas focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
             >
               Back
@@ -396,7 +532,7 @@ export function Workspace() {
           )}
           {view !== DRAFT_VIEW && (
             <div className="ml-auto flex flex-wrap justify-end gap-2">
-              {reachedDraft && view !== 3 && (
+              {reachedDraft && typeof view === "number" && view !== 3 && (
                 <button
                   type="button"
                   disabled={!hydrated}
@@ -408,7 +544,7 @@ export function Workspace() {
               )}
               <button
                 type="submit"
-                disabled={!hydrated}
+                disabled={!hydrated || (view === QUESTIONS_VIEW && clarify.status === "loading")}
                 className="rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-accent-strong disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
               >
                 {primaryLabel}

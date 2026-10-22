@@ -121,10 +121,11 @@ export const STEPS = [
 
 export type StepId = (typeof STEPS)[number]["id"];
 
-/** The three steps, then the draft view (4) where facts are checked beside the output. */
-export type View = StepId | 4;
+/** The three steps, then follow-up questions, then the draft view where facts are checked. */
+export type View = StepId | "questions" | "draft";
 
-export const DRAFT_VIEW = 4;
+export const QUESTIONS_VIEW = "questions";
+export const DRAFT_VIEW = "draft";
 
 // Fixed range keeps the page free of the current date, so it prerenders identically.
 export const GRAD_YEARS = Array.from({ length: 2034 - 2018 + 1 }, (_, i) => String(2018 + i));
