@@ -301,7 +301,14 @@ function JobCard({ job, jobs, selectedJobId, hasOwnDescription, onSelect, onExpl
           </button>
         )}
         {explanation?.status === "loading" && <p className="text-muted">Comparing your profile with this listing…</p>}
-        {explanation?.status === "error" && <p className="text-danger">Fit notes couldn&apos;t be prepared: {explanation.message}</p>}
+        {explanation?.status === "error" && (
+          <p className="text-danger">
+            Fit notes couldn&apos;t be prepared: {explanation.message}{" "}
+            <button type="button" onClick={() => onExplain([job.id])} className="font-semibold text-accent underline underline-offset-2">
+              Try again
+            </button>
+          </p>
+        )}
         {explanation?.status === "ready" && <Explanation value={explanation.value} />}
       </div>
 
