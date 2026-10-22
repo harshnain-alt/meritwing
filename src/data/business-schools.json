@@ -1,0 +1,1317 @@
+{
+ "sources": [
+  {
+   "name": "NIRF India Rankings 2025: Management (ranks 1–100 and band 101–125)",
+   "url": "https://www.nirfindia.org/Rankings/2025/ManagementRanking.html",
+   "publisher": "National Institutional Ranking Framework, Ministry of Education, Government of India",
+   "licence": "No licence stated. Only factual data (institution names and locations) is used, with attribution."
+  },
+  {
+   "name": "Manual additions verified on each institution's official website",
+   "file": "data/sources/business-schools-additions.tsv"
+  }
+ ],
+ "note": "Initial list, not a complete register of Indian business schools. Students can enter any institution that is missing.",
+ "generated": "2026-10-21",
+ "count": 129,
+ "schools": [
+  {
+   "value": "Aligarh Muslim University",
+   "name": "Aligarh Muslim University",
+   "city": "Aligarh",
+   "state": "Uttar Pradesh",
+   "aliases": [
+    "AMU"
+   ],
+   "source": "NIRF 2025 Management (rank 69)"
+  },
+  {
+   "value": "Alliance University",
+   "name": "Alliance University",
+   "city": "Bengaluru",
+   "state": "Karnataka",
+   "aliases": [],
+   "source": "NIRF 2025 Management (rank 71)"
+  },
+  {
+   "value": "Amity University, Gautam Budh Nagar",
+   "name": "Amity University",
+   "city": "Gautam Budh Nagar",
+   "state": "Uttar Pradesh",
+   "aliases": [],
+   "source": "NIRF 2025 Management (rank 49)"
+  },
+  {
+   "value": "Amity University, North Twenty Four Parganas",
+   "name": "Amity University",
+   "city": "North Twenty Four Parganas",
+   "state": "West Bengal",
+   "aliases": [],
+   "source": "NIRF 2025 Management (rank 101-125)"
+  },
+  {
+   "value": "Amity University Haryana, Gurgaon",
+   "name": "Amity University Haryana, Gurgaon",
+   "city": "Gurugram",
+   "state": "Haryana",
+   "aliases": [
+    "AUHG"
+   ],
+   "source": "NIRF 2025 Management (rank 101-125)"
+  },
+  {
+   "value": "Amity University Patna",
+   "name": "Amity University Patna",
+   "city": "Patna",
+   "state": "Bihar",
+   "aliases": [
+    "AUP"
+   ],
+   "source": "NIRF 2025 Management (rank 101-125)"
+  },
+  {
+   "value": "Amrita Vishwa Vidyapeetham",
+   "name": "Amrita Vishwa Vidyapeetham",
+   "city": "Coimbatore",
+   "state": "Tamil Nadu",
+   "aliases": [
+    "AVV",
+    "Amrita School of Business"
+   ],
+   "source": "NIRF 2025 Management (rank 26)"
+  },
+  {
+   "value": "Anna University",
+   "name": "Anna University",
+   "city": "Chennai",
+   "state": "Tamil Nadu",
+   "aliases": [],
+   "source": "NIRF 2025 Management (rank 88)"
+  },
+  {
+   "value": "Atal Bihari Vajpayee Indian Institute of Information Technology and Management",
+   "name": "Atal Bihari Vajpayee Indian Institute of Information Technology and Management",
+   "city": "Gwalior",
+   "state": "Madhya Pradesh",
+   "aliases": [
+    "ABVIIITM"
+   ],
+   "source": "NIRF 2025 Management (rank 93)"
+  },
+  {
+   "value": "Babasheb Bhimrao Ambedkar University",
+   "name": "Babasheb Bhimrao Ambedkar University",
+   "city": "Lucknow",
+   "state": "Uttar Pradesh",
+   "aliases": [
+    "BBAU"
+   ],
+   "source": "NIRF 2025 Management (rank 79)"
+  },
+  {
+   "value": "Banaras Hindu University",
+   "name": "Banaras Hindu University",
+   "city": "Varanasi",
+   "state": "Uttar Pradesh",
+   "aliases": [
+    "BHU",
+    "FMS BHU"
+   ],
+   "source": "NIRF 2025 Management (rank 60)"
+  },
+  {
+   "value": "Bharathidasan Institute of Management",
+   "name": "Bharathidasan Institute of Management",
+   "city": "Tiruchirappalli",
+   "state": "Tamil Nadu",
+   "aliases": [
+    "BIM",
+    "BIM Trichy"
+   ],
+   "source": "NIRF 2025 Management (rank 96)"
+  },
+  {
+   "value": "Bharati Vidyapeeth's Institute of Management and Entrepreneurship Development",
+   "name": "Bharati Vidyapeeth's Institute of Management and Entrepreneurship Development",
+   "city": "Pune",
+   "state": "Maharashtra",
+   "aliases": [
+    "BVSIMED"
+   ],
+   "source": "NIRF 2025 Management (rank 101-125)"
+  },
+  {
+   "value": "Birla Institute of Management Technology",
+   "name": "Birla Institute of Management Technology",
+   "city": "Greater Noida",
+   "state": "Uttar Pradesh",
+   "aliases": [
+    "BIMT",
+    "BIMTECH"
+   ],
+   "source": "NIRF 2025 Management (rank 61)"
+  },
+  {
+   "value": "Birla Institute of Technology",
+   "name": "Birla Institute of Technology",
+   "city": "Ranchi",
+   "state": "Jharkhand",
+   "aliases": [
+    "BIT"
+   ],
+   "source": "NIRF 2025 Management (rank 97)"
+  },
+  {
+   "value": "BML Munjal University",
+   "name": "BML Munjal University",
+   "city": "Gurgaon",
+   "state": "Haryana",
+   "aliases": [
+    "BMU"
+   ],
+   "source": "NIRF 2025 Management (rank 77)"
+  },
+  {
+   "value": "Chandigarh Business School of Administration, Landran",
+   "name": "Chandigarh Business School of Administration, Landran",
+   "city": "Sahibzada Ajit Singh Nagar",
+   "state": "Punjab",
+   "aliases": [
+    "CBSAL"
+   ],
+   "source": "NIRF 2025 Management (rank 101-125)"
+  },
+  {
+   "value": "Chandigarh University",
+   "name": "Chandigarh University",
+   "city": "Mohali",
+   "state": "Punjab",
+   "aliases": [],
+   "source": "NIRF 2025 Management (rank 32)"
+  },
+  {
+   "value": "Chitkara University",
+   "name": "Chitkara University",
+   "city": "Rajpura",
+   "state": "Punjab",
+   "aliases": [],
+   "source": "NIRF 2025 Management (rank 78)"
+  },
+  {
+   "value": "Christ University",
+   "name": "Christ University",
+   "city": "Bengaluru",
+   "state": "Karnataka",
+   "aliases": [],
+   "source": "NIRF 2025 Management (rank 57)"
+  },
+  {
+   "value": "Cochin University of Science and Technology",
+   "name": "Cochin University of Science and Technology",
+   "city": "Cochin",
+   "state": "Kerala",
+   "aliases": [
+    "CUST"
+   ],
+   "source": "NIRF 2025 Management (rank 82)"
+  },
+  {
+   "value": "Faculty of Management Studies, University of Delhi",
+   "name": "Faculty of Management Studies, University of Delhi",
+   "city": "New Delhi",
+   "state": "Delhi",
+   "aliases": [
+    "FMSUD",
+    "FMS",
+    "FMS Delhi"
+   ],
+   "source": "Official website (https://www.fms.edu), checked 2026-10-21"
+  },
+  {
+   "value": "Fore School of Management",
+   "name": "Fore School of Management",
+   "city": "New Delhi",
+   "state": "Delhi",
+   "aliases": [
+    "FSM",
+    "FORE"
+   ],
+   "source": "NIRF 2025 Management (rank 59)"
+  },
+  {
+   "value": "G. L. A. University",
+   "name": "G. L. A. University",
+   "city": "Mathura",
+   "state": "Uttar Pradesh",
+   "aliases": [
+    "GLAU"
+   ],
+   "source": "NIRF 2025 Management (rank 101-125)"
+  },
+  {
+   "value": "Galgotias University",
+   "name": "Galgotias University",
+   "city": "Gautam Budh Nagar",
+   "state": "Uttar Pradesh",
+   "aliases": [],
+   "source": "NIRF 2025 Management (rank 101-125)"
+  },
+  {
+   "value": "Gandhi Institute of Technology And Management (GITAM)",
+   "name": "Gandhi Institute of Technology And Management (GITAM)",
+   "city": "Visakhapatnam",
+   "state": "Andhra Pradesh",
+   "aliases": [
+    "GITMG"
+   ],
+   "source": "NIRF 2025 Management (rank 101-125)"
+  },
+  {
+   "value": "Goa Institute of Management",
+   "name": "Goa Institute of Management",
+   "city": "Sanquelim",
+   "state": "Goa",
+   "aliases": [
+    "GIM"
+   ],
+   "source": "NIRF 2025 Management (rank 43)"
+  },
+  {
+   "value": "Graphic Era University",
+   "name": "Graphic Era University",
+   "city": "Dehradun",
+   "state": "Uttarakhand",
+   "aliases": [
+    "GEU"
+   ],
+   "source": "NIRF 2025 Management (rank 52)"
+  },
+  {
+   "value": "Great Lakes Institute of Management, Chennai",
+   "name": "Great Lakes Institute of Management",
+   "city": "Chennai",
+   "state": "Tamil Nadu",
+   "aliases": [
+    "Great Lakes"
+   ],
+   "source": "NIRF 2025 Management (rank 37)"
+  },
+  {
+   "value": "Great Lakes Institute of Management, Gurgaon",
+   "name": "Great Lakes Institute of Management",
+   "city": "Gurgaon",
+   "state": "Haryana",
+   "aliases": [
+    "Great Lakes"
+   ],
+   "source": "NIRF 2025 Management (rank 50)"
+  },
+  {
+   "value": "Guru Gobind Singh Indraprastha University",
+   "name": "Guru Gobind Singh Indraprastha University",
+   "city": "New Delhi",
+   "state": "Delhi",
+   "aliases": [
+    "GGSIU"
+   ],
+   "source": "NIRF 2025 Management (rank 76)"
+  },
+  {
+   "value": "Guru Jambheshwar University of Science and Technology, Hissar",
+   "name": "Guru Jambheshwar University of Science and Technology, Hissar",
+   "city": "Hisar",
+   "state": "Haryana",
+   "aliases": [
+    "GJUSTH"
+   ],
+   "source": "NIRF 2025 Management (rank 101-125)"
+  },
+  {
+   "value": "Hindustan Institute of Technology and Science (HITS)",
+   "name": "Hindustan Institute of Technology and Science (HITS)",
+   "city": "Chennai",
+   "state": "Tamil Nadu",
+   "aliases": [
+    "HITSH"
+   ],
+   "source": "NIRF 2025 Management (rank 101-125)"
+  },
+  {
+   "value": "ICAR-National Academy of Agricultural Research Management (NAARM)",
+   "name": "ICAR-National Academy of Agricultural Research Management (NAARM)",
+   "city": "Hyderabad",
+   "state": "Telangana",
+   "aliases": [
+    "IAARMN"
+   ],
+   "source": "NIRF 2025 Management (rank 101-125)"
+  },
+  {
+   "value": "ICFAI Foundation for Higher Education, Hyderabad",
+   "name": "ICFAI Foundation for Higher Education, Hyderabad",
+   "city": "Hyderabad",
+   "state": "Telangana",
+   "aliases": [
+    "IFHEH"
+   ],
+   "source": "NIRF 2025 Management (rank 46)"
+  },
+  {
+   "value": "IIHMR University",
+   "name": "IIHMR University",
+   "city": "Jaipur",
+   "state": "Rajasthan",
+   "aliases": [],
+   "source": "NIRF 2025 Management (rank 101-125)"
+  },
+  {
+   "value": "IMI Bhubaneswar",
+   "name": "IMI Bhubaneswar",
+   "city": "Bhubaneswar",
+   "state": "Odisha",
+   "aliases": [],
+   "source": "NIRF 2025 Management (rank 94)"
+  },
+  {
+   "value": "IMI Delhi",
+   "name": "IMI Delhi",
+   "city": "New Delhi",
+   "state": "Delhi",
+   "aliases": [],
+   "source": "NIRF 2025 Management (rank 40)"
+  },
+  {
+   "value": "IMI Kolkata",
+   "name": "IMI Kolkata",
+   "city": "Kolkata",
+   "state": "West Bengal",
+   "aliases": [],
+   "source": "NIRF 2025 Management (rank 42)"
+  },
+  {
+   "value": "Indian Institute of Foreign Trade",
+   "name": "Indian Institute of Foreign Trade",
+   "city": "New Delhi",
+   "state": "Delhi",
+   "aliases": [
+    "IIFT"
+   ],
+   "source": "NIRF 2025 Management (rank 17)"
+  },
+  {
+   "value": "Indian Institute of Management Ahmedabad",
+   "name": "Indian Institute of Management Ahmedabad",
+   "city": "Ahmedabad",
+   "state": "Gujarat",
+   "aliases": [
+    "IIM Ahmedabad",
+    "IIMA",
+    "IIM A"
+   ],
+   "source": "NIRF 2025 Management (rank 1)"
+  },
+  {
+   "value": "Indian Institute of Management Bangalore",
+   "name": "Indian Institute of Management Bangalore",
+   "city": "Bengaluru",
+   "state": "Karnataka",
+   "aliases": [
+    "IIMB",
+    "IIM Bengaluru",
+    "IIM B"
+   ],
+   "source": "NIRF 2025 Management (rank 2)"
+  },
+  {
+   "value": "Indian Institute of Management Bodh Gaya",
+   "name": "Indian Institute of Management Bodh Gaya",
+   "city": "Gaya",
+   "state": "Bihar",
+   "aliases": [
+    "IIMBG",
+    "IIM Gaya"
+   ],
+   "source": "NIRF 2025 Management (rank 31)"
+  },
+  {
+   "value": "Indian Institute of Management Calcutta",
+   "name": "Indian Institute of Management Calcutta",
+   "city": "Kolkata",
+   "state": "West Bengal",
+   "aliases": [
+    "IIMC",
+    "IIM Kolkata",
+    "IIM C"
+   ],
+   "source": "NIRF 2025 Management (rank 7)"
+  },
+  {
+   "value": "Indian Institute of Management Indore",
+   "name": "Indian Institute of Management Indore",
+   "city": "Indore",
+   "state": "Madhya Pradesh",
+   "aliases": [
+    "IIMI",
+    "IIM Indore"
+   ],
+   "source": "NIRF 2025 Management (rank 8)"
+  },
+  {
+   "value": "Indian Institute of Management Jammu (IIMJ)",
+   "name": "Indian Institute of Management Jammu (IIMJ)",
+   "city": "Jammu",
+   "state": "Jammu and Kashmir",
+   "aliases": [
+    "IIMJI",
+    "IIM Jammu"
+   ],
+   "source": "NIRF 2025 Management (rank 35)"
+  },
+  {
+   "value": "Indian Institute of Management Kashipur",
+   "name": "Indian Institute of Management Kashipur",
+   "city": "Kashipur",
+   "state": "Uttarakhand",
+   "aliases": [
+    "IIM Kashipur"
+   ],
+   "source": "NIRF 2025 Management (rank 23)"
+  },
+  {
+   "value": "Indian Institute of Management Kozhikode",
+   "name": "Indian Institute of Management Kozhikode",
+   "city": "Kozhikode",
+   "state": "Kerala",
+   "aliases": [
+    "IIM Kozhikode",
+    "IIMK",
+    "IIM Calicut"
+   ],
+   "source": "NIRF 2025 Management (rank 3)"
+  },
+  {
+   "value": "Indian Institute of Management Lucknow",
+   "name": "Indian Institute of Management Lucknow",
+   "city": "Lucknow",
+   "state": "Uttar Pradesh",
+   "aliases": [
+    "IIML",
+    "IIM Lucknow"
+   ],
+   "source": "NIRF 2025 Management (rank 5)"
+  },
+  {
+   "value": "Indian Institute of Management Nagpur",
+   "name": "Indian Institute of Management Nagpur",
+   "city": "Nagpur",
+   "state": "Maharashtra",
+   "aliases": [
+    "IIMN",
+    "IIM Nagpur"
+   ],
+   "source": "NIRF 2025 Management (rank 25)"
+  },
+  {
+   "value": "Indian Institute of Management Raipur",
+   "name": "Indian Institute of Management Raipur",
+   "city": "Raipur",
+   "state": "Chhattisgarh",
+   "aliases": [
+    "IIM Raipur"
+   ],
+   "source": "NIRF 2025 Management (rank 15)"
+  },
+  {
+   "value": "Indian Institute of Management Ranchi",
+   "name": "Indian Institute of Management Ranchi",
+   "city": "Ranchi",
+   "state": "Jharkhand",
+   "aliases": [
+    "IIM Ranchi"
+   ],
+   "source": "NIRF 2025 Management (rank 18)"
+  },
+  {
+   "value": "Indian Institute of Management Rohtak",
+   "name": "Indian Institute of Management Rohtak",
+   "city": "Rohtak",
+   "state": "Haryana",
+   "aliases": [
+    "IIM Rohtak"
+   ],
+   "source": "NIRF 2025 Management (rank 19)"
+  },
+  {
+   "value": "Indian Institute of Management Sambalpur",
+   "name": "Indian Institute of Management Sambalpur",
+   "city": "Sambalpur",
+   "state": "Odisha",
+   "aliases": [
+    "IIM Sambalpur"
+   ],
+   "source": "NIRF 2025 Management (rank 34)"
+  },
+  {
+   "value": "Indian Institute of Management Shillong",
+   "name": "Indian Institute of Management Shillong",
+   "city": "Shillong",
+   "state": "Meghalaya",
+   "aliases": [
+    "IIM Shillong"
+   ],
+   "source": "NIRF 2025 Management (rank 38)"
+  },
+  {
+   "value": "Indian Institute of Management Sirmaur",
+   "name": "Indian Institute of Management Sirmaur",
+   "city": "Sirmaur",
+   "state": "Himachal Pradesh",
+   "aliases": [
+    "IIM Sirmaur"
+   ],
+   "source": "NIRF 2025 Management (rank 51)"
+  },
+  {
+   "value": "Indian Institute of Management Tiruchirappalli",
+   "name": "Indian Institute of Management Tiruchirappalli",
+   "city": "Tiruchirappalli",
+   "state": "Tamil Nadu",
+   "aliases": [
+    "IIMT",
+    "IIM Tiruchirappalli"
+   ],
+   "source": "NIRF 2025 Management (rank 16)"
+  },
+  {
+   "value": "Indian Institute of Management Udaipur",
+   "name": "Indian Institute of Management Udaipur",
+   "city": "Udaipur",
+   "state": "Rajasthan",
+   "aliases": [
+    "IIMU",
+    "IIM Udaipur"
+   ],
+   "source": "NIRF 2025 Management (rank 21)"
+  },
+  {
+   "value": "Indian Institute of Management Visakhapatnam",
+   "name": "Indian Institute of Management Visakhapatnam",
+   "city": "Visakhapatnam",
+   "state": "Andhra Pradesh",
+   "aliases": [
+    "IIMV",
+    "IIM Visakhapatnam"
+   ],
+   "source": "NIRF 2025 Management (rank 29)"
+  },
+  {
+   "value": "Indian Institute of Management, Amritsar",
+   "name": "Indian Institute of Management, Amritsar",
+   "city": "Amritsar",
+   "state": "Punjab",
+   "aliases": [
+    "IIM Amritsar"
+   ],
+   "source": "NIRF 2025 Management (rank 64)"
+  },
+  {
+   "value": "Indian Institute of Management, Mumbai",
+   "name": "Indian Institute of Management, Mumbai",
+   "city": "Mumbai",
+   "state": "Maharashtra",
+   "aliases": [
+    "IIMM",
+    "IIM Mumbai",
+    "NITIE"
+   ],
+   "source": "NIRF 2025 Management (rank 6)"
+  },
+  {
+   "value": "Indian Institute of Technology (Indian School of Mines)",
+   "name": "Indian Institute of Technology (Indian School of Mines)",
+   "city": "Dhanbad",
+   "state": "Jharkhand",
+   "aliases": [
+    "IITISM",
+    "IIT Dhanbad",
+    "IIT ISM",
+    "ISM Dhanbad"
+   ],
+   "source": "NIRF 2025 Management (rank 48)"
+  },
+  {
+   "value": "Indian Institute of Technology Bombay",
+   "name": "Indian Institute of Technology Bombay",
+   "city": "Mumbai",
+   "state": "Maharashtra",
+   "aliases": [
+    "IITB",
+    "IIT Mumbai",
+    "SJMSOM",
+    "Shailesh J. Mehta School of Management"
+   ],
+   "source": "NIRF 2025 Management (rank 14)"
+  },
+  {
+   "value": "Indian Institute of Technology Delhi",
+   "name": "Indian Institute of Technology Delhi",
+   "city": "New Delhi",
+   "state": "Delhi",
+   "aliases": [
+    "IITD",
+    "IIT New Delhi",
+    "DMS IIT Delhi"
+   ],
+   "source": "NIRF 2025 Management (rank 4)"
+  },
+  {
+   "value": "Indian Institute of Technology Jodhpur",
+   "name": "Indian Institute of Technology Jodhpur",
+   "city": "Jodhpur",
+   "state": "Rajasthan",
+   "aliases": [
+    "IITJ",
+    "IIT Jodhpur"
+   ],
+   "source": "NIRF 2025 Management (rank 98)"
+  },
+  {
+   "value": "Indian Institute of Technology Kanpur",
+   "name": "Indian Institute of Technology Kanpur",
+   "city": "Kanpur",
+   "state": "Uttar Pradesh",
+   "aliases": [
+    "IIT Kanpur"
+   ],
+   "source": "NIRF 2025 Management (rank 27)"
+  },
+  {
+   "value": "Indian Institute of Technology Kharagpur",
+   "name": "Indian Institute of Technology Kharagpur",
+   "city": "Kharagpur",
+   "state": "West Bengal",
+   "aliases": [
+    "IIT Kharagpur",
+    "VGSOM",
+    "Vinod Gupta School of Management"
+   ],
+   "source": "NIRF 2025 Management (rank 12)"
+  },
+  {
+   "value": "Indian Institute of Technology Madras",
+   "name": "Indian Institute of Technology Madras",
+   "city": "Chennai",
+   "state": "Tamil Nadu",
+   "aliases": [
+    "IITM",
+    "IIT Chennai",
+    "DoMS IIT Madras"
+   ],
+   "source": "NIRF 2025 Management (rank 13)"
+  },
+  {
+   "value": "Indian Institute of Technology Roorkee",
+   "name": "Indian Institute of Technology Roorkee",
+   "city": "Roorkee",
+   "state": "Uttarakhand",
+   "aliases": [
+    "IITR",
+    "IIT Roorkee",
+    "DoMS IIT Roorkee"
+   ],
+   "source": "NIRF 2025 Management (rank 22)"
+  },
+  {
+   "value": "Indian School of Business, Hyderabad",
+   "name": "Indian School of Business",
+   "city": "Hyderabad",
+   "state": "Telangana",
+   "aliases": [
+    "ISB"
+   ],
+   "source": "Official website (https://www.isb.edu/en/about-isb/isb-advantage/campuses.html), checked 2026-10-21"
+  },
+  {
+   "value": "Indian School of Business, Mohali",
+   "name": "Indian School of Business",
+   "city": "Mohali",
+   "state": "Punjab",
+   "aliases": [
+    "ISB"
+   ],
+   "source": "Official website (https://www.isb.edu/en/about-isb/isb-advantage/campuses.html), checked 2026-10-21"
+  },
+  {
+   "value": "Institute of Management Technology, Ghaziabad",
+   "name": "Institute of Management Technology",
+   "city": "Ghaziabad",
+   "state": "Uttar Pradesh",
+   "aliases": [
+    "IMT",
+    "IMT Ghaziabad"
+   ],
+   "source": "NIRF 2025 Management (rank 30)"
+  },
+  {
+   "value": "Institute of Management Technology, Hyderabad",
+   "name": "Institute of Management Technology",
+   "city": "Hyderabad",
+   "state": "Telangana",
+   "aliases": [
+    "IMT",
+    "IMT Hyderabad"
+   ],
+   "source": "NIRF 2025 Management (rank 72)"
+  },
+  {
+   "value": "Institute of Management Technology, Nagpur",
+   "name": "Institute of Management Technology, Nagpur",
+   "city": "Nagpur",
+   "state": "Maharashtra",
+   "aliases": [
+    "IMTN",
+    "IMT",
+    "IMT Nagpur"
+   ],
+   "source": "NIRF 2025 Management (rank 99)"
+  },
+  {
+   "value": "Institute of Rural Management Anand",
+   "name": "Institute of Rural Management Anand",
+   "city": "Anand",
+   "state": "Gujarat",
+   "aliases": [
+    "IRMA"
+   ],
+   "source": "NIRF 2025 Management (rank 54)"
+  },
+  {
+   "value": "Jagan Institute of Management Studies",
+   "name": "Jagan Institute of Management Studies",
+   "city": "Delhi",
+   "state": "Delhi",
+   "aliases": [
+    "JIMS"
+   ],
+   "source": "NIRF 2025 Management (rank 90)"
+  },
+  {
+   "value": "Jain university, Bangalore",
+   "name": "Jain university, Bangalore",
+   "city": "Bengaluru",
+   "state": "Karnataka",
+   "aliases": [
+    "JUB"
+   ],
+   "source": "NIRF 2025 Management (rank 73)"
+  },
+  {
+   "value": "Jaipuria Institute of Management, Jaipur",
+   "name": "Jaipuria Institute of Management",
+   "city": "Jaipur",
+   "state": "Rajasthan",
+   "aliases": [],
+   "source": "NIRF 2025 Management (rank 74)"
+  },
+  {
+   "value": "Jaipuria Institute of Management, Noida",
+   "name": "Jaipuria Institute of Management",
+   "city": "Noida",
+   "state": "Uttar Pradesh",
+   "aliases": [],
+   "source": "NIRF 2025 Management (rank 41)"
+  },
+  {
+   "value": "Jaipuria Institute of Management INDORE",
+   "name": "Jaipuria Institute of Management INDORE",
+   "city": "Indore",
+   "state": "Madhya Pradesh",
+   "aliases": [
+    "JIMI"
+   ],
+   "source": "NIRF 2025 Management (rank 101-125)"
+  },
+  {
+   "value": "Jaipuria Institute of Management, Lucknow",
+   "name": "Jaipuria Institute of Management, Lucknow",
+   "city": "Lucknow",
+   "state": "Uttar Pradesh",
+   "aliases": [
+    "JIML"
+   ],
+   "source": "NIRF 2025 Management (rank 67)"
+  },
+  {
+   "value": "Jamia Hamdard",
+   "name": "Jamia Hamdard",
+   "city": "New Delhi",
+   "state": "Delhi",
+   "aliases": [],
+   "source": "NIRF 2025 Management (rank 87)"
+  },
+  {
+   "value": "Jamia Millia Islamia",
+   "name": "Jamia Millia Islamia",
+   "city": "New Delhi",
+   "state": "Delhi",
+   "aliases": [
+    "JMI"
+   ],
+   "source": "NIRF 2025 Management (rank 28)"
+  },
+  {
+   "value": "Jamnalal Bajaj Institute of Management Studies",
+   "name": "Jamnalal Bajaj Institute of Management Studies",
+   "city": "Mumbai",
+   "state": "Maharashtra",
+   "aliases": [
+    "JBIMS"
+   ],
+   "source": "Official website (https://jbims.edu), checked 2026-10-21"
+  },
+  {
+   "value": "K.J.Somaiya Institute of Management",
+   "name": "K.J.Somaiya Institute of Management",
+   "city": "Mumbai",
+   "state": "Maharashtra",
+   "aliases": [
+    "KJSIM",
+    "Somaiya"
+   ],
+   "source": "NIRF 2025 Management (rank 65)"
+  },
+  {
+   "value": "Kalinga Institute of Industrial Technology",
+   "name": "Kalinga Institute of Industrial Technology",
+   "city": "Bhubaneswar",
+   "state": "Odisha",
+   "aliases": [
+    "KIIT",
+    "KSOM"
+   ],
+   "source": "NIRF 2025 Management (rank 68)"
+  },
+  {
+   "value": "Koneru Lakshmaiah Education Foundation University (K L College of Engineering)",
+   "name": "Koneru Lakshmaiah Education Foundation University (K L College of Engineering)",
+   "city": "Vaddeswaram",
+   "state": "Andhra Pradesh",
+   "aliases": [
+    "KLEFUKLCE"
+   ],
+   "source": "NIRF 2025 Management (rank 70)"
+  },
+  {
+   "value": "Lal Bahadur Shastri Institute of Management",
+   "name": "Lal Bahadur Shastri Institute of Management",
+   "city": "Delhi",
+   "state": "Delhi",
+   "aliases": [
+    "LBSIM"
+   ],
+   "source": "NIRF 2025 Management (rank 101-125)"
+  },
+  {
+   "value": "Lovely Professional University",
+   "name": "Lovely Professional University",
+   "city": "Phagwara",
+   "state": "Punjab",
+   "aliases": [
+    "LPU"
+   ],
+   "source": "NIRF 2025 Management (rank 44)"
+  },
+  {
+   "value": "Loyola Institute of Business Administration",
+   "name": "Loyola Institute of Business Administration",
+   "city": "Chennai",
+   "state": "Tamil Nadu",
+   "aliases": [
+    "LIBA"
+   ],
+   "source": "NIRF 2025 Management (rank 55)"
+  },
+  {
+   "value": "Madan Mohan Malaviya University of Technology",
+   "name": "Madan Mohan Malaviya University of Technology",
+   "city": "Gorakhpur",
+   "state": "Uttar Pradesh",
+   "aliases": [
+    "MMMUT"
+   ],
+   "source": "NIRF 2025 Management (rank 83)"
+  },
+  {
+   "value": "Malaviya National Institute of Technology",
+   "name": "Malaviya National Institute of Technology",
+   "city": "Jaipur",
+   "state": "Rajasthan",
+   "aliases": [
+    "MNIT"
+   ],
+   "source": "NIRF 2025 Management (rank 62)"
+  },
+  {
+   "value": "Management Development Institute",
+   "name": "Management Development Institute",
+   "city": "Gurugram",
+   "state": "Haryana",
+   "aliases": [
+    "MDI",
+    "MDI Gurgaon"
+   ],
+   "source": "NIRF 2025 Management (rank 9)"
+  },
+  {
+   "value": "Manipal University Jaipur",
+   "name": "Manipal University Jaipur",
+   "city": "Jaipur",
+   "state": "Rajasthan",
+   "aliases": [
+    "MUJ"
+   ],
+   "source": "NIRF 2025 Management (rank 81)"
+  },
+  {
+   "value": "Mesa School of Business",
+   "name": "Mesa School of Business",
+   "city": "Bengaluru",
+   "state": "Karnataka",
+   "aliases": [
+    "MSB",
+    "Mesa"
+   ],
+   "source": "Official website (https://www.mesaschool.co), checked 2026-10-21"
+  },
+  {
+   "value": "MICA",
+   "name": "MICA",
+   "city": "Ahmedabad",
+   "state": "Gujarat",
+   "aliases": [],
+   "source": "NIRF 2025 Management (rank 33)"
+  },
+  {
+   "value": "National Institute of Agricultural Extension Management",
+   "name": "National Institute of Agricultural Extension Management",
+   "city": "Hyderabad",
+   "state": "Telangana",
+   "aliases": [
+    "NIAEM",
+    "MANAGE"
+   ],
+   "source": "NIRF 2025 Management (rank 95)"
+  },
+  {
+   "value": "National Institute of Bank Management",
+   "name": "National Institute of Bank Management",
+   "city": "Pune",
+   "state": "Maharashtra",
+   "aliases": [
+    "NIBM"
+   ],
+   "source": "NIRF 2025 Management (rank 101-125)"
+  },
+  {
+   "value": "National Institute of Technology Calicut",
+   "name": "National Institute of Technology Calicut",
+   "city": "Kozhikode",
+   "state": "Kerala",
+   "aliases": [
+    "NITC",
+    "NIT Kozhikode"
+   ],
+   "source": "NIRF 2025 Management (rank 85)"
+  },
+  {
+   "value": "National Institute of Technology Tiruchirappalli",
+   "name": "National Institute of Technology Tiruchirappalli",
+   "city": "Tiruchirappalli",
+   "state": "Tamil Nadu",
+   "aliases": [
+    "NITT",
+    "NIT Tiruchirappalli"
+   ],
+   "source": "NIRF 2025 Management (rank 57)"
+  },
+  {
+   "value": "New Delhi Institute of Management",
+   "name": "New Delhi Institute of Management",
+   "city": "New Delhi",
+   "state": "Delhi",
+   "aliases": [
+    "NDIM"
+   ],
+   "source": "NIRF 2025 Management (rank 86)"
+  },
+  {
+   "value": "Nirma University",
+   "name": "Nirma University",
+   "city": "Ahmedabad",
+   "state": "Gujarat",
+   "aliases": [],
+   "source": "NIRF 2025 Management (rank 53)"
+  },
+  {
+   "value": "OP Jindal University",
+   "name": "OP Jindal University",
+   "city": "Raigarh",
+   "state": "Chhattisgarh",
+   "aliases": [
+    "OJU"
+   ],
+   "source": "NIRF 2025 Management (rank 101-125)"
+  },
+  {
+   "value": "Pandit Deendayal Energy University",
+   "name": "Pandit Deendayal Energy University",
+   "city": "Gandhinagar",
+   "state": "Gujarat",
+   "aliases": [
+    "PDEU"
+   ],
+   "source": "NIRF 2025 Management (rank 89)"
+  },
+  {
+   "value": "Panjab University",
+   "name": "Panjab University",
+   "city": "Chandigarh",
+   "state": "Chandigarh",
+   "aliases": [],
+   "source": "NIRF 2025 Management (rank 92)"
+  },
+  {
+   "value": "Presidency University, Bengaluru",
+   "name": "Presidency University, Bengaluru",
+   "city": "Bengaluru",
+   "state": "Karnataka",
+   "aliases": [
+    "PUB"
+   ],
+   "source": "NIRF 2025 Management (rank 101-125)"
+  },
+  {
+   "value": "Prin. L.N. Welingkar Institute of Management Development and Research",
+   "name": "Prin. L.N. Welingkar Institute of Management Development and Research",
+   "city": "Mumbai",
+   "state": "Maharashtra",
+   "aliases": [
+    "PLNWIMDR",
+    "WeSchool",
+    "Welingkar"
+   ],
+   "source": "NIRF 2025 Management (rank 75)"
+  },
+  {
+   "value": "PSG College of Technology",
+   "name": "PSG College of Technology",
+   "city": "Coimbatore",
+   "state": "Tamil Nadu",
+   "aliases": [
+    "PCT"
+   ],
+   "source": "NIRF 2025 Management (rank 84)"
+  },
+  {
+   "value": "Pune Institute of Business Management",
+   "name": "Pune Institute of Business Management",
+   "city": "Pune",
+   "state": "Maharashtra",
+   "aliases": [
+    "PIBM"
+   ],
+   "source": "NIRF 2025 Management (rank 101-125)"
+  },
+  {
+   "value": "Rajagiri Business School",
+   "name": "Rajagiri Business School",
+   "city": "Cochin",
+   "state": "Kerala",
+   "aliases": [
+    "RBS"
+   ],
+   "source": "NIRF 2025 Management (rank 91)"
+  },
+  {
+   "value": "S. P. Jain Institute of Management and Research",
+   "name": "S. P. Jain Institute of Management and Research",
+   "city": "Mumbai",
+   "state": "Maharashtra",
+   "aliases": [
+    "SPJIMR"
+   ],
+   "source": "NIRF 2025 Management (rank 20)"
+  },
+  {
+   "value": "S.R.M. Institute of Science and Technology",
+   "name": "S.R.M. Institute of Science and Technology",
+   "city": "Chennai",
+   "state": "Tamil Nadu",
+   "aliases": [
+    "SRMIST"
+   ],
+   "source": "NIRF 2025 Management (rank 56)"
+  },
+  {
+   "value": "Saveetha Institute of Medical and Technical Sciences",
+   "name": "Saveetha Institute of Medical and Technical Sciences",
+   "city": "Chennai",
+   "state": "Tamil Nadu",
+   "aliases": [
+    "SIMTS"
+   ],
+   "source": "NIRF 2025 Management (rank 63)"
+  },
+  {
+   "value": "Sharda University",
+   "name": "Sharda University",
+   "city": "Greater Noida",
+   "state": "Uttar Pradesh",
+   "aliases": [],
+   "source": "NIRF 2025 Management (rank 101-125)"
+  },
+  {
+   "value": "Siksha 'O' Anusandhan",
+   "name": "Siksha 'O' Anusandhan",
+   "city": "Bhubaneswar",
+   "state": "Odisha",
+   "aliases": [
+    "SOA"
+   ],
+   "source": "NIRF 2025 Management (rank 66)"
+  },
+  {
+   "value": "Sri Balaji University, Pune",
+   "name": "Sri Balaji University, Pune",
+   "city": "Pune",
+   "state": "Maharashtra",
+   "aliases": [
+    "SBUP"
+   ],
+   "source": "NIRF 2025 Management (rank 101-125)"
+  },
+  {
+   "value": "SVKM's Narsee Monjee Institute of Management Studies",
+   "name": "SVKM's Narsee Monjee Institute of Management Studies",
+   "city": "Mumbai",
+   "state": "Maharashtra",
+   "aliases": [
+    "SSNMIMS",
+    "NMIMS"
+   ],
+   "source": "NIRF 2025 Management (rank 24)"
+  },
+  {
+   "value": "Symbiosis Institute of Business Management",
+   "name": "Symbiosis Institute of Business Management",
+   "city": "Pune",
+   "state": "Maharashtra",
+   "aliases": [
+    "SIBM"
+   ],
+   "source": "NIRF 2025 Management (rank 11)"
+  },
+  {
+   "value": "T. A. Pai Management Institute Manipal",
+   "name": "T. A. Pai Management Institute Manipal",
+   "city": "Manipal",
+   "state": "Karnataka",
+   "aliases": [
+    "TAPMIM",
+    "TAPMI"
+   ],
+   "source": "NIRF 2025 Management (rank 39)"
+  },
+  {
+   "value": "Tezpur University",
+   "name": "Tezpur University",
+   "city": "Tezpur",
+   "state": "Assam",
+   "aliases": [],
+   "source": "NIRF 2025 Management (rank 101-125)"
+  },
+  {
+   "value": "Thapar Institute of Engineering and Technology (Deemed-to-be-university)",
+   "name": "Thapar Institute of Engineering and Technology (Deemed-to-be-university)",
+   "city": "Patiala",
+   "state": "Punjab",
+   "aliases": [
+    "TIETD"
+   ],
+   "source": "NIRF 2025 Management (rank 46)"
+  },
+  {
+   "value": "Thiagarajar School of Management",
+   "name": "Thiagarajar School of Management",
+   "city": "Madurai",
+   "state": "Tamil Nadu",
+   "aliases": [
+    "TSM"
+   ],
+   "source": "NIRF 2025 Management (rank 80)"
+  },
+  {
+   "value": "University of Allahabad",
+   "name": "University of Allahabad",
+   "city": "Prayagraj",
+   "state": "Uttar Pradesh",
+   "aliases": [],
+   "source": "NIRF 2025 Management (rank 101-125)"
+  },
+  {
+   "value": "University of Hyderabad",
+   "name": "University of Hyderabad",
+   "city": "Hyderabad",
+   "state": "Telangana",
+   "aliases": [],
+   "source": "NIRF 2025 Management (rank 101-125)"
+  },
+  {
+   "value": "University of Lucknow",
+   "name": "University of Lucknow",
+   "city": "Lucknow",
+   "state": "Uttar Pradesh",
+   "aliases": [],
+   "source": "NIRF 2025 Management (rank 100)"
+  },
+  {
+   "value": "UPES",
+   "name": "UPES",
+   "city": "Dehradun",
+   "state": "Uttarakhand",
+   "aliases": [],
+   "source": "NIRF 2025 Management (rank 36)"
+  },
+  {
+   "value": "Vignan's Foundation for Science, Technology and Research",
+   "name": "Vignan's Foundation for Science, Technology and Research",
+   "city": "Guntur",
+   "state": "Andhra Pradesh",
+   "aliases": [
+    "VSFSTR"
+   ],
+   "source": "NIRF 2025 Management (rank 101-125)"
+  },
+  {
+   "value": "XIM University",
+   "name": "XIM University",
+   "city": "Bhubaneswar",
+   "state": "Odisha",
+   "aliases": [
+    "XIMB"
+   ],
+   "source": "NIRF 2025 Management (rank 45)"
+  },
+  {
+   "value": "XLRI - Xavier School of Management",
+   "name": "XLRI - Xavier School of Management",
+   "city": "Jamshedpur",
+   "state": "Jharkhand",
+   "aliases": [
+    "XXSM",
+    "XLRI"
+   ],
+   "source": "NIRF 2025 Management (rank 10)"
+  }
+ ]
+}
