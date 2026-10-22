@@ -158,7 +158,7 @@ export function DraftView({
               {confirmed ? "Facts confirmed by you" : "Unconfirmed"}
             </span>
           </div>
-          <CopyPreview text={previewToText(preview)} confirmed={confirmed} />
+          <PreviewActions model={preview} confirmed={confirmed} />
           <p className="text-sm text-muted">
             Your own wording arranged as a resume. It is not AI-written, so some lines may read like notes.
             Empty sections are left out.
@@ -280,41 +280,85 @@ function Version({ label, text }: { label: string; text: string }) {
   );
 }
 
-/** Copies the preview as plain text. Falls back to a selectable box where the clipboard is blocked. */
-function CopyPreview({ text, confirmed }: { text: string; confirmed: boolean }) {
-  const [status, setStatus] = useState<"idle" | "copied" | "manual">("idle");
+/**
+ * Copy as text and Download PDF for the preview. Both use exactly the preview's content.
+ * Copy falls back to a selectable box where the clipboard is blocked.
+ */
+function PreviewActions({ model, confirmed }: { model: ResumePreviewModel; confirmed: boolean }) {
+  const [status, setStatus] = useState<
+    | { kind: "idle" }
+    | { kind: "copied" }
+    | { kind: "manual" }
+    | { kind: "pdf-working" }
+    | { kind: "pdf-done"; fileName: string; replaced: { from: string; to: string }[] }
+    | { kind: "pdf-failed" }
+  >({ kind: "idle" });
   const boxRef = useRef<HTMLTextAreaElement>(null);
+  const text = previewToText(model);
 
   async function copy() {
     try {
       await navigator.clipboard.writeText(text);
-      setStatus("copied");
-      setTimeout(() => setStatus((s) => (s === "copied" ? "idle" : s)), 2500);
+      setStatus({ kind: "copied" });
+      setTimeout(() => setStatus((s) => (s.kind === "copied" ? { kind: "idle" } : s)), 2500);
     } catch {
-      setStatus("manual");
+      setStatus({ kind: "manual" });
       setTimeout(() => boxRef.current?.select(), 0);
     }
   }
 
+  async function downloadPdf() {
+    if (status.kind === "pdf-working") return;
+    setStatus({ kind: "pdf-working" });
+    try {
+      const { createResumePdf } = await import("@/lib/resumePdf");
+      const pdf = await createResumePdf(model);
+      const url = URL.createObjectURL(pdf.blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = pdf.fileName;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 10_000);
+      setStatus({ kind: "pdf-done", fileName: pdf.fileName, replaced: pdf.replaced });
+    } catch {
+      setStatus({ kind: "pdf-failed" });
+    }
+  }
+
+  const button =
+    "rounded-lg border border-line-strong bg-surface px-3.5 py-2 text-sm font-semibold text-ink hover:bg-canvas disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
+  const reminder = confirmed ? "Uses your own wording." : "Uses your own wording. Check your facts before using it.";
+
   return (
     <div className="space-y-2">
-      <div className="flex flex-wrap items-center gap-3">
-        <button
-          type="button"
-          onClick={copy}
-          className="rounded-lg border border-line-strong bg-surface px-3.5 py-2 text-sm font-semibold text-ink hover:bg-canvas focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-        >
+      <div className="flex flex-wrap items-center gap-2">
+        <button type="button" onClick={copy} className={button}>
           Copy as text
         </button>
-        <p role="status" className="text-sm text-muted">
-          {status === "copied"
-            ? "Copied your resume text."
-            : confirmed
-              ? "Copies your own wording."
-              : "Copies your own wording. Check your facts before using it."}
-        </p>
+        <button type="button" onClick={downloadPdf} disabled={status.kind === "pdf-working"} className={button}>
+          {status.kind === "pdf-working" ? "Preparing PDF…" : "Download PDF"}
+        </button>
       </div>
-      {status === "manual" && (
+      <div role="status" className="text-sm text-muted">
+        {status.kind === "copied" && <p>Copied your resume text.</p>}
+        {status.kind === "pdf-working" && <p>Preparing your PDF…</p>}
+        {status.kind === "pdf-done" && (
+          <>
+            <p>Downloaded {status.fileName}.</p>
+            {status.replaced.length > 0 && (
+              <p className="mt-1 text-ink">
+                Some characters can&apos;t be shown in the PDF and were replaced:{" "}
+                {status.replaced.map((r) => `${r.from} → ${r.to}`).join(", ")}. Edit your text if that matters.
+              </p>
+            )}
+          </>
+        )}
+        {status.kind === "pdf-failed" && <p className="text-danger">The PDF couldn&apos;t be created. Try again, or use Copy as text.</p>}
+        {(status.kind === "idle" || status.kind === "manual") && <p>{reminder}</p>}
+      </div>
+      {status.kind === "manual" && (
         <div>
           <label htmlFor="copy-fallback" className="text-sm text-ink">
             Copying isn&apos;t allowed here. Select the text below and copy it yourself.

@@ -48,7 +48,11 @@ who have real venture or project experience but find it hard to describe their o
 - **Draft workspace** after the questions: an honest "drafting isn't connected" notice, fact checks where
   the resume and the answers disagree, a summary with Edit links, and a **resume layout preview**
   built only from the student's own wording, labelled *Unconfirmed* until they confirm the facts.
-  **Copy as text** copies that preview as plain text.
+  **Copy as text** copies that preview as plain text, and **Download PDF** saves a resume-only A4
+  PDF of it, generated in the browser: real, selectable text; every line wrapped inside the
+  margins; a section heading never left alone at the bottom of a page, and each bullet kept on one
+  page. Characters the standard PDF fonts can't show (for example ₹ or Devanagari) are replaced
+  (₹ becomes "Rs.") and the student is told which ones.
 - **Clear my data** removes everything entered and read in the session.
 - Responsive layout that works on mobile.
 
@@ -61,7 +65,8 @@ who have real venture or project experience but find it hard to describe their o
 - Resume and job-description extraction use simple rules, so unusual layouts may need manual
   correction (every extracted value is editable).
 - No accounts or saved progress: refreshing the page clears everything, by design for now.
-- No PDF/Word export yet.
+- No Word export. The PDF uses standard fonts, so non-Latin scripts such as Devanagari can't be
+  shown in it yet (they appear on screen and in Copy as text).
 
 ## How resume information is processed
 
@@ -149,6 +154,7 @@ npx vercel --prod
 ## Tech stack
 
 Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS 4 · unpdf for PDF text extraction ·
+jsPDF for resume PDF download (loaded only when used) ·
 Anthropic TypeScript SDK (behind a provider interface) with Zod-validated structured output for follow-up questions.
 
 ## Data sources
