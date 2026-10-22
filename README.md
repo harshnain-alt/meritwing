@@ -9,7 +9,7 @@ or any other function.
 **Target user:** MBA, PGDM and other business-school students in India applying for internships,
 who have real venture or project experience but find it hard to describe their own contribution.
 
-**Live prototype:** _Not deployed yet — see [Deployment](#deployment)._
+**Live prototype:** <https://meritwing.vercel.app>
 
 > **Prototype status:** the three-step onboarding, resume reading and the review screen work.
 > **AI drafting is not connected yet.** The app says so on screen and never shows simulated AI
@@ -83,6 +83,7 @@ hosting provider's settings and never committed.
 ## Deployment
 
 The app is a standard Next.js 16 project and deploys to Vercel with no extra configuration.
+The live prototype at <https://meritwing.vercel.app> is deployed this way with the Vercel CLI.
 
 **From the Vercel dashboard (recommended):** sign in at <https://vercel.com>, choose
 *Add New → Project*, import this GitHub repository, keep the detected Next.js settings, and click
