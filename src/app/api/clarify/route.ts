@@ -183,9 +183,14 @@ export async function POST(request: Request) {
     const result = sanitise(response.parsed_output, input.previous);
     return Response.json({ result }, { headers: { "Cache-Control": "no-store" } });
   } catch (err) {
-    // Log the error type and status only, never request or response content.
+    // Log the error type, status and the API's own error message (which describes the request,
+    // e.g. "credit balance is too low"), never request or response content.
     const status = err instanceof Anthropic.APIError ? err.status : undefined;
-    console.error(`[clarify] ${err instanceof Error ? err.name : "UnknownError"}${status ? ` status=${status}` : ""}`);
+    const apiError = err instanceof Anthropic.APIError ? (err.error as { error?: { type?: string; message?: string } })?.error : undefined;
+    console.error(
+      `[clarify] ${err instanceof Error ? err.name : "UnknownError"}${status ? ` status=${status}` : ""}` +
+        (apiError?.type ? ` ${apiError.type}: ${apiError.message ?? ""}` : ""),
+    );
 
     if (err instanceof Anthropic.AuthenticationError || err instanceof Anthropic.PermissionDeniedError) {
       return fail(503, {
@@ -201,7 +206,8 @@ export async function POST(request: Request) {
       return fail(502, {
         code: "rejected",
         retryable: false,
-        message: "The AI service rejected the request. Check the ANTHROPIC_MODEL setting, or shorten very long text.",
+        message:
+          "The AI service rejected the request, for example because the Anthropic account has no credit left or ANTHROPIC_MODEL is invalid. The server log has the exact reason.",
       });
     }
     if (err instanceof Anthropic.APIConnectionError || err instanceof Anthropic.InternalServerError || err instanceof Anthropic.APIError) {
