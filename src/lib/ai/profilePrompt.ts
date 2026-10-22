@@ -126,7 +126,9 @@ export function groundProfile(output: z.infer<typeof OutputSchema>, input: Profi
       text = `Team result: ${text}`;
     }
     seen.add(flat(text));
-    facts.push({ id: `F${facts.length + 1}`, text, evidence, source: f.source, kind: f.kind });
+    // Venture items quoted only from "what it was about" describe the venture, not the student's work.
+    const own = f.source === "resume" || quoteFound(`${v.personal}\n${v.results}`, evidence);
+    facts.push({ id: `F${facts.length + 1}`, text, evidence, source: f.source, kind: f.kind, basis: own ? "own" : "context" });
     if (facts.length === L.facts) break;
   }
 

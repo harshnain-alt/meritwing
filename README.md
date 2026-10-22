@@ -147,10 +147,31 @@ how many listings each rule left out:
    lead, head, director…) are left out; "Chief of Staff" is kept.
 8. **Duplicates:** the same company, title and location (or the same link) appear once.
 
-Results show openings whose title names the student's interest first, then the newest. Fit notes
-come from Gemini and are labelled *AI interpretation*; every reason must cite a confirmed profile
-item and quote the listing, and every unmet requirement must be quoted from the listing, or the
-server drops it.
+### How results are ranked
+
+The filters above stay strict; ranking only orders the openings that passed them. Each opening is
+compared with the student's **confirmed own-work profile items** (resume lines and their own venture
+contributions and results). An item is *linked* to an opening when the role's own text shares a
+responsibility or skill area with it (from a stated vocabulary in
+[`src/lib/jobs/evidence.ts`](src/lib/jobs/evidence.ts), e.g. suppliers and procurement, logistics,
+campaigns, content), or when an AI fit note cites it. These never count as evidence:
+
+- what the venture was about (its industry or team), and an employer's name in a job line;
+- skills the student only lists (shown instead as "you list it, but your profile doesn't show you
+  using it");
+- generic shared words alone (reporting, coordination, processes, planning, pricing);
+- company text: "About us" style sections, and sentences an employer repeats across its listings.
+
+Order: openings linked to two or more items first; those linked to fewer are labelled **Exploratory
+match** and follow. Within each group, openings that don't ask for more years of experience than the
+profile's dated roles show come first, then more linked items, then more shared areas; ties keep the
+search order (title names the interest first, then newest). The page states this rule; there are no
+scores or percentages. Every card shows the linked items with the shared areas, and what the listing
+asks for that the profile doesn't show: an experience requirement above the profile, skills it names,
+and (with AI fit notes) quoted requirements. Fit notes come from Gemini and are labelled
+*AI interpretation*; every reason must cite a confirmed profile item and quote at least four words of
+the listing, and every unmet requirement must be quoted from the listing, or the server drops it.
+AI fit notes are requested for the three highest-ranked openings, and on request for others.
 
 ## Unfinished or not yet built
 

@@ -70,7 +70,8 @@ describe("groundMatches", () => {
           {
             id: "j1",
             fits: [
-              { reason: "You compared supplier quotes, as this role asks.", factId: "F1", jobQuote: "Compare vendor quotes" },
+              { reason: "You compared supplier quotes, as this role asks.", factId: "F1", jobQuote: "Compare vendor quotes and shortlist suppliers" },
+              { reason: "Your quotes relate to its vendors.", factId: "F1", jobQuote: "vendor quotes" },
               { reason: "You negotiated contracts.", factId: "F1", jobQuote: "negotiate contracts" },
               { reason: "Matches supplier work.", factId: "F9", jobQuote: "shortlist suppliers" },
               { reason: "You used SAP for sourcing.", factId: "F1", jobQuote: "shortlist suppliers" },
@@ -81,9 +82,9 @@ describe("groundMatches", () => {
       },
       { facts, jobs: [job] },
     );
-    assert.deepEqual(result.j1.fits.map((f) => f.jobQuote), ["Compare vendor quotes"]);
+    assert.deepEqual(result.j1.fits.map((f) => f.jobQuote), ["Compare vendor quotes and shortlist suppliers"]);
     assert.deepEqual(result.j1.gaps, ["2+ years in procurement", "Advanced Excel"]);
-    assert.equal(result.j1.removed, 4);
+    assert.equal(result.j1.removed, 5, "a two-word fragment, an unquoted phrase, an unknown fact, an invented tool, and an unquoted gap");
   });
 
   test("a listing without a description is marked, not guessed", () => {

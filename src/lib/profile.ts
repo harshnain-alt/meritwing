@@ -21,6 +21,11 @@ export type ProfileFact = {
   evidence: string;
   source: FactSource | "student";
   kind: FactKind;
+  /**
+   * "own": something the student did (resume lines, their venture contributions or results, or
+   * added by them). "context": what the venture was about; never counted as the student's work.
+   */
+  basis: "own" | "context";
 };
 
 export type ProfileInput = {
@@ -70,7 +75,7 @@ export function profileFromOwnWords(data: ApplicationData): ProfileFact[] {
   const facts: ProfileFact[] = [];
   const add = (text: string, source: FactSource, kind: FactKind) => {
     const t = text.trim();
-    if (t && facts.length < PROFILE_LIMITS.facts) facts.push({ id: `F${facts.length + 1}`, text: t, evidence: t, source, kind });
+    if (t && facts.length < PROFILE_LIMITS.facts) facts.push({ id: `F${facts.length + 1}`, text: t, evidence: t, source, kind, basis: "own" });
   };
   splitItems(e.personal).forEach((t) => add(t, "venture", "experience"));
   splitItems(e.results).forEach((t) => add(e.resultsAttribution === "shared" ? `Team result: ${t}` : t, "venture", "achievement"));

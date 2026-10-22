@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { ClarifyError } from "@/lib/clarify";
 import type { JobExplanation } from "@/lib/jobs/explain";
+import { RANKING_RULE, type RankedJob } from "@/lib/jobs/rank";
 import { ANYWHERE_IN_INDIA, CITIES, FUNCTIONS } from "@/lib/jobs/taxonomy";
 import { NOT_CONNECTED, type JobListing, type JobPreferences, type JobSearchResult } from "@/lib/jobs/types";
 
@@ -23,6 +24,8 @@ export const EXPLAIN_BATCH = 3;
 
 type JobsViewProps = {
   jobs: JobsState;
+  /** The openings in evidence order, with the evidence for each. */
+  ranked: RankedJob[];
   prefs: JobPreferences;
   /** Preferences changed after these results were found. */
   outdated: boolean;
@@ -56,9 +59,10 @@ export function summarisePreferences(p: JobPreferences): string {
 
 /** Real openings from the employer boards searched, with transparent match criteria. */
 export function JobsView(props: JobsViewProps) {
-  const { jobs, prefs, outdated, explanationsOutdated, onSearch, onExplain, onEditPreferences, onPasteOwn, explainError } = props;
+  const { jobs, ranked, prefs, outdated, explanationsOutdated, onSearch, onExplain, onEditPreferences, onPasteOwn, explainError } = props;
   const result = jobs.result;
-  const unexplained = result?.jobs.filter((j) => !jobs.explanations[j.id]).map((j) => j.id) ?? [];
+  const unexplained = ranked.filter((r) => !jobs.explanations[r.job.id]).map((r) => r.job.id);
+  const exploratory = ranked.filter((r) => r.exploratory).length;
 
   return (
     <div className="space-y-6">
@@ -113,15 +117,18 @@ export function JobsView(props: JobsViewProps) {
             <NoResults {...props} result={result} />
           ) : (
             <>
-              <p className="text-sm text-muted">
-                {result.counts.shown} {result.counts.shown === 1 ? "opening matches" : "openings match"} all your preferences
-                {result.counts.shown === 40 ? " (showing the first 40)" : ""}. Roles whose title names your interest come
-                first, then the newest. Matching is by the words in each listing; there are no scores.
-              </p>
+              <div className="space-y-1.5 text-sm text-muted">
+                <p className="text-ink">
+                  {result.counts.shown} {result.counts.shown === 1 ? "opening matches" : "openings match"} your type, role,
+                  location and workplace choices{result.counts.shown === 40 ? " (showing the first 40)" : ""}
+                  {exploratory > 0 && `; ${exploratory} of them ${exploratory === 1 ? "is an exploratory match" : "are exploratory matches"} with limited evidence in your profile`}.
+                </p>
+                <p>{RANKING_RULE}</p>
+              </div>
               {explanationsOutdated && (
                 <p role="status" className="text-sm text-ink">
                   Your profile changed, so the fit notes below are outdated.{" "}
-                  <button type="button" onClick={() => onExplain(result.jobs.slice(0, EXPLAIN_BATCH).map((j) => j.id))} className="font-semibold text-accent underline underline-offset-2">
+                  <button type="button" onClick={() => onExplain(ranked.slice(0, EXPLAIN_BATCH).map((r) => r.job.id))} className="font-semibold text-accent underline underline-offset-2">
                     Explain again
                   </button>
                 </p>
@@ -132,13 +139,13 @@ export function JobsView(props: JobsViewProps) {
                 </p>
               )}
               <ol className="space-y-4">
-                {result.jobs.map((job) => (
-                  <JobCard key={job.id} job={job} {...props} />
+                {ranked.map((r) => (
+                  <JobCard key={r.job.id} job={r.job} rank={r} {...props} />
                 ))}
               </ol>
               {unexplained.length > 0 && (
                 <button type="button" onClick={() => onExplain(unexplained.slice(0, EXPLAIN_BATCH))} className={secondary}>
-                  Explain the fit for the next {Math.min(EXPLAIN_BATCH, unexplained.length)}
+                  Get AI fit notes for the next {Math.min(EXPLAIN_BATCH, unexplained.length)}
                 </button>
               )}
             </>
@@ -239,7 +246,7 @@ function NoResults({ result, prefs, onEditPreferences, onPasteOwn, onIncludeCity
   );
 }
 
-function JobCard({ job, jobs, selectedJobId, hasOwnDescription, onSelect, onExplain }: JobsViewProps & { job: JobListing }) {
+function JobCard({ job, rank, jobs, selectedJobId, hasOwnDescription, onSelect, onExplain }: JobsViewProps & { job: JobListing; rank: RankedJob }) {
   const [confirming, setConfirming] = useState(false);
   const explanation = jobs.explanations[job.id];
   const selected = selectedJobId === job.id;
@@ -255,7 +262,12 @@ function JobCard({ job, jobs, selectedJobId, hasOwnDescription, onSelect, onExpl
           <h3 className="text-[17px] font-semibold leading-snug text-ink">{job.title}</h3>
           <p className="mt-0.5 text-[15px] text-ink-soft">{job.company}</p>
         </div>
-        {selected && <span className="rounded-full bg-accent-soft px-2.5 py-0.5 text-xs font-semibold text-accent">Selected</span>}
+        <div className="flex flex-wrap gap-1.5">
+          {rank.exploratory && (
+            <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-900">Exploratory match</span>
+          )}
+          {selected && <span className="rounded-full bg-accent-soft px-2.5 py-0.5 text-xs font-semibold text-accent">Selected</span>}
+        </div>
       </div>
 
       <dl className="mt-3 grid gap-x-6 gap-y-1.5 text-sm sm:grid-cols-2">
@@ -283,6 +295,8 @@ function JobCard({ job, jobs, selectedJobId, hasOwnDescription, onSelect, onExpl
         <span className="text-muted"> · {job.company}&apos;s {job.source.platform} careers board</span>
       </p>
 
+      <EvidenceBlock rank={rank} />
+
       <div className="mt-3 rounded-lg bg-canvas px-4 py-3 text-sm">
         <p className="font-semibold text-ink">Matches your preferences</p>
         <ul className="mt-1 space-y-0.5 text-ink-soft">
@@ -297,7 +311,7 @@ function JobCard({ job, jobs, selectedJobId, hasOwnDescription, onSelect, onExpl
       <div className="mt-3 text-sm">
         {!explanation && (
           <button type="button" onClick={() => onExplain([job.id])} className="font-semibold text-accent underline underline-offset-2">
-            Explain how my profile fits
+            Get AI fit notes for this listing
           </button>
         )}
         {explanation?.status === "loading" && <p className="text-muted">Comparing your profile with this listing…</p>}
@@ -330,6 +344,51 @@ function JobCard({ job, jobs, selectedJobId, hasOwnDescription, onSelect, onExpl
         )}
       </div>
     </li>
+  );
+}
+
+/** The rule-based evidence behind the ranking: linked own-work items and what isn't shown. */
+function EvidenceBlock({ rank }: { rank: RankedJob }) {
+  const { evidence, linkedCount, exploratory } = rank;
+  const exp = evidence.experience;
+  const missing = [
+    ...(exp?.gap
+      ? [`Asks for ${exp.requiredYears}+ years of experience; your profile shows ${exp.profileMonths ? `about ${exp.profileMonths} months of dated work` : "no dated work experience"}.`]
+      : []),
+    ...evidence.skillsNotShown.map((s) => `${s[0].toUpperCase()}${s.slice(1)}: named in the listing, not shown in your profile.`),
+    ...evidence.listedOnly.map((s) => `${s[0].toUpperCase()}${s.slice(1)}: you list it, but your profile doesn't show you using it.`),
+  ];
+  return (
+    <div className="mt-3 space-y-2 rounded-lg border border-line px-4 py-3 text-sm">
+      <p className="font-semibold text-ink">
+        Evidence from your profile{" "}
+        <span className="font-normal text-muted">
+          · linked to {linkedCount} of your own-work {linkedCount === 1 ? "item" : "items"}
+          {exploratory ? " (exploratory: limited evidence)" : ""}
+        </span>
+      </p>
+      {evidence.linked.length === 0 ? (
+        <p className="text-ink-soft">None of your own-work items share responsibility or skill words with this listing.</p>
+      ) : (
+        <ul className="space-y-1 text-ink-soft">
+          {evidence.linked.map((l) => (
+            <li key={l.factId}>
+              “{l.factText}” <span className="text-muted">— the listing also mentions {l.terms.join(", ")}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+      {missing.length > 0 && (
+        <div>
+          <p className="font-medium text-ink">Not shown in your profile</p>
+          <ul className="mt-0.5 list-disc space-y-0.5 pl-5 text-ink-soft">
+            {missing.map((m) => (
+              <li key={m}>{m}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
   );
 }
 

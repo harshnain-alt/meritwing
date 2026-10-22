@@ -1,0 +1,406 @@
+{
+ "recorded": "2026-10-22T13:08:50.716Z",
+ "note": "Real listings from the configured employer boards (Bengaluru, full-time), descriptions capped at 3000 characters. Recorded for tests only; never shown as live results.",
+ "jobs": [
+  {
+   "id": "lever:zeta:95e45b27-6712-47ba-8944-1253791e7896",
+   "title": "Manager - Employer Branding & Communications",
+   "company": "Zeta",
+   "locations": [
+    "Bangalore - DD"
+   ],
+   "employmentType": "full-time",
+   "employmentTypeText": "Full-time",
+   "workplace": "onsite",
+   "postedAt": "2026-10-16T10:11:59.988Z",
+   "url": "https://jobs.lever.co/zeta/95e45b27-6712-47ba-8944-1253791e7896",
+   "applyUrl": "https://jobs.lever.co/zeta/95e45b27-6712-47ba-8944-1253791e7896/apply",
+   "source": {
+    "platform": "Lever",
+    "employer": "Zeta",
+    "boardUrl": "https://jobs.lever.co/zeta"
+   },
+   "retrievedAt": "2026-10-22T13:08:50.716Z",
+   "description": "About Us\nBuild the future of banking.\nZeta is a next-generation banking technology company providing cloud-native, fully stackable processing and core banking platforms for issuers. With a focus on scalability, compliance, and innovation, Zeta empowers financial institutions to modernize their technology infrastructure and deliver secure, seamless digital banking experiences.\n Our Impact and Growth\nOur impact runs at real-world scale. Today, over 25 million cards are live on Zeta-powered platforms across 7 countries, supported by a passionate team of 1,700+ Zetanauts across India, the US, EMEA, and Asia. Backed by SoftBank Vision Fund, Mastercard, and other reputed strategic investors, we reached a valuation of $2 billion in Jan 1, 2025.\n Our Product Lines\nOur focus is on establishing product lines that focus on key outcomes by addressing real customer pain points, modernizing legacy systems, and strengthening core fundamentals. As a result, our systems and platforms support a wide range of banking and payments capabilities, including:\n\nProduct\n Description\nTachyon\nOur cloud-native banking stack built for population-scale systems\nCipher\nOur unified authentication platform for secure, high-volume banking environments\nDigital Credit as a Service\nEnabling banks to launch credit lines on UPI\nElena\nOur intelligent and conversational AI platform for banking\nPixel\nIndia’s first digital-native credit card, launched in partnership with HDFC Bank, for whom we also revamped their PayZapp mobile app: Winner of the Celent Model Bank Award for Payments Innovation 2024\nSparrow\nThe leading card experience for non-prime cardholders in the US\n…and more across cards, payments, lending, and core banking.\n Our Culture and Values\nWe are an engineering-first organization that values ownership, bias for action, and long-term thinking. Together, we solve some of the hardest problems in banking tech. Our culture is built around trust, collaboration, and creating the conditions for you to drive impact proportionate to your potential. Reinforcing our commitment to creating an inclusive and supportive workplace, we have been consistently recognized as a Great Place to Work.\nIf you want to build cutting-edge banking tech that enables banks to serve millions reliably, securely, and at a population scale, Zeta is your playground.\nLearn More About Zeta\nIf you would like to learn more about how we have grown and evolved over the years, watch our journey here. You can also explore our website and follow us on LinkedIn, Instagram,YouTube, and X.\n \nAbout the role\n \nIn this role you own how Zeta is seen outside the company as an employer brand, how it speaks to its people, and how it brings them together. Employer branding, internal communications, employee engagement & culture building carry equal weight. This is a hands-on manager role: you write and create content yourself, set creative direction, and lead a team.\n\n\nResponsibilities\nEmployer Branding\n\n• \nShape the employer brand s",
+   "criteria": [
+    {
+     "label": "Function",
+     "detail": "“communications” in the job title (Marketing & brand)"
+    },
+    {
+     "label": "Location",
+     "detail": "Bangalore - DD (matches Bengaluru)"
+    },
+    {
+     "label": "Type",
+     "detail": "Full-time (“Full-time”)"
+    },
+    {
+     "label": "Workplace",
+     "detail": "On-site"
+    }
+   ],
+   "roleInTitle": true
+  },
+  {
+   "id": "greenhouse:stripe:8247120",
+   "title": "Monetization Operations Analyst",
+   "company": "Stripe",
+   "locations": [
+    "Bengaluru"
+   ],
+   "employmentType": "not-stated",
+   "employmentTypeText": "",
+   "workplace": "not-stated",
+   "postedAt": "2026-10-16T04:16:28-04:00",
+   "url": "https://stripe.com/jobs/search?gh_jid=8247120",
+   "applyUrl": "https://stripe.com/jobs/search?gh_jid=8247120",
+   "source": {
+    "platform": "Greenhouse",
+    "employer": "Stripe",
+    "boardUrl": "https://boards.greenhouse.io/stripe"
+   },
+   "retrievedAt": "2026-10-22T13:08:50.716Z",
+   "description": "Who we are\n\nAbout Stripe\n\nStripe is a financial infrastructure platform for businesses. Millions of companies—from the world's largest enterprises to the most ambitious startups—use Stripe to accept payments, grow their revenue, and accelerate new business opportunities. Our mission is to increase the GDP of the internet, and we have a staggering amount of work ahead. That means you have an unprecedented opportunity to put the global economy within everyone's reach while doing the most important work of your career.\n\nAbout the team\n\nThe Finance Operations (FinOps) team provides and enhances core business services that are the backbone of Stripe. FinOps uses data and operational excellence to deliver technology solutions, payroll services, operational excellence, and monetization services to Stripe.\n\nWhat you'll do\n\nWe're looking for a Monetization Operations Analyst to join our growing team. You'll help us improve user experience through accurate and timely onboarding of contracts and workflows, and deliver improvements in our integrated financial systems with business partners, financial colleagues, and engineers.\n\nResponsibilities\n\n• Onboard sold custom contracts into our billing systems.\n\n• Work with legal contracts with strong attention to detail and accuracy.\n\n• Develop and manage scalable billing and collection processes for complex user agreements and new business operations.\n\n• Build scalable and auditable onboarding processes for new and existing users.\n\n• Partner with internal systems, global deal management, legal, sales ops, internal audit, go-to-market, engineering, and accounting teams to develop and improve processes for contract reviews and to anticipate changing business requirements.\n\n• Partner with account managers to resolve user inquiries related to onboarding implementation, billing, and collections.\n\n• Advocate for the customer to internal stakeholders. Share system feedback and insights with Sales, Product Management, Engineering, Support, and Legal on innovation and improvements needed to optimize the Stripe user experience.\n\n• Help scope, build, and deliver continuous process improvements that enhance operations.\n\nWho you are\n\nWe're looking for someone who meets the minimum requirements to be considered for the role. If you meet these requirements, you are encouraged to apply. The preferred qualifications are a bonus, not a requirement.\n\nMinimum requirements\n\n• 5+ years of experience in a client-facing role, ideally in customer success, consulting, financial services, account management, or sales, preferably working with technical products.\n\n• Track record of leading technical conversations and persuading others to take action based on requirements and value provided by solutions.\n\n• Ability to be detail-oriented while visualizing the larger impact of a series of transactions.\n\n• Strong problem-solving skills and the ability to navigate data and people to find answers.\n\n• Strong operating rigor, including organizational ",
+   "criteria": [
+    {
+     "label": "Function",
+     "detail": "“operations” in the job title (Operations)"
+    },
+    {
+     "label": "Location",
+     "detail": "Bengaluru (matches Bengaluru)"
+    },
+    {
+     "label": "Type",
+     "detail": "Not stated by the employer"
+    },
+    {
+     "label": "Workplace",
+     "detail": "Not stated by the employer"
+    }
+   ],
+   "roleInTitle": true
+  },
+  {
+   "id": "greenhouse:groww:4980317101",
+   "title": "Procurement Specialist",
+   "company": "Groww",
+   "locations": [
+    "Bengaluru-VTP, India"
+   ],
+   "employmentType": "not-stated",
+   "employmentTypeText": "",
+   "workplace": "not-stated",
+   "postedAt": "2026-10-14T11:07:00-04:00",
+   "url": "https://job-boards.eu.greenhouse.io/groww/jobs/4980317101",
+   "applyUrl": "https://job-boards.eu.greenhouse.io/groww/jobs/4980317101",
+   "source": {
+    "platform": "Greenhouse",
+    "employer": "Groww",
+    "boardUrl": "https://boards.greenhouse.io/groww"
+   },
+   "retrievedAt": "2026-10-22T13:08:50.716Z",
+   "description": "About Groww:\n\nWe are a passionate group of people focused on making financial services accessible to every Indian through a multi-product platform. Each day, we help millions of customers take charge of their financial journey. Customer obsession is in our DNA. Every product, every design, every algorithm down to the tiniest detail is executed keeping the customers’ needs and convenience in mind. Our people are our greatest strength. Everyone at Groww is driven by ownership, customer-centricity, integrity and the passion to constantly challenge the status quo.\n\nAre you as passionate about defying conventions and creating something extraordinary as we are? Let’s chat.\n\nOur Vision\n\nEvery individual deserves the knowledge, tools, and confidence to make informed financial decisions. At Groww, we are making sure every Indian feels empowered to do so through a cutting-edge multi-product platform offering a variety of financial services. Our long-term vision is to become the trusted financial partner for millions of Indians.\n\nOur Values\n\nOur culture enables us to be what we are — India’s fastest-growing financial services company. It fosters an environment where collaboration, transparency, and open communication take center-stage and hierarchies fade away. There is space for every individual to be themselves and feel motivated to bring their best to the table, as well as craft a promising career for themselves.\n\nThe values that form our foundation are:\n\n• Radical customer centricity\n\n• Ownership-driven culture\n\n• Keeping everything simple\n\n• Long-term thinking\n\n• Complete transparency\n\nAbout the Role\n\nWe seek an experienced, results-driven purchasing manager to join our team at Groww. As a purchase manager, you will be responsible for handling the procurement process, sourcing suppliers and managing vendor relationships to ensure a seamless supply chain and optimise costs. You will also collaborate with cross-functional teams, make strategic decisions and implement best practices within our procurement function.\n\nThis is an exciting opportunity to contribute to our company's success and be part of a dynamic team in a competitive market.\n\nKey Responsibilities\n\n• Develop and implement procurement strategies and policies for cost optimization and supply chain efficiency\n\n• Identify, evaluate, and select suppliers based on quality, cost-effectiveness, and ethical standards\n\n• Negotiate contracts and terms with suppliers to ensure favorable pricing and mutually beneficial agreements\n\n• Manage supplier relationships, including performance evaluation, issue resolution, and long-term partnership building\n\n• Conduct market research and analysis to stay updated on industry trends and pricing fluctuations\n\n• Monitor inventory levels, analyze demand patterns, and implement inventory management strategies\n\n• Collaborate with internal stakeholders to understand requirements and align procurement with organizational goals\n\n• Implement procurement systems and tools to",
+   "criteria": [
+    {
+     "label": "Function",
+     "detail": "“procurement” in the job title (Supply chain & procurement)"
+    },
+    {
+     "label": "Location",
+     "detail": "Bengaluru-VTP, India (matches Bengaluru)"
+    },
+    {
+     "label": "Type",
+     "detail": "Not stated by the employer"
+    },
+    {
+     "label": "Workplace",
+     "detail": "Not stated by the employer"
+    }
+   ],
+   "roleInTitle": true
+  },
+  {
+   "id": "lever:meesho:0a1226b1-1fff-4a4f-81a4-7e85087c8d08",
+   "title": "Manager-  Fulfilment & Experience",
+   "company": "Meesho",
+   "locations": [
+    "Bangalore, Karnataka"
+   ],
+   "employmentType": "full-time",
+   "employmentTypeText": "Full Time Employee",
+   "workplace": "onsite",
+   "postedAt": "2026-10-14T08:59:56.430Z",
+   "url": "https://jobs.lever.co/meesho/0a1226b1-1fff-4a4f-81a4-7e85087c8d08",
+   "applyUrl": "https://jobs.lever.co/meesho/0a1226b1-1fff-4a4f-81a4-7e85087c8d08/apply",
+   "source": {
+    "platform": "Lever",
+    "employer": "Meesho",
+    "boardUrl": "https://jobs.lever.co/meesho"
+   },
+   "retrievedAt": "2026-10-22T13:08:50.716Z",
+   "description": "About the Team\n \nBeing part of Meesho's Fulfillment and Experience (F&E) team as Manager will zip you to the cockpit of our ever-burgeoning rocketship and, you’ll shape the experience of Bharat’s next billion e-commerce users. We’re an eclectic mix of over 100 professionals, all driven by the first principles of problem-solving. We come with diverse skill sets and responsibilities ranging from running operations/support to managing the supply chain, and maintaining analytics to ensure the best possible user and seller experience. At Meesho, we are on a mission to achieve what has never been done before – introducing e-commerce to the tier-2 and tier-3 cities of India. Our team's crucial contribution to this ambitious endeavor involves completely reimagining fulfillment from the ground up. This translates into a multitude of \"zero-to-one\" projects, offering opportunities for those willing to seize them. Our focus is on constructing a supply chain and user experience that reshapes the landscape of e-commerce. Simultaneously, we are unwavering in our commitment to introducing best-in-class processes and policies, coupled with a steadfast dedication to continuous innovation. The ultimate goal is to consistently deliver excellence in both User and Seller experiences. Emphasizing personal growth and enjoyment at work is integral to our culture, just as much as our dedication to hard work. We foster this through regular one-on-one virtual meetings, engaging monthly all-team catch-ups, and timely recognition and rewards. Join us in this exciting journey where innovation meets personal and professional development!\n \nAbout the Role\nAs a Manager- F&E, you'll be responsible for identifying key problems, setting the priorities, coming up with solutions and driving implementation. In order to drive implementation, you'll get complete autonomy in terms of the team and processes that you would want to set up. You'll also be responsible for shaping up the right solutions in coordination with the product team, in case your solution requires tech interventions.\n\n\nWhat you will do\n• \nDesign programs to improve experience metrics, driving improvement in NPS or relevant operational metrics\n\n• \nOwn a key part of user experience for one or more of marketplace participants - our entrepreneurs, their customers, or our suppliers\n\n• \nParticipate in building strategy as an advocate for better user experience from the vantage point the programs you own\n\n• \nInfluence product development choices using data and insights which originate from in-depth knowledge of your program\n\n• \nDrive program adherence with operations teams and continuously solve edge cases with suboptimal outcomes due to current processes\n\n• \nEngage the Meesho Leadership as active stakeholders in problem-solving for your programs\n\n• \nManage internal and external stakeholders to ensure success of the programs you own.\n\n• \nThe role requires strong generalist problem solving skills and offers mobility across diff",
+   "criteria": [
+    {
+     "label": "Function",
+     "detail": "“fulfilment” in the job title (Operations)"
+    },
+    {
+     "label": "Location",
+     "detail": "Bangalore, Karnataka (matches Bengaluru)"
+    },
+    {
+     "label": "Type",
+     "detail": "Full-time (“Full Time Employee”)"
+    },
+    {
+     "label": "Workplace",
+     "detail": "On-site"
+    }
+   ],
+   "roleInTitle": true
+  },
+  {
+   "id": "greenhouse:groww:5000706101",
+   "title": "Finance Content Creator",
+   "company": "Groww",
+   "locations": [
+    "Bengaluru, India"
+   ],
+   "employmentType": "not-stated",
+   "employmentTypeText": "",
+   "workplace": "not-stated",
+   "postedAt": "2026-10-09T03:18:37-04:00",
+   "url": "https://job-boards.eu.greenhouse.io/groww/jobs/5000706101",
+   "applyUrl": "https://job-boards.eu.greenhouse.io/groww/jobs/5000706101",
+   "source": {
+    "platform": "Greenhouse",
+    "employer": "Groww",
+    "boardUrl": "https://boards.greenhouse.io/groww"
+   },
+   "retrievedAt": "2026-10-22T13:08:50.716Z",
+   "description": "About Groww:\n\nWe are a passionate group of people focused on making financial services accessible to every Indian through a multi-product platform. Each day, we help millions of customers take charge of their financial journey. Customer obsession is in our DNA. Every product, every design, every algorithm down to the tiniest detail is executed keeping the customers’ needs and convenience in mind. Our people are our greatest strength. Everyone at Groww is driven by ownership, customer-centricity, integrity and the passion to constantly challenge the status quo.\n\nAre you as passionate about defying conventions and creating something extraordinary as we are? Let’s chat.\n\nOur Vision\n\nEvery individual deserves the knowledge, tools, and confidence to make informed financial decisions. At Groww, we are making sure every Indian feels empowered to do so through a cutting-edge multi-product platform offering a variety of financial services. Our long-term vision is to become the trusted financial partner for millions of Indians.\n\nOur Values\n\nOur culture enables us to be what we are — India’s fastest-growing financial services company. It fosters an environment where collaboration, transparency, and open communication take center-stage and hierarchies fade away. There is space for every individual to be themselves and feel motivated to bring their best to the table, as well as craft a promising career for themselves.\n\nThe values that form our foundation are:\n\n• Radical customer centricity\n\n• Ownership-driven culture\n\n• Keeping everything simple\n\n• Long-term thinking\n\n• Complete transparency\n\nJob Summary:\n\nWe are looking for a dynamic and camera-friendly Finance Content Creator - YouTube to become the face of our channel. The ideal candidate will have the ability to simplify complex topics, engage audiences, and deliver content with energy and authenticity. If you love being in front of the camera and have a knack for storytelling, we'd love to hear from you!\n\nKey Responsibilities:\n\n• Present On Camera: Deliver scripts with high energy, excellent voice modulation, and natural expressions\n\n• Create Engaging Content: Produce short-form and long-form videos on finance, stock markets, brands, and trending topics\n\n• Simplify Complex Topics: Make financial concepts relatable and entertaining for diverse audiences\n\n• Collaborate with Teams: Work closely with scriptwriters, video editors, and producers on content planning and shoots\n\n• Stay Trendy: Keep up with social media trends, algorithms, and audience feedback\n\nRequirements & Skills\n\n• Camera Confidence: Strong, friendly, and expressive on-screen personality\n\n• Communication: Excellent spoken communication with clear pronunciation\n\n• Languages: Fluency in English and Hindi (bilingual preferred)\n\nPreferred Qualifications\n\n• Experience: 1 - 2 years as content creator or camera facing role in any brands\n\n• Background: Anchoring, acting, journalism, mass communication, or digital content creation experience\n\nThis is",
+   "criteria": [
+    {
+     "label": "Function",
+     "detail": "“content” in the job title (Marketing & brand)"
+    },
+    {
+     "label": "Location",
+     "detail": "Bengaluru, India (matches Bengaluru)"
+    },
+    {
+     "label": "Type",
+     "detail": "Not stated by the employer"
+    },
+    {
+     "label": "Workplace",
+     "detail": "Not stated by the employer"
+    }
+   ],
+   "roleInTitle": true
+  },
+  {
+   "id": "greenhouse:inmobi:8266455",
+   "title": "Manager - Social Media",
+   "company": "InMobi",
+   "locations": [
+    "bangalore"
+   ],
+   "employmentType": "not-stated",
+   "employmentTypeText": "",
+   "workplace": "not-stated",
+   "postedAt": "2026-10-09T03:16:46-04:00",
+   "url": "https://job-boards.greenhouse.io/inmobi/jobs/8266455",
+   "applyUrl": "https://job-boards.greenhouse.io/inmobi/jobs/8266455",
+   "source": {
+    "platform": "Greenhouse",
+    "employer": "InMobi",
+    "boardUrl": "https://boards.greenhouse.io/inmobi"
+   },
+   "retrievedAt": "2026-10-22T13:08:50.716Z",
+   "description": "InMobi (Corporate)\n\nInMobi Group is a global technology company shaping the future of agentic commerce and advertising. Through its ecosystem of businesses — including InMobi Advertising and flagship consumer platform Glance — InMobi leverages data, machine learning, and generative AI to help brands reach audiences more precisely and consumers discover products more intuitively. Glance, which is pioneering new models of agentic commerce, is owned and operated by Glance InMobi Pte. Ltd., a non-consolidated subsidiary of InMobi Pte. Ltd.\n\nInMobi Advertising\n\nInMobi Advertising, part of global technology company InMobi, is an agentic advertising platform helping brands and merchants achieve their business outcomes. Through its proprietary intelligence, AI-led solutions, and vast consumer reach — including flagship consumer platform Glance — InMobi Advertising delivers the omnichannel performance defining what's next in advertising and commerce. Glance is owned and operated by Glance InMobi Pte. Ltd., a non-consolidated subsidiary of InMobi Pte. Ltd. To learn more, visit advertising.inmobi.com.\n\nGlance\n\nGlance is an intelligent shopping agent, redefining the commerce experience. Powered by proprietary agentic intelligence and generative AI, Glance delivers a hyper-personalized consumer experience across mobile and TV — shaping the new era of shopping. Glance is operated by Glance InMobi Pte. Ltd., a non-consolidated subsidiary of global technology leader InMobi, and is backed by Mithril Capital, Google and Jio Platforms. To learn more, visit glance.com.\n\nAbout InMobi\n\nInMobi is a global technology company shaping the future of agentic commerce and advertising. Through its ecosystem of businesses, including independently operated consumer platform Glance, InMobi leverages data, machine learning, and generative AI to help brands reach audiences more precisely and consumers discover products more intuitively. Glance, which is pioneering new models of agentic commerce, is owned and operated by Glance InMobi Pte. Ltd., an associate of InMobi Technology Services Pte. Ltd.\n\nThe InMobi Group\n\nThe InMobi Group is the umbrella under which this ecosystem of businesses comes together. It spans:\n\n• Consumer brands: Glance, an intelligent shopping agent, and 1Weather, a hyperlocal weather application.\n\n• Enterprise platforms: InMobi Advertising, which provides media buyers and owners with the tools, data, and expertise to grow their business on mobile and beyond.\n\nEach business serves its own audiences and has its own identity. At group level, InMobi is the common thread: the company, the technology, and the point of view behind them. This role owns how that group is presented and understood.\n\nRole Overview\n\nThe Social Media Manager & Community is a global, group-level position based in Bengaluru, reporting to the Global Head of Corporate Marketing. \"Group level\" means the role represents the InMobi Group as a whole, rather than any single business. It is responsi",
+   "criteria": [
+    {
+     "label": "Function",
+     "detail": "“social media” in the job title (Marketing & brand)"
+    },
+    {
+     "label": "Location",
+     "detail": "bangalore (matches Bengaluru)"
+    },
+    {
+     "label": "Type",
+     "detail": "Not stated by the employer"
+    },
+    {
+     "label": "Workplace",
+     "detail": "Not stated by the employer"
+    }
+   ],
+   "roleInTitle": true
+  },
+  {
+   "id": "greenhouse:stripe:8248096",
+   "title": "Risk Operations Manager",
+   "company": "Stripe",
+   "locations": [
+    "Bangalore"
+   ],
+   "employmentType": "not-stated",
+   "employmentTypeText": "",
+   "workplace": "not-stated",
+   "postedAt": "2026-10-05T06:46:26-04:00",
+   "url": "https://stripe.com/jobs/search?gh_jid=8248096",
+   "applyUrl": "https://stripe.com/jobs/search?gh_jid=8248096",
+   "source": {
+    "platform": "Greenhouse",
+    "employer": "Stripe",
+    "boardUrl": "https://boards.greenhouse.io/stripe"
+   },
+   "retrievedAt": "2026-10-22T13:08:50.716Z",
+   "description": "About Stripe\n\nStripe is a financial infrastructure platform for businesses. Millions of companies—from the world’s largest enterprises to the most ambitious startups—use Stripe to accept payments, grow their revenue, and accelerate new business opportunities. Our mission is to increase the GDP of the internet, and we have a staggering amount of work ahead. That means you have an unprecedented opportunity to put the global economy within everyone’s reach while doing the most important work of your career.\n\nAbout the team\n\nPartner Risk Operations(PRO) is responsible for managing the risk relationships with our critical payment ecosystem partners, including global payment methods, card networks, and banking partners. Our mission is to establish operational controls that mitigate user and partner risk while enabling strategic development opportunities. At the Stripe Delivery Center, the team will provide operational support for scaled investigations, assist with inquiries, and assess nuanced and complex partner programs.\n\nWhat you’ll do\n\nIn this role, you will lead a team of Partner Risk Operations Associates dedicated to managing higher-tier support, including escalations from Tier 1 and internal escalations. Your team will assess onboarding possibilities from a partner perspective, collaborating closely with our Go-To-Market (GTM) teams to ensure seamless integration of new users. As subject matter experts in card monitoring programs and banking partner relationships, you will drive initiatives that enhance our risk management capabilities.\n\nThe Partner Risk Operations Manager will be an adaptable leader and cultivate the engagement of their team members while guiding them to be the best they can be, through feedback, coaching, mentoring, and advocacy within the organization. This means helping to set team goals, and using metrics to efficiently measure and guide team performance in pursuit of those goals. To be a fit, you will have a strong operations mindset, be able to move quickly, and be passionate about delivering an incredible user experience.\n\nResponsibilities\n\n• Recruit, manage, coach, and develop a team of in-office Risk Operations Associates \n\n• Guide your team to handle risk-related user escalations and support internal teams with complex inquiries, guiding cross-functional teams on how to navigate network compliance rules\n\n• Drive strong operational delivery and process improvement helping to maintain risk detection strategies and business rules that balance risk and customer experience\n\n• Build a great culture and ensure team members are happy, effective, and growing in their career\n\n• Set clear goals and direction, and provide regular feedback on team members’ performance\n\n• Be data-driven in your analysis of performance, and in your decision making\n\n• Transmit and foster our values, serving as a beacon of Stripe’s user-centric philosophy and culture of transparency, empathy, inclusion, and empowerment\n\nWho you are\n\nWe're looking for",
+   "criteria": [
+    {
+     "label": "Function",
+     "detail": "“operations” in the job title (Operations)"
+    },
+    {
+     "label": "Location",
+     "detail": "Bangalore (matches Bengaluru)"
+    },
+    {
+     "label": "Type",
+     "detail": "Not stated by the employer"
+    },
+    {
+     "label": "Workplace",
+     "detail": "Not stated by the employer"
+    }
+   ],
+   "roleInTitle": true
+  },
+  {
+   "id": "lever:meesho:538d386d-a584-41ed-91dc-607f83ca1c91",
+   "title": "Deputy Manager - Logistics Intelligence",
+   "company": "Meesho",
+   "locations": [
+    "Bangalore, Karnataka"
+   ],
+   "employmentType": "not-stated",
+   "employmentTypeText": "",
+   "workplace": "onsite",
+   "postedAt": "2026-09-25T10:29:08.152Z",
+   "url": "https://jobs.lever.co/meesho/538d386d-a584-41ed-91dc-607f83ca1c91",
+   "applyUrl": "https://jobs.lever.co/meesho/538d386d-a584-41ed-91dc-607f83ca1c91/apply",
+   "source": {
+    "platform": "Lever",
+    "employer": "Meesho",
+    "boardUrl": "https://jobs.lever.co/meesho"
+   },
+   "retrievedAt": "2026-10-22T13:08:50.716Z",
+   "description": "About the Team\n \nIt’s no secret that Meesho is making massive leaps towards becoming the most used e-commerce app in India. Our Finance team has a key role to play in the company's success. Here’s your chance to be a part of the Meesho success story!😎\nAs Deputy Manager - Finance, you will be one among the 50+ professionals working in domains such as Financial Reporting, Finance Operations, Business Finance, Treasury Management and Taxation. The team consists of Chartered Accountants, Business experts and Engineers, who have previously worked for internationally renowned organizations.\nOur team believes in working hard and partying harder. We organize team trivia nights, board game marathons, and other fun events to foster our team spirit💥.\n \nAbout the role\n \nWe are looking for an Deputy Manager Finance who can enable the scale-up of Supply Chain for Meesho’s overall Marketplace platform by providing value-added finance solutions. Meesho’s Supply Chain quantum is >$500m/annum and we are the biggest customer for all the large Supply chain solution companies in India. Meesho has also developed its captive supply chain solution which is unique and helps us transform our logistics offering to our sellers. In this role you will take ownership of the finance operations of this Business. You will work in a fast-paced environment, creating newsystems and processes. You will also ensure that we are balancing customer needs,competitive landscapes and strategic priorities constantly\n \n \n\n\nWhat you will do\n• Cross Functional Insight & Collaboration - Translate complex analytics into actionable insights for Operations, Finance, Product & Audit stakeholders—e.g. cost leakage patterns, dispute frequency drivers, high risk lanes.\n\n• Developing automated programs that help validate the invoices raised by our external Logistics Partners. Add significant value by critically analysing instances of billing errors that are not in sync with the rate cards and work closely with the Operations team for closure of disputes raised with logistics partner\n\n• Build and maintain real time KPI & Control Tower Dashboard by integrating data across TMS, ERP, and external feeds.\n\n• Identify cost optimization opportunities\n\n• Technology & Automation Initiatives - Pilot or integrate smart data capture systems to automate invoice capture, delivery confirmations, and van reconciliation, minimizing manual errors\n\n• Explore RPA or Gen AI agents to process billing disputes, query logistics partners, or flag anomalies automatically\n\n• Help de-bottleneck supply operations by providing innovative finance solutions to business challenges\n\n• Lead a team of 2-4 members and supervise interactions with logistics partner for resolving disputes and any other queries\n\n• Collaborate with Product for strengthening financial controls in supply chain and automate new use cases.\n\n• Oversee reconciliation of Cash collections from delivery agents. Investigate and resolve any mismatches.\n\n• Liaison with In",
+   "criteria": [
+    {
+     "label": "Function",
+     "detail": "“logistics” in the job title (Supply chain & procurement)"
+    },
+    {
+     "label": "Location",
+     "detail": "Bangalore, Karnataka (matches Bengaluru)"
+    },
+    {
+     "label": "Type",
+     "detail": "Not stated by the employer"
+    },
+    {
+     "label": "Workplace",
+     "detail": "On-site"
+    }
+   ],
+   "roleInTitle": true
+  },
+  {
+   "id": "lever:cred:b3fdba2a-802c-4e03-b445-5284c5e3c157",
+   "title": "credit card bill payments growth",
+   "company": "CRED",
+   "locations": [
+    "bengaluru"
+   ],
+   "employmentType": "full-time",
+   "employmentTypeText": "full time",
+   "workplace": "onsite",
+   "postedAt": "2026-09-24T05:23:17.772Z",
+   "url": "https://jobs.lever.co/cred/b3fdba2a-802c-4e03-b445-5284c5e3c157",
+   "applyUrl": "https://jobs.lever.co/cred/b3fdba2a-802c-4e03-b445-5284c5e3c157/apply",
+   "source": {
+    "platform": "Lever",
+    "employer": "CRED",
+    "boardUrl": "https://jobs.lever.co/cred"
+   },
+   "retrievedAt": "2026-10-22T13:08:50.716Z",
+   "description": "what will you do?\n• own key input levers of the ccbp business - acquisition and resurrection of members paying credit card bills, and multi-card adoption - deep-diving on metrics and diagnosing drop-offs to course-correct performance.\n\n• track and report on these levers daily/weekly/monthly, owning monthly planning and flagging deviations early.\n\n• exercise judgment on when to resolve issues independently vs. escalate, and anticipate recurring problem patterns before they hit the numbers.\n\n• own execution across the bill-pay funnel (discovery, reminders, payment, retry/failure), building preventive and reactive interventions to lift conversion.\n\n• translate broader category strategy into concrete campaigns, experiments, and milestones you can ship and measure.\n\n• own merchandising for ccbp on and off app - home page assets, cross-sell placements, communication plans.\n\n• design and run campaigns (offers, cashback, reward mechanics) to drive adoption and repeat usage, optimizing spend for roI rather than just reach.\n\n• focus on reducing friction and building payment confidence — low-cost engagement over short-term yield maximization.\n\n• run a constant experimentation cadence (A/B/multivariate testing) to find growth inflection points, and productize what works into the core journey.\n\n• partner with product and data science teams to build personalization models (due-date prediction, smart nudges, next-best-card-to-pay) that increase throughput.\n\n• bring clear, data-backed narratives to cross-functional discussions (Marketing, Rewards, Product, Risk) to align on priorities and unblock execution.\n\nWhat we’re looking for\n• 4–7 years of experience in user growth/ category management roles, with prior ownership of high-frequency consumer transaction/payment categories or 3-5 years of experience in management consulting, investment banking, growth strategy, corporate strategy, or fintech strategy roles.\n\n• data-driven mindset — comfortable analyzing data to form hypotheses, identify opportunities, and measure experiment success.\n\n• track record of driving growth initiatives end-to-end (ideation → execution → measurable impact) at a consumer-first company.\n\n• high ownership and bias for action in a fast-paced, ambiguous, agile environment.\n\n• strong program/project management skills - able to run multiple cross-functional initiatives (product, marketing, risk, ops) simultaneously with attention to detail.",
+   "criteria": [
+    {
+     "label": "Function",
+     "detail": "“growth” in the job title (Growth)"
+    },
+    {
+     "label": "Location",
+     "detail": "bengaluru (matches Bengaluru)"
+    },
+    {
+     "label": "Type",
+     "detail": "Full-time (“full time”)"
+    },
+    {
+     "label": "Workplace",
+     "detail": "On-site"
+    }
+   ],
+   "roleInTitle": true
+  },
+  {
+   "id": "lever:meesho:22bd899a-f442-419f-9d3f-5046b715c40d",
+   "title": "Deputy Manager- Procurement",
+   "company": "Meesho",
+   "locations": [
+    "Bangalore, Karnataka"
+   ],
+   "employmentType": "full-time",
+   "employmentTypeText": "Full Time Employee",
+   "workplace": "onsite",
+   "postedAt": "2026-09-23T10:00:46.685Z",
+   "url": "https://jobs.lever.co/meesho/22bd899a-f442-419f-9d3f-5046b715c40d",
+   "applyUrl": "https://jobs.lever.co/meesho/22bd899a-f442-419f-9d3f-5046b715c40d/apply",
+   "source": {
+    "platform": "Lever",
+    "employer": "Meesho",
+    "boardUrl": "https://jobs.lever.co/meesho"
+   },
+   "retrievedAt": "2026-10-22T13:08:50.716Z",
+   "description": "About the Team\n \nIt's no secret that Meesho is making massive leaps towards becoming the most used e-commerce app in India. Our commercials team has a key role to play in the company's success. Here's your chance to be a part of the Meesho success story! \n \nAs Deputy Manager - Commercials, you will be one among the 50+ professionals working in domains such as procurement, negotiations, supplier relationship management, product/service sourcing and cost evaluation. The team consists of Chartered Accountants, Business experts and Engineers, who have previously worked for internationally renowned organizations. Our team believes in working hard and partying harder. We organize team trivia nights, board game marathons, and other fun events to foster our team spirit.\n \nAbout the Role\n \nWe are seeking a highly skilled and experienced Deputy Manager, Commercials who will lead the procurement & commercials for IT, Marketing, HR, Admin, Legal verticals at Meesho. This role provides an unique opportunity to be an integral part of the ecosystem wherein, Meesho partners with a varied range of global companies. This role requires to manage the company's overall requirements pertaining to procurement of services and products consumed by the organization across various functions. Find the best value deal for the organization with a rationalized approach.\n\n\nWhat will you do \n• Lead the categories assigned to you such as Marketing, IT while working across different range of projects to have all skills expertise. \n\n• Perform cost analysis and benchmarking exercises to negotiate the cost and evaluate for decision making. \n\n• Create and publish reports on a timely basis and update trackers for data management. \n\n• Manage and negotiate contracts and terms with the suppliers and close agreements within a certain TAT. \n\n• Manage commercial requirements across categories from IT. Marketing, HR, Admin, Legal etc. \n\n• In-depth knowledge of IT procurement i.e. softwares, SaaS Models, Subscription based, servers & data, hardware etc. \n\n• Quick turn around to close deals while following all due processes and documenting the journey. \n\n• Establish category specific objectives and formulate sourcing strategies. \n\n• Industry knowledge and connects in domain expertise for benchmarking purposes and ensuring benchmark data is maintained and adhered.\n\n• Ensure proper internal stakeholder management and external vendor management.\n\nWhat will you need \n• Bachelor's degree in any discipline; masters degree will be a plus.\n\n• 4-7 Years of post qualification experience in the procurement domain. \n\n• Preference to IT and Marketing procurement folks having hands-on experience. \n\n• Excellent knowledge of different cost models and pricing methodology. \n\n• Proven skills in Market Analysis (category specific), Vendor identification, Vendor Profile Evaluation.\n\n• Performance Assessment and Vendor Management.\n\n• Knowledge of regional statutory regulations and Tax structure related to the catego",
+   "criteria": [
+    {
+     "label": "Function",
+     "detail": "“procurement” in the job title (Supply chain & procurement)"
+    },
+    {
+     "label": "Location",
+     "detail": "Bangalore, Karnataka (matches Bengaluru)"
+    },
+    {
+     "label": "Type",
+     "detail": "Full-time (“Full Time Employee”)"
+    },
+    {
+     "label": "Workplace",
+     "detail": "On-site"
+    }
+   ],
+   "roleInTitle": true
+  }
+ ]
+}

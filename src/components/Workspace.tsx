@@ -39,6 +39,7 @@ import {
   type ClarifyInput,
 } from "@/lib/clarify";
 import type { JobExplanation } from "@/lib/jobs/explain";
+import { rankJobs } from "@/lib/jobs/rank";
 import type { JobListing, JobPreferences, JobSearchResult } from "@/lib/jobs/types";
 import { suggestJobDetails } from "@/lib/jobParser";
 import {
@@ -202,6 +203,14 @@ export function Workspace() {
   const prefsKey = JSON.stringify(prefs);
   const jobsOutdated = jobs.status === "ready" && jobs.prefsKey !== prefsKey;
   const explanationsOutdated = Object.keys(jobs.explanations).length > 0 && jobs.factsKey !== factsKey;
+  // Fit notes only count towards the ranking while they belong to the current confirmed profile.
+  const ranked = useMemo(() => {
+    const notes = jobs.factsKey === factsKey
+      ? Object.fromEntries(Object.entries(jobs.explanations).flatMap(([id, e]) => (e.status === "ready" ? [[id, e.value]] : [])))
+      : {};
+    // The search time stands in for "now" (dates like "Jun 2024 - Present"), keeping rendering free of the clock.
+    return jobs.result ? rankJobs(jobs.result.jobs, confirmedFacts, notes, new Date(jobs.result.searchedAt)) : [];
+  }, [jobs, confirmedFacts, factsKey]);
   const prefErrors = preferenceErrors(profile, confirmedFacts, prefs);
   const hasOwnDescription = Boolean(data.internship.description.trim()) && data.internship.description !== selectedJob?.description;
 
@@ -348,7 +357,9 @@ export function Workspace() {
       return;
     }
     setJobs({ ...NO_JOBS, status: "ready", prefsKey: key, result });
-    if (confirmedFacts.length && result.jobs.length) void explain(result.jobs.slice(0, EXPLAIN_BATCH), result);
+    // AI fit notes for the openings with the most evidence first.
+    const top = rankJobs(result.jobs, confirmedFacts, {}, new Date(result.searchedAt)).slice(0, EXPLAIN_BATCH).map((r) => r.job);
+    if (confirmedFacts.length && top.length) void explain(top, result);
   }
 
   /** Asks AI how the confirmed profile relates to these openings. */
@@ -367,7 +378,11 @@ export function Workspace() {
       explanations: { ...(j.factsKey === key ? j.explanations : {}), ...Object.fromEntries(targets.map((t) => [t.id, { status: "loading" as const }])) },
     }));
     const res = await postJson("/api/jobs/explain", {
-      facts: confirmedFacts.slice(0, 20).map((f) => ({ id: f.id, text: f.text.slice(0, 300) })),
+      // Own work only; venture context and education aren't evidence, and listed skills are marked as such.
+      facts: confirmedFacts
+        .filter((f) => f.basis === "own" && f.kind !== "education")
+        .slice(0, 20)
+        .map((f) => ({ id: f.id, text: (f.kind === "skill" ? `Listed skill (not shown in use): ${f.text}` : f.text).slice(0, 300) })),
       jobs: targets.map((t) => ({ id: t.id, title: t.title, company: t.company, description: t.description.slice(0, 4000) })),
     });
     if (!res) return;
@@ -761,7 +776,7 @@ export function Workspace() {
             onAddFact={() =>
               setProfile((p) => {
                 const n = 1 + Math.max(0, ...p.facts.filter((f) => f.id.startsWith("S")).map((f) => Number(f.id.slice(1))));
-                return { ...p, confirmed: false, facts: [...p.facts, { id: `S${n}`, text: "", evidence: "", source: "student", kind: "experience" }] };
+                return { ...p, confirmed: false, facts: [...p.facts, { id: `S${n}`, text: "", evidence: "", source: "student", kind: "experience", basis: "own" }] };
               })
             }
             onConfirm={(c) => setProfile((p) => ({ ...p, confirmed: c }))}
@@ -772,6 +787,7 @@ export function Workspace() {
         {view === JOBS_VIEW && (
           <JobsView
             jobs={jobs}
+            ranked={ranked}
             prefs={prefs}
             outdated={jobsOutdated}
             explanationsOutdated={explanationsOutdated}

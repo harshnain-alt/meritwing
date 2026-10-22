@@ -126,7 +126,9 @@ export function ProfileView({ profile, outdated, prefs, errors, onRetry, onUseOw
                 {profile.facts.map((f, i) => (
                   <li key={f.id} className="rounded-lg border border-line bg-surface px-4 py-3">
                     <div className="flex items-center justify-between gap-2">
-                      <span className="text-xs font-semibold uppercase tracking-wide text-muted">{SOURCE_LABEL[f.source]}</span>
+                      <span className="text-xs font-semibold uppercase tracking-wide text-muted">
+                        {f.basis === "context" ? "About your venture (not counted as your own work)" : SOURCE_LABEL[f.source]}
+                      </span>
                       <button
                         type="button"
                         onClick={() => onRemoveFact(f.id)}
