@@ -175,11 +175,13 @@ export function BulletsPanel({ state, outdated, confirmed, projectName, role, on
                   </div>
                   <textarea
                     aria-label={`Bullet ${index + 1}`}
-                    rows={2}
+                    // Grows with the text where field-sizing is supported; elsewhere rows estimates a
+                    // phone-width line, so a whole bullet is visible without scrolling inside the box.
+                    rows={Math.min(6, Math.max(2, Math.ceil(item.text.length / 34)))}
                     value={item.text}
                     disabled={!item.included}
                     onChange={(e) => setItem(item.id, { text: e.target.value })}
-                    className="mt-2 block w-full resize-y rounded-lg border border-line bg-surface px-3 py-2 text-sm leading-relaxed text-ink focus:border-accent focus:outline-none focus:ring-3 focus:ring-accent/15 disabled:bg-canvas disabled:text-faint"
+                    className="mt-2 block min-h-16 w-full resize-y rounded-lg border border-line bg-surface px-3 py-2 text-sm leading-relaxed text-ink [field-sizing:content] focus:border-accent focus:outline-none focus:ring-3 focus:ring-accent/15 disabled:bg-canvas disabled:text-faint"
                   />
                   <Sources ids={item.sources} facts={w.facts} teamResults={w.teamResults} />
                   {item.text !== item.original && (
