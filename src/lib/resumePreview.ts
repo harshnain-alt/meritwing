@@ -105,3 +105,21 @@ function splitItems(text: string): string[] {
     .map((line) => (isBullet(line) ? stripBullet(line) : line.trim()))
     .filter(Boolean);
 }
+
+/** Plain-text version of the preview for copying: same content and order, no formatting. */
+export function previewToText(model: ResumePreviewModel): string {
+  const out: string[] = [model.name];
+  if (model.contact.length) out.push(model.contact.join(" | "));
+  for (const section of model.sections) {
+    out.push("", section.heading.toUpperCase());
+    for (const entry of section.entries) {
+      if (!entry.title) continue;
+      out.push(entry.dates ? `${entry.title} (${entry.dates})` : entry.title);
+      if (entry.subtitle) out.push(entry.subtitle);
+      if (entry.context) out.push(entry.context);
+      for (const bullet of entry.bullets) out.push(`• ${bullet}`);
+    }
+    for (const line of section.lines) out.push(line.bullet ? `• ${line.text}` : line.text);
+  }
+  return out.join("\n").trim();
+}

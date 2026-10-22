@@ -5,13 +5,16 @@ import type { ResumeSections } from "@/lib/application";
  * output is copied from the input, sorted into a section by its nearest heading.
  */
 
-type SectionKey = "education" | "experience" | "skills" | "additional";
+// "summary" holds profile or objective text: kept, but listed with the lines we couldn't place.
+type SectionKey = "education" | "experience" | "skills" | "additional" | "summary";
 
+// Matched against the lower-cased heading with "&" written as "and".
 const HEADINGS: [SectionKey, RegExp][] = [
-  ["education", /^(education|academic background|academics|academic qualifications|qualifications|education (and|&) qualifications)$/],
-  ["experience", /^((relevant |work |professional |entrepreneurial |industry )?experience|employment( history)?|internships?|projects|ventures|(ventures|projects) (and|&) (projects|ventures)|work history|professional background)$/],
-  ["skills", /^((technical |core |key )?skills|skills (and|&) (interests|tools|languages)|tools|competencies|languages (and|&) skills)$/],
-  ["additional", /^(achievements|awards|awards (and|&) achievements|achievements (and|&) awards|additional( information)?|extra-?curricular( activities)?|leadership( experience)?|positions? of responsibility|responsibilities|activities|certifications?|interests|volunteering|volunteer experience|honou?rs( (and|&) awards)?|publications)$/],
+  ["education", /^(education|educational (background|qualifications?|details)|academic (background|qualifications?|details|profile)|academics|qualifications|education and qualifications)$/],
+  ["experience", /^((relevant |work |professional |entrepreneurial |industry |internship |corporate )?experience|employment( history)?|internships?( and projects)?|projects( and internships)?|(academic|key|major|live|selected) projects|ventures( and projects)?|projects and ventures|work history|professional background|work experience and internships)$/],
+  ["skills", /^((technical |core |key |relevant |it )?skills( and (interests|tools|languages|competencies|certifications))?|tools( and technologies)?|(core )?competencies|languages and skills)$/],
+  ["additional", /^(((scholastic|academic|key|other) )?achievements( and awards)?|awards( and (achievements|recognition|honou?rs))?|honou?rs( and awards)?|recognition|additional( information)?|extra-?curricular( activities)?|extra-?curriculars|co-?curricular( activities)?|leadership( (experience|roles|and extra-?curriculars?))?|positions? of responsibility|responsibilities|activities|certifications?( and courses)?|courses|interests|hobbies( and interests)?|volunteering|volunteer (experience|work)|social work|publications|languages)$/],
+  ["summary", /^((professional |career )?summary|(professional )?profile|(career )?objective|about me)$/],
 ];
 
 const EMAIL_RE = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i;
@@ -21,6 +24,7 @@ function headingKey(line: string): SectionKey | null {
   const normalised = line
     .trim()
     .replace(/[:|]+$/, "")
+    .replace(/\s*&\s*/g, " and ")
     .replace(/\s+/g, " ")
     .toLowerCase();
   if (!normalised || normalised.length > 45) return null;
@@ -61,6 +65,7 @@ export function parseResumeText(raw: string): ResumeSections {
     experience: [],
     skills: [],
     additional: [],
+    summary: [],
   };
   const header: string[] = [];
   let current: SectionKey | null = null;
@@ -100,7 +105,7 @@ export function parseResumeText(raw: string): ResumeSections {
     experience: tidy(sections.experience),
     skills: tidy(sections.skills),
     additional: tidy(sections.additional),
-    unsorted: tidy(unsorted),
+    unsorted: tidy([...unsorted, ...(sections.summary.length ? ["", ...sections.summary] : [])]),
   };
 }
 
@@ -113,7 +118,10 @@ function tidy(lines: string[]): string {
 
 /* ---------- Shared line helpers ---------- */
 
-const BULLET_RE = /^\s*([•●▪◦‣∙·*–-]|\d+[.)])\s+/;
+// Bullet symbols, including Wingdings/Symbol glyphs that PDFs extract as private-use
+// characters (U+F0B7, U+F0A7, U+F076, U+F0D8, U+F0FC). Hyphens, asterisks and numbers
+// need a following space so values like "-5" aren't treated as bullets.
+const BULLET_RE = /^\s*(?:[•●▪◦‣∙·–➢►▸■□❖✓✔→⇒]\s*|[*-]\s+|\d+[.)]\s+)(?=\S)/;
 
 export function isBullet(line: string): boolean {
   return BULLET_RE.test(line);

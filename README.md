@@ -30,7 +30,10 @@ who have real venture or project experience but find it hard to describe their o
 - **Resume reading** (no AI): text is extracted from text-based PDFs up to 5 MB, sorted into
   sections by simple rules, and used to fill empty details (never overwriting what the student
   typed). Scanned or unreadable PDFs fall back to pasting text. Students can check and edit
-  everything that was read; the original text is kept unchanged.
+  everything that was read; the original text is kept unchanged. Recognises common Indian resume
+  headings (e.g. *Educational Qualifications*, *Internship Experience*, *Scholastic Achievements*,
+  *Positions of Responsibility*) and the bullet symbols PDFs often produce; summary or objective
+  text is listed under *Lines we couldn't place*.
 - **Searchable dropdowns** for State / Union Territory (all 36) and business school (129
   institutions from NIRF 2025 plus verified additions, with free entry for any other school).
 - **AI follow-up questions** after step 3 (*A few quick questions*): Claude reads the project
@@ -45,6 +48,7 @@ who have real venture or project experience but find it hard to describe their o
 - **Draft workspace** after the questions: an honest "drafting isn't connected" notice, fact checks where
   the resume and the answers disagree, a summary with Edit links, and a **resume layout preview**
   built only from the student's own wording, labelled *Unconfirmed* until they confirm the facts.
+  **Copy as text** copies that preview as plain text.
 - **Clear my data** removes everything entered and read in the session.
 - Responsive layout that works on mobile.
 
@@ -66,7 +70,7 @@ who have real venture or project experience but find it hard to describe their o
   the size (max 5 MB) and that the file really is a PDF, extracts the text in memory with
   [unpdf](https://github.com/unjs/unpdf) (Mozilla pdf.js), and returns it. The file is **not
   saved** to disk or storage, and neither the file nor its text is logged.
-- **AI follow-up questions** send, from the app's server to the Anthropic API: the resume's
+- **AI follow-up questions** send, from the app's server to the configured AI provider (Anthropic by default): the resume's
   education, experience, skills and additional sections, the project details, any results and the
   job description. The student's **name, email and phone are not sent**; email addresses and phone
   numbers inside the text are replaced with placeholders first. The API key stays on the server,
@@ -91,12 +95,13 @@ Other scripts: `npm run lint`, `npx tsc --noEmit`, `npm run build`, `npm start`.
 
 ## Environment variables
 
-See [`.env.example`](.env.example). Both are **server-side only** — never prefix them with
+See [`.env.example`](.env.example). All are **server-side only** — never prefix them with
 `NEXT_PUBLIC_`, never commit them.
 
 | Variable | Required | Purpose |
 |---|---|---|
-| `ANTHROPIC_API_KEY` | For AI follow-up questions | Anthropic API key from the Anthropic Console |
+| `AI_PROVIDER` | No | AI provider for follow-up questions; defaults to `anthropic` (the only one built in) |
+| `ANTHROPIC_API_KEY` | For the Anthropic provider | Anthropic API key from the Anthropic Console; the account needs API credit (a claude.ai subscription doesn't include it) |
 | `ANTHROPIC_MODEL` | No | Claude model for the questions; defaults to `claude-opus-5-5` |
 
 - **Locally:** create `.env.local` in this folder (ignored by Git) with
@@ -105,7 +110,25 @@ See [`.env.example`](.env.example). Both are **server-side only** — never pref
   Production (and Preview), mark it Sensitive, then redeploy.
 
 Everything else works without a key; the questions screen then explains that AI questions aren't
-set up yet.
+set up yet, or why the provider rejected the request (for example no credit), and lets the
+student continue.
+
+### Switching AI provider
+
+Only the follow-up questions use AI, and all provider-specific code lives in
+`src/lib/ai/providers/`. The prompt, the expected output shape (a Zod schema) and the limits on
+the output (at most three new questions) are shared in `src/lib/ai/clarifyPrompt.ts`.
+
+To add another provider:
+
+1. Install that provider's official SDK.
+2. Create `src/lib/ai/providers/<name>.ts` exporting a `ProviderFactory` (see
+   `src/lib/ai/provider.ts`): read its key and model from environment variables, return a setup
+   error when they're missing, call the model with the shared system prompt and student data, and
+   return output that validates against `OutputSchema` (use the provider's structured-output
+   feature where it has one). Translate its SDK errors into `ProviderError`s.
+3. Register it in `src/lib/ai/index.ts`, add its variable names to `.env.example`, and set
+   `AI_PROVIDER=<name>`.
 
 ## Deployment
 
@@ -126,7 +149,7 @@ npx vercel --prod
 ## Tech stack
 
 Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS 4 · unpdf for PDF text extraction ·
-Anthropic TypeScript SDK with Zod-validated structured output for follow-up questions.
+Anthropic TypeScript SDK (behind a provider interface) with Zod-validated structured output for follow-up questions.
 
 ## Data sources
 
@@ -141,6 +164,7 @@ Anthropic TypeScript SDK with Zod-validated structured output for follow-up ques
 src/app/                      page, layout, the PDF extraction route and /api/clarify
 src/components/               workspace, steps, searchable dropdown, resume preview
 src/lib/                      validation, resume parsing and checks, preview builder
+src/lib/ai/                   AI provider interface, shared prompt and output schema, providers/
 data/                         business-school sources and notes
 scripts/build-datasets.mjs    rebuilds src/data/business-schools.json
 ```

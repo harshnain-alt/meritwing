@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import { Checkbox } from "@/components/Field";
 import { ResumePreview } from "@/components/ResumePreview";
 import {
@@ -8,7 +8,7 @@ import {
   type StepId,
 } from "@/lib/application";
 import { choiceFor, type ResumeCheck } from "@/lib/resumeChecks";
-import type { ResumePreviewModel } from "@/lib/resumePreview";
+import { previewToText, type ResumePreviewModel } from "@/lib/resumePreview";
 import { OutdatedNotice, RelevantNotes, type Answer, type ClarifyState } from "@/components/steps/QuestionsView";
 
 type DraftViewProps = {
@@ -158,6 +158,7 @@ export function DraftView({
               {confirmed ? "Facts confirmed by you" : "Unconfirmed"}
             </span>
           </div>
+          <CopyPreview text={previewToText(preview)} confirmed={confirmed} />
           <p className="text-sm text-muted">
             Your own wording arranged as a resume. It is not AI-written, so some lines may read like notes.
             Empty sections are left out.
@@ -275,6 +276,59 @@ function Version({ label, text }: { label: string; text: string }) {
     <div className="bg-surface px-5 py-3">
       <p className="text-xs font-semibold uppercase tracking-wide text-muted">{label}</p>
       <p className="mt-1 whitespace-pre-wrap break-words text-sm leading-relaxed text-ink">{text}</p>
+    </div>
+  );
+}
+
+/** Copies the preview as plain text. Falls back to a selectable box where the clipboard is blocked. */
+function CopyPreview({ text, confirmed }: { text: string; confirmed: boolean }) {
+  const [status, setStatus] = useState<"idle" | "copied" | "manual">("idle");
+  const boxRef = useRef<HTMLTextAreaElement>(null);
+
+  async function copy() {
+    try {
+      await navigator.clipboard.writeText(text);
+      setStatus("copied");
+      setTimeout(() => setStatus((s) => (s === "copied" ? "idle" : s)), 2500);
+    } catch {
+      setStatus("manual");
+      setTimeout(() => boxRef.current?.select(), 0);
+    }
+  }
+
+  return (
+    <div className="space-y-2">
+      <div className="flex flex-wrap items-center gap-3">
+        <button
+          type="button"
+          onClick={copy}
+          className="rounded-lg border border-line-strong bg-surface px-3.5 py-2 text-sm font-semibold text-ink hover:bg-canvas focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+        >
+          Copy as text
+        </button>
+        <p role="status" className="text-sm text-muted">
+          {status === "copied"
+            ? "Copied your resume text."
+            : confirmed
+              ? "Copies your own wording."
+              : "Copies your own wording. Check your facts before using it."}
+        </p>
+      </div>
+      {status === "manual" && (
+        <div>
+          <label htmlFor="copy-fallback" className="text-sm text-ink">
+            Copying isn&apos;t allowed here. Select the text below and copy it yourself.
+          </label>
+          <textarea
+            id="copy-fallback"
+            ref={boxRef}
+            readOnly
+            rows={8}
+            value={text}
+            className="mt-1.5 block w-full rounded-lg border border-line bg-surface px-3 py-2 font-mono text-xs text-ink"
+          />
+        </div>
+      )}
     </div>
   );
 }

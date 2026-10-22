@@ -152,7 +152,8 @@ export function RelevantNotes({ points }: { points: RelevantPoint[] }) {
 }
 
 function ClarifyErrorPanel({ error, onRetry, onEdit }: { error: ClarifyError; onRetry: () => void; onEdit: (step: StepId) => void }) {
-  const setup = error.code === "not_configured" || error.code === "auth";
+  // Problems only the site owner can fix: missing or rejected key, no credit, invalid model.
+  const setup = error.code === "not_configured" || error.code === "auth" || error.code === "rejected";
   return (
     <div role="alert" className="space-y-4 rounded-xl border border-danger/25 bg-danger-soft px-5 py-4">
       <div>
@@ -200,6 +201,11 @@ function SetupSteps(): ReactNode {
   const code = "rounded bg-canvas px-1 py-0.5 font-mono text-[13px] text-ink";
   return (
     <div className="mt-3 space-y-3">
+      <p>
+        The server picks its AI provider from <span className={code}>AI_PROVIDER</span> (default{" "}
+        <span className={code}>anthropic</span>, currently the only one built in). The provider needs its own key and
+        an account with API access; see the project README for the variables.
+      </p>
       <div>
         <p className="font-semibold text-ink">Running locally</p>
         <ol className="mt-1 list-decimal space-y-1 pl-5">
@@ -208,8 +214,8 @@ function SetupSteps(): ReactNode {
             <span className={code}>.env.local</span> (it is ignored by Git).
           </li>
           <li>
-            Add the line <span className={code}>ANTHROPIC_API_KEY=</span> followed by your key from the Anthropic
-            Console. Optionally add <span className={code}>ANTHROPIC_MODEL=</span> to choose a model.
+            For Anthropic, add the line <span className={code}>ANTHROPIC_API_KEY=</span> followed by your key from the
+            Anthropic Console. Optionally add <span className={code}>ANTHROPIC_MODEL=</span> to choose a model.
           </li>
           <li>
             Stop and restart <span className={code}>npm run dev</span>.
@@ -221,8 +227,8 @@ function SetupSteps(): ReactNode {
         <ol className="mt-1 list-decimal space-y-1 pl-5">
           <li>Open the meritwing project → Settings → Environment Variables.</li>
           <li>
-            Add <span className={code}>ANTHROPIC_API_KEY</span> for Production (and Preview if you use it). Mark it
-            Sensitive.
+            Add the provider&apos;s key (for Anthropic, <span className={code}>ANTHROPIC_API_KEY</span>) for Production,
+            and Preview if you use it. Mark it Sensitive.
           </li>
           <li>Redeploy the latest deployment so the new variable is used.</li>
         </ol>
