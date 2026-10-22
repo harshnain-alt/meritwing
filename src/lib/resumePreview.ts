@@ -29,7 +29,11 @@ export type ResumePreviewModel = {
   sections: PreviewSection[];
 };
 
-export function buildPreview(data: ApplicationData, checks: ResumeCheck[]): ResumePreviewModel {
+/**
+ * projectBullets: AI-written bullets the student reviewed and chose to add. When given, they
+ * replace the project's own-wording bullets; the copy text and the PDF use the same model.
+ */
+export function buildPreview(data: ApplicationData, checks: ResumeCheck[], projectBullets?: string[] | null): ResumePreviewModel {
   const { about, experience, resume } = data;
   const proposed = resume.proposed;
   const choice = (id: ResumeCheck["id"]) => {
@@ -73,10 +77,12 @@ export function buildPreview(data: ApplicationData, checks: ResumeCheck[]): Resu
         {
           title: experience.projectName.trim(),
           context: experience.about.trim(),
-          bullets: [
-            ...splitItems(experience.personal),
-            ...results.map((r) => (experience.resultsAttribution === "shared" ? `Team result: ${r}` : r)),
-          ],
+          bullets: projectBullets?.length
+            ? projectBullets
+            : [
+                ...splitItems(experience.personal),
+                ...results.map((r) => (experience.resultsAttribution === "shared" ? `Team result: ${r}` : r)),
+              ],
         },
       ],
       lines: [],
@@ -99,7 +105,7 @@ export function buildPreview(data: ApplicationData, checks: ResumeCheck[]): Resu
 }
 
 /** Splits an answer into items on line breaks or bullet characters; keeps the wording. */
-function splitItems(text: string): string[] {
+export function splitItems(text: string): string[] {
   return text
     .split("\n")
     .map((line) => (isBullet(line) ? stripBullet(line) : line.trim()))

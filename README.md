@@ -11,11 +11,11 @@ who have real venture or project experience but find it hard to describe their o
 
 **Live prototype:** <https://meritwing.vercel.app>
 
-> **Prototype status:** the three-step onboarding, resume reading, AI follow-up questions and the
-> review screen work. **AI application drafting is not built yet.** The app says so on screen and
-> never shows simulated AI output. The follow-up questions need a Google Gemini API key on the server
-> (see [Environment variables](#environment-variables)); without one, the app explains that they
-> aren't set up and lets the student continue.
+> **Prototype status:** the three-step onboarding, resume reading, AI follow-up questions, AI-written
+> resume bullets for the project and the review screen work. A requirement-to-experience map and a
+> suitability answer are **not built yet**, and the app never shows simulated AI output. The AI features
+> need a Google Gemini API key on the server (see [Environment variables](#environment-variables));
+> without one, the app explains that they aren't set up and lets the student continue.
 
 ## What works today
 
@@ -45,23 +45,39 @@ who have real venture or project experience but find it hard to describe their o
   edits their information afterwards, the questions are marked *Outdated* and can be refreshed
   (earlier answers are sent along so questions aren't repeated). Failures show Retry where it can
   help, and the student can always continue without questions.
-- **Draft workspace** after the questions: an honest "drafting isn't connected" notice, fact checks where
+- **Draft workspace** after the questions: a notice saying exactly which parts come from AI, fact checks where
   the resume and the answers disagree, a summary with Edit links, and a **resume layout preview**
-  built only from the student's own wording, labelled *Unconfirmed* until they confirm the facts.
-  **Copy as text** copies that preview as plain text, and **Download PDF** saves a resume-only A4
+  built from the student's own wording, labelled *Unconfirmed* until they confirm the facts.
+- **AI resume bullets** for the project entry, available once the student has confirmed their facts:
+  Gemini rewords the confirmed project details, results and follow-up answers into up to five bullets
+  for the target role, most relevant first. Each bullet cites the facts it is based on (shown under
+  *Based on*) and is marked *Your own work* or *Team achievement*; results the student marked as shared
+  are always team bullets. Without numbers, bullets stay qualitative. The server then **drops any bullet
+  containing a number, capitalised name or tool, common tool word (e.g. "dashboard") or leadership
+  claim ("led", "supervised") that isn't in the student's own facts**, and tells the student what was
+  removed. The resume and job description are background only, so a skill listed on the resume (e.g.
+  Excel) is never claimed for the project. Nothing reaches the resume until the student reviews, edits
+  or excludes bullets and chooses *Add to my resume*; they can switch back to their own wording at any
+  time. If their facts or answers change afterwards, the bullets are marked *Outdated* and the resume
+  shows their own wording until they write them again or keep them.
+- **Copy as text** copies the preview as plain text, and **Download PDF** saves a resume-only A4
   PDF of it, generated in the browser: real, selectable text; every line wrapped inside the
   margins; a section heading never left alone at the bottom of a page, and each bullet kept on one
   page. Characters the standard PDF fonts can't show (for example ₹ or Devanagari) are replaced
-  (₹ becomes "Rs.") and the student is told which ones.
+  (₹ becomes "Rs.") and the student is told which ones. Both use exactly what the preview shows,
+  including any AI bullets the student added and edited.
 - **Clear my data** removes everything entered and read in the session.
 - Responsive layout that works on mobile.
 
 ## Unfinished or not yet built
 
-- **AI application drafting** — requirement-to-experience map, tailored resume bullets and a
-  suitability answer. *Not implemented. Nothing in the app simulates it.*
-- The resume layout preview is **not AI-written**: it arranges the student's own words, so some
-  lines read like notes.
+- **Requirement-to-experience map and suitability answer** — *not implemented. Nothing in the app
+  simulates them.*
+- AI bullets cover the **project entry only**. Resume experience lines are shown in the student's own
+  words, so some read like notes.
+- The bullet checks catch invented numbers, names, common tool words and leadership claims, but not
+  every possible overstatement (for example a stronger verb for the same task). That is why the
+  student reviews every bullet; their own edits aren't checked.
 - Resume and job-description extraction use simple rules, so unusual layouts may need manual
   correction (every extracted value is editable).
 - No accounts or saved progress: refreshing the page clears everything, by design for now.
@@ -84,6 +100,9 @@ who have real venture or project experience but find it hard to describe their o
   use submitted content and responses to improve its products, and human reviewers may read them**;
   Step 3 tells students this before they continue. A paid Gemini project (billing enabled) is not used
   for product improvement.
+- **AI resume bullets** send the same information plus the student's answered follow-up questions,
+  under the same rules: no name or contact details, nothing logged, and only when the student asks
+  for bullets after confirming their facts.
 - All answers live only in the open browser tab and are cleared on refresh or with *Clear my data*.
 - On Vercel, request bodies are limited to 4.5 MB, so PDFs between 4.5 MB and 5 MB are rejected
   there; the app then suggests pasting the text instead.
@@ -110,7 +129,7 @@ See [`.env.example`](.env.example). All are **server-side only** — never prefi
 |---|---|---|
 | `AI_PROVIDER` | No | `gemini` (default) or `anthropic`. Only the selected provider is called; there is no fallback |
 | `GEMINI_API_KEY` | For Gemini | API key from Google AI Studio |
-| `GEMINI_MODEL` | No | Gemini model for the questions; defaults to `gemini-3.8-flash`, which has a free tier. `gemini-3.5-flash-lite` is a free-tier alternative if the daily free quota runs out |
+| `GEMINI_MODEL` | No | Gemini model for the questions and bullets; defaults to `gemini-3.8-flash`, which has a free tier. `gemini-3.5-flash-lite` is a free-tier alternative if the daily free quota runs out |
 | `ANTHROPIC_API_KEY` | Only if `AI_PROVIDER=anthropic` | Anthropic API key; the account needs API credit |
 | `ANTHROPIC_MODEL` | No | Claude model when using Anthropic; defaults to `claude-opus-5-5` |
 
@@ -119,24 +138,27 @@ See [`.env.example`](.env.example). All are **server-side only** — never prefi
 - **On Vercel:** Project → Settings → Environment Variables → add `GEMINI_API_KEY` (and `GEMINI_MODEL` only if you change the model) for
   Production (and Preview), mark it Sensitive, then redeploy.
 
-Everything else works without a key; the questions screen then explains that AI questions aren't
-set up yet, or why the provider rejected the request (for example an invalid key, a used-up free
-quota or a busy model), and lets the student continue. Requests are never retried automatically.
+Everything else works without a key; the questions screen and the bullets panel then explain that
+AI isn't set up yet, or why the provider rejected the request (for example an invalid key, a used-up
+free quota or a busy model), and let the student continue. Requests are never retried automatically.
 
 ### Switching AI provider
 
-Only the follow-up questions use AI, and all provider-specific code lives in
-`src/lib/ai/providers/`. The prompt, the expected output shape (a Zod schema) and the limits on
-the output (at most three new questions) are shared in `src/lib/ai/clarifyPrompt.ts`.
+The follow-up questions and the resume bullets use AI, and all provider-specific code lives in
+`src/lib/ai/providers/`. Each feature's prompt, output shape (a Zod schema) and server-side checks
+are provider-neutral: `src/lib/ai/clarifyPrompt.ts` (at most three new questions) and
+`src/lib/ai/bulletsPrompt.ts` (up to five bullets, with the grounding checks). Both API routes share
+`src/lib/ai/route.ts`.
 
 To add another provider:
 
 1. Install that provider's official SDK.
 2. Create `src/lib/ai/providers/<name>.ts` exporting a `ProviderFactory` (see
    `src/lib/ai/provider.ts`): read its key and model from environment variables, return a setup
-   error when they're missing, call the model with the shared system prompt and student data, and
-   return output that validates against `OutputSchema` (use the provider's structured-output
-   feature where it has one). Translate its SDK errors into `ProviderError`s.
+   error when they're missing, and implement `generate`: call the model with the request's system
+   prompt and student data, and return output that validates against the request's Zod `schema`
+   (use the provider's structured-output feature where it has one). Translate its SDK errors into
+   `ProviderError`s.
 3. Register it in `src/lib/ai/index.ts`, add its variable names to `.env.example`, and set
    `AI_PROVIDER=<name>`.
 
@@ -161,7 +183,7 @@ npx vercel --prod
 Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS 4 · unpdf for PDF text extraction ·
 jsPDF for resume PDF download (loaded only when used) ·
 Google Gen AI SDK (`@google/genai`, Interactions API) and the Anthropic TypeScript SDK behind a provider
-interface, with Zod-validated structured output for follow-up questions.
+interface, with Zod-validated structured output for follow-up questions and resume bullets.
 
 ## Data sources
 
@@ -173,10 +195,10 @@ interface, with Zod-validated structured output for follow-up questions.
 ## Project structure
 
 ```
-src/app/                      page, layout, the PDF extraction route and /api/clarify
-src/components/               workspace, steps, searchable dropdown, resume preview
-src/lib/                      validation, resume parsing and checks, preview builder
-src/lib/ai/                   AI provider interface, shared prompt and output schema, providers/
+src/app/                      page, layout, the PDF extraction route, /api/clarify and /api/bullets
+src/components/               workspace, steps, bullets panel, searchable dropdown, resume preview
+src/lib/                      validation, resume parsing and checks, preview builder, bullet facts
+src/lib/ai/                   AI provider interface, shared route handling, prompts, checks, providers/
 data/                         business-school sources and notes
 scripts/build-datasets.mjs    rebuilds src/data/business-schools.json
 ```

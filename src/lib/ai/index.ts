@@ -1,5 +1,5 @@
 import type { ClarifyError } from "@/lib/clarify";
-import type { ClarifyProvider, ProviderFactory } from "@/lib/ai/provider";
+import type { AiProvider, ProviderFactory } from "@/lib/ai/provider";
 import { createAnthropicProvider } from "@/lib/ai/providers/anthropic";
 import { createGeminiProvider } from "@/lib/ai/providers/gemini";
 
@@ -17,7 +17,7 @@ const PROVIDERS: Record<string, ProviderFactory> = {
 
 export const DEFAULT_PROVIDER = "gemini";
 
-export function getClarifyProvider(env: NodeJS.ProcessEnv = process.env): ClarifyProvider | { setupError: ClarifyError } {
+export function getAiProvider(env: NodeJS.ProcessEnv = process.env): AiProvider | { setupError: ClarifyError } {
   const id = (env.AI_PROVIDER?.trim() || DEFAULT_PROVIDER).toLowerCase();
   const factory = PROVIDERS[id];
   if (!factory) {
@@ -25,7 +25,7 @@ export function getClarifyProvider(env: NodeJS.ProcessEnv = process.env): Clarif
       setupError: {
         code: "not_configured",
         retryable: false,
-        message: `AI questions aren't set up on this server: AI_PROVIDER is “${id}”, which isn't supported. Supported: ${Object.keys(PROVIDERS).join(", ")}.`,
+        message: `AI features aren't set up on this server:AI_PROVIDER is “${id}”, which isn't supported. Supported: ${Object.keys(PROVIDERS).join(", ")}.`,
       },
     };
   }

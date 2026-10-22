@@ -1,7 +1,6 @@
 import { ApiError, GoogleGenAI } from "@google/genai";
 import { z } from "zod";
-import { OutputSchema } from "@/lib/ai/clarifyPrompt";
-import { ProviderError, type ProviderFactory } from "@/lib/ai/provider";
+import { NO_RESULT, ProviderError, type ProviderFactory } from "@/lib/ai/provider";
 
 /*
  * Google Gemini provider, using the official @google/genai SDK and the Interactions API.
@@ -14,16 +13,21 @@ import { ProviderError, type ProviderFactory } from "@/lib/ai/provider";
 
 const DEFAULT_MODEL = "gemini-3.8-flash";
 
-// The shared output schema as JSON Schema, plus the array limits Gemini enforces itself.
-const RESPONSE_SCHEMA = (() => {
-  const { $schema: _ignored, ...schema } = z.toJSONSchema(OutputSchema) as Record<string, unknown> & {
+// Each task's Zod schema as JSON Schema, plus the array limits Gemini enforces itself.
+const jsonSchemas = new WeakMap<object, Record<string, unknown>>();
+function responseSchema(schema: z.ZodType, arrayLimits: Record<string, number> = {}): Record<string, unknown> {
+  const cached = jsonSchemas.get(schema);
+  if (cached) return cached;
+  const { $schema: _ignored, ...json } = z.toJSONSchema(schema) as Record<string, unknown> & {
     properties: Record<string, Record<string, unknown>>;
   };
   void _ignored;
-  schema.properties.questions = { ...schema.properties.questions, maxItems: 3 };
-  schema.properties.relevant = { ...schema.properties.relevant, maxItems: 4 };
-  return schema;
-})();
+  for (const [key, max] of Object.entries(arrayLimits)) {
+    if (json.properties[key]) json.properties[key] = { ...json.properties[key], maxItems: max };
+  }
+  jsonSchemas.set(schema, json);
+  return json;
+}
 
 export const createGeminiProvider: ProviderFactory = (env) => {
   const apiKey = env.GEMINI_API_KEY?.trim();
@@ -32,7 +36,7 @@ export const createGeminiProvider: ProviderFactory = (env) => {
       setupError: {
         code: "not_configured",
         retryable: false,
-        message: "AI questions aren't set up on this server yet: AI_PROVIDER is “gemini” but GEMINI_API_KEY is missing.",
+        message: "AI features aren't set up on this server yet: AI_PROVIDER is “gemini” but GEMINI_API_KEY is missing.",
       },
     };
   }
@@ -42,7 +46,7 @@ export const createGeminiProvider: ProviderFactory = (env) => {
   return {
     id: "gemini",
     model,
-    async generate({ system, user }) {
+    async generate({ system, user, schema, arrayLimits }) {
       let interaction;
       try {
         interaction = await client.interactions.create(
@@ -50,7 +54,7 @@ export const createGeminiProvider: ProviderFactory = (env) => {
             model,
             system_instruction: system,
             input: user,
-            response_format: { type: "text", mime_type: "application/json", schema: RESPONSE_SCHEMA },
+            response_format: { type: "text", mime_type: "application/json", schema: responseSchema(schema, arrayLimits) },
             generation_config: { max_output_tokens: 4096 },
             store: false,
           },
@@ -62,12 +66,7 @@ export const createGeminiProvider: ProviderFactory = (env) => {
         throw translate(err);
       }
 
-      const noResult = (detail: string) =>
-        new ProviderError(
-          { code: "no_result", retryable: true, message: "We couldn't prepare questions this time. Try again." },
-          502,
-          detail,
-        );
+      const noResult = (detail: string) => new ProviderError(NO_RESULT, 502, detail);
       if (interaction.status !== "completed") throw noResult(`interaction status=${interaction.status}`);
       let json: unknown;
       try {
@@ -75,7 +74,7 @@ export const createGeminiProvider: ProviderFactory = (env) => {
       } catch {
         throw noResult("output was not valid JSON");
       }
-      const parsed = OutputSchema.safeParse(json);
+      const parsed = schema.safeParse(json);
       if (!parsed.success) throw noResult("output did not match the schema");
       return parsed.data;
     },
@@ -115,7 +114,7 @@ function translate(err: unknown): ProviderError {
       {
         code: "rate_limited",
         retryable: true,
-        message: "The AI service's free quota is used up for now. Try again later, or continue without questions.",
+        message: "The AI service's free quota is used up for now. Try again later, or continue without AI.",
       },
       429,
       log,
@@ -137,7 +136,7 @@ function translate(err: unknown): ProviderError {
       {
         code: "unavailable",
         retryable: true,
-        message: "The AI service is busy right now. Try again in a minute, or continue without questions.",
+        message: "The AI service is busy right now. Try again in a minute, or continue without AI.",
       },
       503,
       log,

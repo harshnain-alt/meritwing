@@ -9,6 +9,7 @@ import {
 } from "@/lib/application";
 import { choiceFor, type ResumeCheck } from "@/lib/resumeChecks";
 import { previewToText, type ResumePreviewModel } from "@/lib/resumePreview";
+import { BulletsPanel, type BulletsState } from "@/components/steps/BulletsPanel";
 import { OutdatedNotice, RelevantNotes, type Answer, type ClarifyState } from "@/components/steps/QuestionsView";
 
 type DraftViewProps = {
@@ -25,11 +26,18 @@ type DraftViewProps = {
   onAnswer: (id: string, answer: Answer) => void;
   onEarlierAnswer: (index: number, answer: string | null) => void;
   onRefreshQuestions: () => void;
+  bullets: BulletsState;
+  bulletsOutdated: boolean;
+  /** The preview's project entry uses AI bullets the student reviewed and added. */
+  aiBulletsInPreview: boolean;
+  onWriteBullets: () => void;
+  onKeepBullets: () => void;
+  onBulletsChange: (update: (state: BulletsState) => BulletsState) => void;
 };
 
 /**
- * Shown after the three steps. Drafting is not connected yet, so this shows only the
- * student's own information, with fact checks beside a layout preview of their wording.
+ * Shown after the three steps: the student's own information with fact checks, AI-written
+ * project bullets they review before adding, and a layout preview of the resume.
  */
 export function DraftView({
   data,
@@ -45,6 +53,12 @@ export function DraftView({
   onAnswer,
   onEarlierAnswer,
   onRefreshQuestions,
+  bullets,
+  bulletsOutdated,
+  aiBulletsInPreview,
+  onWriteBullets,
+  onKeepBullets,
+  onBulletsChange,
 }: DraftViewProps) {
   const { about, experience, resume, internship } = data;
   const role = [internship.title.trim(), internship.company.trim()].filter(Boolean).join(" at ") || "this internship";
@@ -64,11 +78,10 @@ export function DraftView({
           <path d="M10 2a8 8 0 1 0 0 16 8 8 0 0 0 0-16Zm0 4.25a1 1 0 1 1 0 2 1 1 0 0 1 0-2Zm1 8.25H9v-5h2v5Z" />
         </svg>
         <div>
-          <p className="font-semibold text-ink">Application drafting isn&apos;t connected yet</p>
+          <p className="font-semibold text-ink">AI is used only where it&apos;s marked</p>
           <p className="mt-0.5 text-[15px] text-ink-soft">
-            Only the follow-up questions and the notes marked &ldquo;AI interpretation&rdquo; come from AI. Everything
-            else here is your own information, unchanged. Writing tailored application content for {role} is the
-            next step.
+            The follow-up questions, the notes marked &ldquo;AI interpretation&rdquo; and any AI-written bullets you
+            choose to add come from AI. Everything else here is your own information, unchanged.
           </p>
         </div>
       </div>
@@ -142,6 +155,17 @@ export function DraftView({
                 />
               )}
             </div>
+
+            <BulletsPanel
+              state={bullets}
+              outdated={bulletsOutdated}
+              confirmed={confirmed}
+              projectName={experience.projectName.trim()}
+              role={role}
+              onWrite={onWriteBullets}
+              onKeep={onKeepBullets}
+              onChange={onBulletsChange}
+            />
           </section>
         </div>
 
@@ -158,9 +182,11 @@ export function DraftView({
               {confirmed ? "Facts confirmed by you" : "Unconfirmed"}
             </span>
           </div>
-          <PreviewActions model={preview} confirmed={confirmed} />
+          <PreviewActions model={preview} confirmed={confirmed} aiBullets={aiBulletsInPreview} />
           <p className="text-sm text-muted">
-            Your own wording arranged as a resume. It is not AI-written, so some lines may read like notes.
+            {aiBulletsInPreview
+              ? `The ${experience.projectName.trim() || "project"} bullets are AI-written from your confirmed facts and reviewed by you. Everything else is your own wording arranged as a resume.`
+              : "Your own wording arranged as a resume. It is not AI-written, so some lines may read like notes."}{" "}
             Empty sections are left out.
           </p>
           <div className="rounded-xl bg-[#ece8e1] px-2 py-5 sm:px-6 sm:py-8">
@@ -284,7 +310,7 @@ function Version({ label, text }: { label: string; text: string }) {
  * Copy as text and Download PDF for the preview. Both use exactly the preview's content.
  * Copy falls back to a selectable box where the clipboard is blocked.
  */
-function PreviewActions({ model, confirmed }: { model: ResumePreviewModel; confirmed: boolean }) {
+function PreviewActions({ model, confirmed, aiBullets }: { model: ResumePreviewModel; confirmed: boolean; aiBullets: boolean }) {
   const [status, setStatus] = useState<
     | { kind: "idle" }
     | { kind: "copied" }
@@ -329,7 +355,8 @@ function PreviewActions({ model, confirmed }: { model: ResumePreviewModel; confi
 
   const button =
     "rounded-lg border border-line-strong bg-surface px-3.5 py-2 text-sm font-semibold text-ink hover:bg-canvas disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
-  const reminder = confirmed ? "Uses your own wording." : "Uses your own wording. Check your facts before using it.";
+  const wording = aiBullets ? "Uses your own wording and the AI bullets you added." : "Uses your own wording.";
+  const reminder = confirmed ? wording : `${wording} Check your facts before using it.`;
 
   return (
     <div className="space-y-2">

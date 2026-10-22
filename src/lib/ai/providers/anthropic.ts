@@ -1,7 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { betaZodOutputFormat } from "@anthropic-ai/sdk/helpers/beta/zod";
-import { OutputSchema } from "@/lib/ai/clarifyPrompt";
-import { ProviderError, type ProviderFactory } from "@/lib/ai/provider";
+import { NO_RESULT, ProviderError, type ProviderFactory } from "@/lib/ai/provider";
 
 /*
  * Anthropic (Claude) provider. Configuration, server-side only:
@@ -20,7 +19,7 @@ export const createAnthropicProvider: ProviderFactory = (env) => {
       setupError: {
         code: "not_configured",
         retryable: false,
-        message: "AI questions aren't set up on this server yet: AI_PROVIDER is “anthropic” but ANTHROPIC_API_KEY is missing.",
+        message: "AI features aren't set up on this server yet: AI_PROVIDER is “anthropic” but ANTHROPIC_API_KEY is missing.",
       },
     };
   }
@@ -30,7 +29,7 @@ export const createAnthropicProvider: ProviderFactory = (env) => {
   return {
     id: "anthropic",
     model,
-    async generate({ system, user }) {
+    async generate({ system, user, schema }) {
       let response;
       try {
         response = await client.beta.messages.parse({
@@ -38,18 +37,14 @@ export const createAnthropicProvider: ProviderFactory = (env) => {
           max_tokens: 16000,
           system,
           messages: [{ role: "user", content: user }],
-          output_config: { effort: "medium", format: betaZodOutputFormat(OutputSchema) },
+          output_config: { effort: "medium", format: betaZodOutputFormat(schema) },
           ...(FALLBACK_MODELS.has(model) ? { betas: ["server-side-fallback-2026-07-01"], fallbacks: "default" as const } : {}),
         });
       } catch (err) {
         throw translate(err);
       }
       if (response.stop_reason === "refusal" || response.stop_reason === "max_tokens" || !response.parsed_output) {
-        throw new ProviderError(
-          { code: "no_result", retryable: true, message: "We couldn't prepare questions this time. Try again." },
-          502,
-          `unusable response: stop_reason=${response.stop_reason}`,
-        );
+        throw new ProviderError(NO_RESULT, 502, `unusable response: stop_reason=${response.stop_reason}`);
       }
       return response.parsed_output;
     },
@@ -99,9 +94,5 @@ function translate(err: unknown): ProviderError {
     );
   }
   // Includes the SDK's own error when the output fails schema validation.
-  return new ProviderError(
-    { code: "no_result", retryable: true, message: "We couldn't prepare questions this time. Try again." },
-    502,
-    log,
-  );
+  return new ProviderError(NO_RESULT, 502, log);
 }

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { StepIndicator } from "@/components/StepIndicator";
+import { bulletsForResume, NO_BULLETS, toWritten, type BulletsState } from "@/components/steps/BulletsPanel";
 import { DraftView } from "@/components/steps/DraftView";
 import { ExperienceStep } from "@/components/steps/ExperienceStep";
 import { InternshipStep } from "@/components/steps/InternshipStep";
@@ -24,6 +25,7 @@ import {
   type StepId,
   type View,
 } from "@/lib/application";
+import { bulletFacts, bulletsFingerprint, bulletsOverLimit, buildBulletsInput, type BulletsInput } from "@/lib/bullets";
 import {
   buildClarifyInput,
   CLARIFY_LIMITS,
@@ -74,6 +76,15 @@ const noopSubscribe = () => () => {};
 type Attempted = Record<StepId, boolean>;
 const NOT_ATTEMPTED: Attempted = { 1: false, 2: false, 3: false };
 
+/** Follow-up questions the student answered, earliest first. Skipped and blank ones are left out. */
+function answeredFollowUps(clarify: ClarifyState): BulletsInput["followUps"] {
+  const latest = (clarify.result?.questions ?? []).map((q) => {
+    const a = clarify.answers[q.id];
+    return { question: q.question, answer: a && !a.skipped ? a.text.trim() : "" };
+  });
+  return [...clarify.asked.map((a) => ({ question: a.question, answer: a.answer?.trim() ?? "" })), ...latest].filter((f) => f.answer);
+}
+
 /** Undo details that were filled from a resume and haven't been edited since. */
 function withoutFilled(about: AboutData, filled: ResumeData["filled"]): AboutData {
   const next = { ...about };
@@ -102,6 +113,9 @@ export function Workspace() {
   // Guards against duplicate question requests from repeated clicks.
   const clarifyBusy = useRef(false);
   const clarifyAbort = useRef<AbortController | null>(null);
+  const [bullets, setBullets] = useState<BulletsState>(NO_BULLETS);
+  const bulletsBusy = useRef(false);
+  const bulletsAbort = useRef<AbortController | null>(null);
 
   const headingRef = useRef<HTMLHeadingElement>(null);
   const isFirstRender = useRef(true);
@@ -117,10 +131,15 @@ export function Workspace() {
 
   const checks = useMemo(() => computeChecks(data), [data]);
   const unresolved = unresolvedChecks(data, checks).length;
-  const preview = useMemo(() => buildPreview(data, checks), [data, checks]);
   const currentFingerprint = useMemo(() => clarifyFingerprint(buildClarifyInput(data)), [data]);
   // Questions prepared from information that has since changed.
   const clarifyOutdated = clarify.status === "ready" && clarify.fingerprint !== currentFingerprint;
+  const bulletsInput = useMemo(() => buildBulletsInput(data, answeredFollowUps(clarify)), [data, clarify]);
+  const currentBulletsFingerprint = useMemo(() => bulletsFingerprint(bulletsInput), [bulletsInput]);
+  // Bullets written from facts or answers that have since changed.
+  const bulletsOutdated = Boolean(bullets.written) && bullets.written!.fingerprint !== currentBulletsFingerprint;
+  const projectBullets = bulletsForResume(bullets, currentBulletsFingerprint);
+  const preview = useMemo(() => buildPreview(data, checks, projectBullets), [data, checks, projectBullets]);
 
   const stepErrors = {
     1: validateStart(data.about, data.resume),
@@ -282,6 +301,60 @@ export function Workspace() {
     }
   }
 
+  /** Asks the server for resume bullets written only from the confirmed facts and answers. */
+  async function requestBullets() {
+    if (bulletsBusy.current || !confirmed) return;
+    const input = bulletsInput;
+    const fingerprint = currentBulletsFingerprint;
+    const tooLong = bulletsOverLimit(input);
+    if (tooLong) {
+      setBullets((b) => ({ ...b, error: { code: "too_long", message: tooLong, retryable: false } }));
+      return;
+    }
+
+    bulletsBusy.current = true;
+    const controller = new AbortController();
+    bulletsAbort.current = controller;
+    setBullets((b) => ({ ...b, loading: true, error: null }));
+    try {
+      const res = await fetch("/api/bullets", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(input),
+        signal: controller.signal,
+      });
+      const json = await res.json().catch(() => null);
+      if (!res.ok || !json?.result) {
+        const error: ClarifyError = json?.error ?? {
+          code: "unavailable",
+          retryable: true,
+          message: res.status === 504 ? "The AI service took too long to answer. Try again." : "Something went wrong. Try again.",
+        };
+        setBullets((b) => ({ ...b, loading: false, error }));
+        return;
+      }
+      // New bullets always need reviewing before they reach the resume.
+      setBullets({
+        loading: false,
+        error: null,
+        written: toWritten(json.result, fingerprint, bulletFacts(input), input.project.resultsOwnership === "shared"),
+        added: false,
+      });
+    } catch (err) {
+      if ((err as Error).name === "AbortError") return;
+      setBullets((b) => ({
+        ...b,
+        loading: false,
+        error: { code: "unavailable", retryable: true, message: "We couldn't reach the server. Check your connection and try again." },
+      }));
+    } finally {
+      if (bulletsAbort.current === controller) {
+        bulletsAbort.current = null;
+        bulletsBusy.current = false;
+      }
+    }
+  }
+
   /** Opens the questions screen, fetching questions unless current ones still fit the information. */
   function openQuestions() {
     goTo(QUESTIONS_VIEW);
@@ -335,6 +408,10 @@ export function Workspace() {
     clarifyAbort.current = null;
     clarifyBusy.current = false;
     setClarify(NO_CLARIFY);
+    bulletsAbort.current?.abort();
+    bulletsAbort.current = null;
+    bulletsBusy.current = false;
+    setBullets(NO_BULLETS);
     setData(emptyApplication);
     setAttempted(NOT_ATTEMPTED);
     setConfirmed(false);
@@ -511,6 +588,14 @@ export function Workspace() {
             onAnswer={setAnswer}
             onEarlierAnswer={setEarlierAnswer}
             onRefreshQuestions={openQuestions}
+            bullets={bullets}
+            bulletsOutdated={bulletsOutdated}
+            aiBulletsInPreview={projectBullets !== null}
+            onWriteBullets={() => void requestBullets()}
+            onKeepBullets={() =>
+              setBullets((b) => (b.written ? { ...b, written: { ...b.written, fingerprint: currentBulletsFingerprint } } : b))
+            }
+            onBulletsChange={setBullets}
           />
         )}
 
