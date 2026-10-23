@@ -29,3 +29,32 @@ body {
   background: var(--color-accent-soft);
   color: var(--color-ink);
 }
+
+/* Printing the page prints only the resume: its A4 pages, nothing of the app. */
+.resume-print {
+  display: none;
+}
+@media print {
+  @page {
+    size: A4;
+    margin: 0;
+  }
+  body > :not(.resume-print) {
+    display: none !important;
+  }
+  body {
+    background: #ffffff;
+  }
+  .resume-print {
+    display: block;
+  }
+  .resume-print-page {
+    display: block;
+    width: 210mm;
+    height: 297mm;
+    break-after: page;
+  }
+  .resume-print-page:last-child {
+    break-after: auto;
+  }
+}

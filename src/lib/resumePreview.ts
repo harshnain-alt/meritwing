@@ -1,5 +1,6 @@
 import type { ApplicationData, ResumeSections } from "@/lib/application";
 import { choiceFor, type ResumeCheck } from "@/lib/resumeChecks";
+import { continuesBullet, splitTrailingDate } from "@/lib/resume/lines";
 import { isBullet, stripBullet } from "@/lib/resumeParser";
 
 /*
@@ -7,7 +8,11 @@ import { isBullet, stripBullet } from "@/lib/resumeParser";
  * Nothing here rewrites, embellishes or invents content.
  */
 
-export type PreviewLine = { text: string; bullet: boolean };
+/**
+ * A line from the resume, in the student's words. lead + date: the same line split where it
+ * ends in a date ("Example Co, Mumbai" + "Jun 2023 – Present"), so the date can be right-aligned.
+ */
+export type PreviewLine = { text: string; bullet: boolean; lead?: string; date?: string };
 
 export type PreviewEntry = {
   title: string;
@@ -47,11 +52,21 @@ export function buildPreview(data: ApplicationData, checks: ResumeCheck[], proje
   const excluded = checks.filter((c) => c.block && choice(c.id) === "answers").map((c) => c.block!);
   const resumeLines = (section: keyof ResumeSections): PreviewLine[] => {
     if (!proposed) return [];
-    return proposed[section]
-      .split("\n")
-      .filter((_, i) => !excluded.some((b) => b.section === section && i >= b.start && i <= b.end))
-      .filter((line) => line.trim())
-      .map((line) => ({ text: isBullet(line) ? stripBullet(line) : line.trim(), bullet: isBullet(line) }));
+    const lines: PreviewLine[] = [];
+    for (const raw of proposed[section].split("\n").filter((_, i) => !excluded.some((b) => b.section === section && i >= b.start && i <= b.end))) {
+      if (!raw.trim()) continue;
+      const bullet = isBullet(raw);
+      const text = bullet ? stripBullet(raw) : raw.trim();
+      const prev = lines.at(-1);
+      // Text a PDF extractor broke onto its own line rejoins its bullet, word for word.
+      if (!bullet && prev?.bullet && continuesBullet(prev.text, text)) {
+        prev.text = `${prev.text} ${text}`;
+        continue;
+      }
+      const dated = bullet ? null : splitTrailingDate(text);
+      lines.push(dated ? { text, bullet, ...dated } : { text, bullet });
+    }
+    return lines;
   };
 
   const name = pick("name", about.fullName, proposed?.name ?? "");

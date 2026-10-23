@@ -169,7 +169,7 @@ export function DraftView({
           </section>
         </div>
 
-        <section aria-labelledby="preview-heading" className="space-y-3 lg:sticky lg:top-6">
+        <section aria-labelledby="preview-heading" className="min-w-0 space-y-3">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
             <h2 id="preview-heading" className="font-display text-xl font-semibold text-ink">
               Resume layout preview
@@ -189,7 +189,7 @@ export function DraftView({
               : "Your own wording arranged as a resume. It is not AI-written, so some lines may read like notes."}{" "}
             Empty sections are left out.
           </p>
-          <div className="rounded-xl bg-[#ece8e1] px-2 py-5 sm:px-6 sm:py-8">
+          <div className="rounded-xl bg-[#e6e9ee] px-2 py-4 sm:px-5 sm:py-5">
             <ResumePreview model={preview} />
           </div>
         </section>

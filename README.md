@@ -96,10 +96,19 @@ contribution.
   or excludes bullets and chooses *Add to my resume*; they can switch back to their own wording at any
   time. If their facts or answers change afterwards, the bullets are marked *Outdated* and the resume
   shows their own wording until they write them again or keep them.
+- **One resume layout for the preview, the PDF and printing** (`src/lib/resume/layout.ts`): every
+  line is positioned on an A4 page in points, measured with the PDF font's own character widths. The
+  preview draws those positions as A4 pages (with *Actual size* / *Fit to width*), the PDF draws the
+  same positions with jsPDF, and printing the page (Ctrl+P) prints only those pages, so what the
+  student sees is what they download. Layout: centred name and contact line (email, phone and links
+  are clickable in the PDF), uppercase section headings with a rule, organisation or degree in bold
+  with its dates right-aligned to the margin, wrapped bullets with a hanging indent, and empty
+  sections left out. Lines that PDF text extraction broke off a bullet ("…and engineering" / "teams")
+  are joined back. Long content flows onto more pages, numbered *Page X of Y*; a section heading is
+  never left alone at the bottom of a page, a short entry moves to the next page whole instead of
+  splitting after one bullet, and text is never shrunk to fit.
 - **Copy as text** copies the preview as plain text, and **Download PDF** creates a resume-only A4
-  PDF of it, generated in the browser: real, selectable text; every line wrapped inside the
-  margins; a section heading never left alone at the bottom of a page, and each bullet kept on one
-  page. Characters the standard PDF fonts can't show (for example ₹ or Devanagari) are replaced
+  PDF of it, generated in the browser: real, selectable text with nothing of the app on it. Characters the standard PDF fonts can't show (for example ₹ or Devanagari) are replaced
   (₹ becomes "Rs.") and the student is told which ones. Both use exactly what the preview shows,
   including any AI bullets the student added and edited. A page can't tell whether the browser
   actually saved a download, so after creating the PDF the app says it is ready and keeps a
@@ -329,6 +338,8 @@ src/lib/jobs/                 board readers, matching rules and filters, job typ
 src/components/               workspace, steps, bullets panel, searchable dropdown, resume preview
 src/lib/                      validation, resume parsing and checks, preview builder, bullet facts
 src/lib/ai/                   AI provider interface, shared route handling, prompts, checks, providers/
+src/lib/resume/               shared resume layout (preview, PDF, print) and line clean-up
 data/                         business-school sources and notes
 scripts/build-datasets.mjs    rebuilds src/data/business-schools.json
+scripts/build-font-metrics.mjs  rebuilds src/lib/resume/helvetica-metrics.json from jsPDF's font
 ```
