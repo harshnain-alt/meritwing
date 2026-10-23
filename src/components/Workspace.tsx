@@ -680,13 +680,13 @@ export function Workspace() {
         />
       </div>
 
-      <div className="mt-8 flex flex-col gap-4 sm:mt-10 sm:flex-row sm:items-end sm:justify-between">
+      <div key={view} className="mw-rise mt-8 flex flex-col gap-4 sm:mt-10 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-sm font-medium text-accent">{copy.eyebrow}</p>
           <h1
             ref={headingRef}
             tabIndex={-1}
-            className="mt-1 font-display text-3xl font-semibold tracking-tight text-ink focus:outline-none sm:text-[2.125rem]"
+            className="mt-1 text-3xl font-semibold tracking-tight text-ink focus:outline-none sm:text-[2.125rem]"
           >
             {copy.title}
           </h1>
@@ -719,7 +719,7 @@ export function Workspace() {
               type="button"
               onClick={handleClear}
               autoFocus
-              className="rounded-lg bg-danger px-3.5 py-2 text-sm font-semibold text-white hover:bg-danger/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-danger"
+              className="rounded-lg bg-danger-fill px-3.5 py-2 text-sm font-semibold text-white hover:bg-danger-fill-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-danger"
             >
               Yes, clear my data
             </button>
@@ -914,7 +914,7 @@ export function Workspace() {
               <button
                 type="submit"
                 disabled={!hydrated || (view === QUESTIONS_VIEW && clarify.status === "loading")}
-                className="rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-accent-strong disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                className="rounded-lg bg-accent-fill px-5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-accent-fill-hover disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
               >
                 {primaryLabel}
               </button>

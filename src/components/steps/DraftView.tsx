@@ -90,7 +90,7 @@ export function DraftView({
         <div className="space-y-6">
           <section aria-labelledby="facts-heading" className="space-y-4">
             <div>
-              <h2 id="facts-heading" className="font-display text-xl font-semibold text-ink">
+              <h2 id="facts-heading" className="text-xl font-semibold tracking-tight text-ink">
                 Check your facts
               </h2>
               <p className="mt-1 text-[15px] text-muted">
@@ -171,12 +171,12 @@ export function DraftView({
 
         <section aria-labelledby="preview-heading" className="min-w-0 space-y-3">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
-            <h2 id="preview-heading" className="font-display text-xl font-semibold text-ink">
+            <h2 id="preview-heading" className="text-xl font-semibold tracking-tight text-ink">
               Resume layout preview
             </h2>
             <span
               className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-                confirmed ? "bg-accent-soft text-accent" : "bg-amber-100 text-amber-900"
+                confirmed ? "bg-accent-soft text-accent" : "bg-warn-soft text-warn"
               }`}
             >
               {confirmed ? "Facts confirmed by you" : "Unconfirmed"}
@@ -189,7 +189,7 @@ export function DraftView({
               : "Your own wording arranged as a resume. It is not AI-written, so some lines may read like notes."}{" "}
             Empty sections are left out.
           </p>
-          <div className="rounded-xl bg-[#e6e9ee] px-2 py-4 sm:px-5 sm:py-5">
+          <div className="rounded-xl bg-raise px-2 py-4 sm:px-5 sm:py-5">
             <ResumePreview model={preview} />
           </div>
         </section>
@@ -246,7 +246,7 @@ function CheckCard({
 }) {
   const unresolved = !resolution;
   return (
-    <div className={`rounded-xl border bg-surface ${unresolved ? "border-amber-300" : "border-line"}`}>
+    <div className={`rounded-xl border bg-surface ${unresolved ? "border-warn-line" : "border-line"}`}>
       <div className="flex items-start justify-between gap-3 border-b border-line px-5 py-3.5">
         <div>
           <h3 className="font-semibold text-ink">{check.title}</h3>
@@ -254,7 +254,7 @@ function CheckCard({
         </div>
         <span
           className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-            unresolved ? "bg-amber-100 text-amber-900" : "bg-accent-soft text-accent"
+            unresolved ? "bg-warn-soft text-warn" : "bg-accent-soft text-accent"
           }`}
         >
           {unresolved ? "Needs decision" : "Resolved"}
@@ -268,7 +268,7 @@ function CheckCard({
         <ul className="space-y-1 border-t border-line px-5 py-3 text-sm text-ink-soft">
           {check.differences.map((d) => (
             <li key={d} className="flex gap-2">
-              <span aria-hidden="true" className="text-amber-700">
+              <span aria-hidden="true" className="text-warn">
                 •
               </span>
               {d}

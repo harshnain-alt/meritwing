@@ -153,7 +153,7 @@ export function JobsView(props: JobsViewProps) {
           ) : (
             <>
               {ranked.length < 5 && (
-                <div role="status" className="rounded-xl border border-amber-300 bg-amber-50 px-5 py-4 text-sm text-ink">
+                <div role="status" className="rounded-xl border border-warn-line bg-warn-soft px-5 py-4 text-sm text-ink">
                   <p className="font-semibold">Only {ranked.length} {ranked.length === 1 ? "opening matches" : "openings match"} your filters right now</p>
                   <p className="mt-1 text-ink-soft">
                     We searched {result.sources.filter((s) => s.status === "ok").length} employer careers boards and haven&apos;t widened your
@@ -178,8 +178,8 @@ export function JobsView(props: JobsViewProps) {
                 </div>
               ) : (
                 <ol className={`space-y-3 ${jobs.status === "loading" ? "opacity-60" : ""}`}>
-                  {shown.map((r) => (
-                    <JobCard key={r.job.id} rank={r} {...props} onDetails={() => openDetails(r.job)} />
+                  {shown.map((r, i) => (
+                    <JobCard key={r.job.id} index={i} rank={r} {...props} onDetails={() => openDetails(r.job)} />
                   ))}
                 </ol>
               )}
@@ -351,7 +351,7 @@ function Segmented({ label, value, options, onChange }: { label: string; value: 
   );
 }
 
-function JobCard({ rank, selectedJobId, hasOwnDescription, onSelect, onDetails }: JobsViewProps & { rank: RankedJob; onDetails: () => void }) {
+function JobCard({ index, rank, selectedJobId, hasOwnDescription, onSelect, onDetails }: JobsViewProps & { index: number; rank: RankedJob; onDetails: () => void }) {
   const { job } = rank;
   const selected = selectedJobId === job.id;
   const facts = [
@@ -364,7 +364,11 @@ function JobCard({ rank, selectedJobId, hasOwnDescription, onSelect, onDetails }
   ].filter(Boolean) as string[];
 
   return (
-    <li className={`rounded-xl border bg-surface px-4 py-4 sm:px-5 ${selected ? "border-accent ring-1 ring-accent" : "border-line"}`}>
+    // Cards fade in once when they appear (a short stagger for the first few), never continuously.
+    <li
+      style={{ animationDelay: `${Math.min(index, 6) * 45}ms` }}
+      className={`mw-card mw-rise rounded-xl border bg-surface px-4 py-4 sm:px-5 ${selected ? "border-accent ring-1 ring-accent" : "border-line"}`}
+    >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <h3 className="text-[17px] font-semibold leading-snug text-ink">{job.title}</h3>
@@ -438,7 +442,7 @@ export function TailorButton({ job, hasOwnDescription, onSelect }: { job: JobLis
 }
 
 export function Badge({ tone, children }: { tone: "amber" | "cobalt" | "grey"; children: ReactNode }) {
-  const cls = tone === "amber" ? "bg-amber-100 text-amber-900" : tone === "cobalt" ? "bg-accent-soft text-accent" : "bg-line text-ink-soft";
+  const cls = tone === "amber" ? "bg-warn-soft text-warn" : tone === "cobalt" ? "bg-accent-soft text-accent" : "bg-line text-ink-soft";
   return <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${cls}`}>{children}</span>;
 }
 
@@ -540,7 +544,7 @@ function Spinner({ small }: { small?: boolean }) {
 }
 
 const base = "rounded-lg px-4 py-2 text-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
-export const primary = `${base} bg-accent text-white hover:bg-accent-strong`;
+export const primary = `${base} bg-accent-fill text-white hover:bg-accent-fill-hover`;
 export const outline = `${base} border border-accent text-accent hover:bg-accent-soft`;
 export const ghost = `${base} text-ink hover:bg-canvas`;
 export const secondary = `${base} border border-line-strong bg-surface text-ink hover:bg-canvas`;

@@ -22,6 +22,8 @@ contribution.
 
 ## What works today
 
+- **Landing page** with the animated winged-tiger mark, what Meritwing does, the five steps and what
+  it won't do; *Start with your resume* opens step 1. Nothing is stored, so a refresh returns here.
 - **Five-stage flow**, with progress, Back/Continue and inputs kept between steps:
   1. **Resume** — full name, plus upload a resume (PDF), paste resume text, or continue
      without a resume. Optional *Additional details*: email, phone, State / Union Territory,
@@ -116,6 +118,13 @@ contribution.
   created, it says which, with *Try again*, and nothing the student entered is lost.
 - **Clear my data** removes everything entered and read in the session.
 - Responsive layout that works on mobile.
+- **Dark theme**: near-black background, charcoal surfaces, white text and electric-blue accents, with
+  every text colour at least 4.5:1 against its background. The resume preview stays a white A4 page.
+- **Motion**: the landing mark's wings unfold once, then it floats and beats its wings gently; the
+  header mark is still apart from a single wingbeat on hover. Elsewhere motion is brief and one-time
+  (step headings, job cards, the details panel, a small lift on card hover), and nothing moves
+  continuously around job results. With the system's *reduce motion* setting, all of it is off.
+  The mark is an original SVG drawn in code (`src/components/brand/tigerSvg.ts`), a first version.
 
 ## Job sources
 
@@ -335,7 +344,8 @@ src/app/                      page, layout, the PDF extraction route, /api/profi
                               /api/jobs/explain, /api/clarify and /api/bullets
 src/data/employers.json       the employer careers boards searched for jobs (configurable)
 src/lib/jobs/                 board readers, matching rules and filters, job types
-src/components/               workspace, steps, bullets panel, searchable dropdown, resume preview
+src/components/               app shell, landing, workspace, steps, bullets panel, searchable dropdown, resume preview
+src/components/brand/         the winged-tiger mark
 src/lib/                      validation, resume parsing and checks, preview builder, bullet facts
 src/lib/ai/                   AI provider interface, shared route handling, prompts, checks, providers/
 src/lib/resume/               shared resume layout (preview, PDF, print) and line clean-up

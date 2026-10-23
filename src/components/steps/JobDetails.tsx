@@ -62,13 +62,13 @@ export function JobDetails({ rank, explanation, selected, hasOwnDescription, onC
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
-      <div aria-hidden="true" onClick={onClose} className="absolute inset-0 bg-ink/40" />
+      <div aria-hidden="true" onClick={onClose} className="mw-fade absolute inset-0 bg-black/70 backdrop-blur-[2px]" />
       <div
         ref={panelRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby="details-title"
-        className="relative flex h-full w-full flex-col bg-surface shadow-2xl sm:max-w-xl"
+        className="mw-panel relative flex h-full w-full flex-col border-line-strong bg-surface shadow-2xl sm:max-w-xl sm:border-l"
       >
         <header className="border-b border-line px-5 py-4">
           <div className="flex items-start justify-between gap-3">

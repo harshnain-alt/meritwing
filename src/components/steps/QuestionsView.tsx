@@ -110,7 +110,7 @@ export function QuestionsView({ clarify, outdated, onAnswer, onRetry, onEdit }: 
 
 export function OutdatedNotice({ onRefresh }: { onRefresh: () => void }) {
   return (
-    <div role="status" className="flex flex-col gap-3 rounded-xl border border-amber-300 bg-amber-50 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+    <div role="status" className="flex flex-col gap-3 rounded-xl border border-warn-line bg-warn-soft px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
       <p className="text-sm text-ink">
         <span className="font-semibold">Outdated.</span> Your information changed after these questions were
         prepared, so they may no longer fit.
@@ -178,7 +178,7 @@ function ClarifyErrorPanel({ error, onRetry, onEdit }: { error: ClarifyError; on
           <button
             type="button"
             onClick={onRetry}
-            className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white hover:bg-accent-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            className="rounded-lg bg-accent-fill px-4 py-2 text-sm font-semibold text-white hover:bg-accent-fill-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
           >
             Retry
           </button>

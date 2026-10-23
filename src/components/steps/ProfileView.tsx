@@ -52,7 +52,7 @@ type ProfileViewProps = {
 
 const SOURCE_LABEL = { resume: "From your resume", venture: "From your venture details", student: "Added by you" } as const;
 const chip =
-  "inline-flex cursor-pointer items-center gap-2 rounded-full border px-3 py-1.5 text-sm has-[:checked]:border-accent has-[:checked]:bg-accent-soft has-[:checked]:text-ink has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-accent";
+  "inline-flex cursor-pointer items-center gap-2 rounded-full border px-3 py-1.5 text-sm has-[:checked]:border-accent has-[:checked]:bg-accent/25 has-[:checked]:font-medium has-[:checked]:text-ink has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-accent";
 
 /** Step: confirm the candidate profile, then choose job preferences. */
 export function ProfileView({ profile, outdated, prefs, errors, onRetry, onUseOwnWords, onFact, onRemoveFact, onAddFact, onConfirm, onPrefs, onSkipSearch }: ProfileViewProps) {
@@ -63,7 +63,7 @@ export function ProfileView({ profile, outdated, prefs, errors, onRetry, onUseOw
     <div className="space-y-8">
       <section aria-labelledby="profile-heading" className="space-y-4">
         <div>
-          <h2 id="profile-heading" tabIndex={-1} className="font-display text-xl font-semibold text-ink focus:outline-none">
+          <h2 id="profile-heading" tabIndex={-1} className="text-xl font-semibold tracking-tight text-ink focus:outline-none">
             Your profile
           </h2>
           <p className="mt-1 text-[15px] text-muted">
@@ -102,7 +102,7 @@ export function ProfileView({ profile, outdated, prefs, errors, onRetry, onUseOw
         {profile.status === "ready" && (
           <div className="space-y-3">
             {outdated && (
-              <div role="status" className="flex flex-col gap-2 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-ink sm:flex-row sm:items-center sm:justify-between">
+              <div role="status" className="flex flex-col gap-2 rounded-lg border border-warn-line bg-warn-soft px-4 py-3 text-sm text-ink sm:flex-row sm:items-center sm:justify-between">
                 <p>
                   <span className="font-semibold">Outdated.</span> Your resume or venture details changed after this
                   profile was read.
@@ -169,7 +169,7 @@ export function ProfileView({ profile, outdated, prefs, errors, onRetry, onUseOw
 
       <section aria-labelledby="prefs-heading" className="space-y-6">
         <div>
-          <h2 id="prefs-heading" className="font-display text-xl font-semibold text-ink">
+          <h2 id="prefs-heading" className="text-xl font-semibold tracking-tight text-ink">
             What are you looking for?
           </h2>
           <p className="mt-1 text-[15px] text-muted">
@@ -245,7 +245,7 @@ export function ProfileView({ profile, outdated, prefs, errors, onRetry, onUseOw
 }
 
 const primary =
-  "rounded-lg bg-accent px-3.5 py-2 text-sm font-semibold text-white hover:bg-accent-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
+  "rounded-lg bg-accent-fill px-3.5 py-2 text-sm font-semibold text-white hover:bg-accent-fill-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
 const secondary =
   "rounded-lg border border-line-strong bg-surface px-3.5 py-2 text-sm font-semibold text-ink hover:bg-canvas focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
 

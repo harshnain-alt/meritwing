@@ -178,7 +178,7 @@ function ResumeInput({ resume, upload, onResumeMode, onPasteDraft, onReadPaste, 
             <FileInput
               id="resumeFile"
               upload={upload}
-              className="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-accent-strong"
+              className="inline-flex items-center gap-2 rounded-lg bg-accent-fill px-4 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-accent-fill-hover"
             >
               {upload.status === "uploading" ? "Reading your PDF…" : "Choose PDF file"}
             </FileInput>

@@ -58,7 +58,7 @@ type BulletsPanelProps = {
 const button =
   "rounded-lg border border-line-strong bg-surface px-3.5 py-2 text-sm font-semibold text-ink hover:bg-canvas disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
 const primary =
-  "rounded-lg bg-accent px-3.5 py-2 text-sm font-semibold text-white hover:bg-accent-strong disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
+  "rounded-lg bg-accent-fill px-3.5 py-2 text-sm font-semibold text-white hover:bg-accent-fill-hover disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
 
 /**
  * AI-written bullets for the project entry. The student reviews, edits and chooses bullets
@@ -120,7 +120,7 @@ export function BulletsPanel({ state, outdated, confirmed, projectName, role, on
       {w && !state.loading && (
         <>
           {outdated && (
-            <div role="status" className="space-y-2 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-ink">
+            <div role="status" className="space-y-2 rounded-lg border border-warn-line bg-warn-soft px-4 py-3 text-sm text-ink">
               <p>
                 <span className="font-semibold">Outdated.</span> Your facts changed after these bullets were written
                 {state.added ? ", so your resume shows your own wording again" : ""}. Write them again, or check them
@@ -168,7 +168,7 @@ export function BulletsPanel({ state, outdated, confirmed, projectName, role, on
                     </label>
                     <span
                       className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
-                        item.kind === "team" ? "bg-amber-100 text-amber-900" : "bg-accent-soft text-accent"
+                        item.kind === "team" ? "bg-warn-soft text-warn" : "bg-accent-soft text-accent"
                       }`}
                     >
                       {item.kind === "team" ? "Team achievement" : "Your own work"}
