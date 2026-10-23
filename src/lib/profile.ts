@@ -3,6 +3,7 @@ import { resumeForAi, withoutContact } from "@/lib/clarify";
 import type { JobPreferences } from "@/lib/jobs/types";
 import { isBullet, stripBullet } from "@/lib/resumeParser";
 import { splitItems } from "@/lib/resumePreview";
+import { bulletText, ventureWork } from "@/lib/ventureEntry";
 
 /*
  * The candidate profile: short facts drawn from the student's resume and venture details,
@@ -55,14 +56,16 @@ export const PROFILE_LIMITS = { facts: 12, factText: 300, resume: 20000, field: 
 
 export function buildProfileInput(data: ApplicationData): ProfileInput {
   const e = data.experience;
+  const work = ventureWork(e);
   return {
     resume: resumeForAi(data),
     venture: {
-      name: e.projectName.trim(),
-      about: withoutContact(e.about.trim()),
-      personal: withoutContact(e.personal.trim()),
-      results: withoutContact(e.results.trim()),
-      resultsOwnership: e.results.trim() ? e.resultsAttribution : "",
+      name: (e.entry?.heading ?? e.projectName).trim(),
+      about: withoutContact((e.entry?.description ?? e.about).trim()),
+      personal: withoutContact(work.personal),
+      // Team results from the entry, kept apart from the student's own work.
+      results: withoutContact(work.results),
+      resultsOwnership: work.resultsAttribution,
     },
   };
 }
@@ -70,8 +73,8 @@ export function buildProfileInput(data: ApplicationData): ProfileInput {
 export const profileFingerprint = (input: ProfileInput) => JSON.stringify(input);
 
 /**
- * A profile made only from the student's own lines, used when AI isn't available: venture
- * contributions and results, resume experience lines and skills, unchanged.
+ * A profile made only from the student's own lines, used when AI isn't available: their venture
+ * entry (own work, and team results marked as such), resume experience lines and skills, unchanged.
  */
 export function profileFromOwnWords(data: ApplicationData): ProfileFact[] {
   const e = data.experience;
@@ -80,8 +83,9 @@ export function profileFromOwnWords(data: ApplicationData): ProfileFact[] {
     const t = text.trim();
     if (t && facts.length < PROFILE_LIMITS.facts) facts.push({ id: `F${facts.length + 1}`, text: t, evidence: t, source, kind, basis: "own" });
   };
-  splitItems(e.personal).forEach((t) => add(t, "venture", "experience"));
-  splitItems(e.results).forEach((t) => add(e.resultsAttribution === "shared" ? `Team result: ${t}` : t, "venture", "achievement"));
+  const work = ventureWork(e);
+  splitItems(work.personal).forEach((t) => add(t, "venture", "experience"));
+  splitItems(work.results).forEach((t) => add(bulletText({ text: t, kind: "team" }), "venture", "achievement"));
   const proposed = data.resume.proposed;
   if (proposed) {
     proposed.experience

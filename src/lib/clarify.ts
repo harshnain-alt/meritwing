@@ -1,42 +1,16 @@
-import { ATTRIBUTION_OPTIONS, type ApplicationData } from "@/lib/application";
+import type { ApplicationData } from "@/lib/application";
 
 /*
- * Shared between the browser and /api/clarify: what is sent for clarification
- * questions and what comes back. Contact details and the student's name are never sent.
+ * Shared by the AI features: input limits, the error shape every AI route returns, and the
+ * scrubbing that keeps the student's name and contact details out of anything sent to AI.
  */
-
-export type ClarifyInput = {
-  internship: { title: string; company: string; description: string };
-  project: {
-    name: string;
-    about: string;
-    personal: string;
-    results: string;
-    /** "Mine individually", "Shared with the team", "A mix…" or "" */
-    resultsOwnership: string;
-  };
-  /** Resume sections (education, experience, skills, additional), contact details removed. */
-  resume: string;
-  /** Follow-up questions already put to the student; answer null means they skipped it. */
-  previous: { question: string; answer: string | null }[];
-};
 
 export const CLARIFY_LIMITS = {
   description: 15000,
   resume: 20000,
   field: 6000,
   short: 300,
-  previous: 6,
 } as const;
-
-export type QuestionFocus = "ownership" | "actions" | "results";
-
-export type ClarifyQuestion = { id: string; question: string; why: string; focus: QuestionFocus };
-
-/** The model's reading of how the experience relates to the role. An interpretation, not a fact. */
-export type RelevantPoint = { roleNeed: string; evidence: string };
-
-export type ClarifyResult = { questions: ClarifyQuestion[]; relevant: RelevantPoint[] };
 
 export type ClarifyErrorCode =
   | "not_configured"
@@ -73,50 +47,4 @@ export function resumeForAi(data: ApplicationData): string {
       .map(([heading, text]) => `${heading}\n${text.trim()}`)
       .join("\n\n"),
   );
-}
-
-export function buildClarifyInput(data: ApplicationData, previous: ClarifyInput["previous"] = []): ClarifyInput {
-  const { experience, internship } = data;
-
-  return {
-    internship: {
-      title: internship.title.trim(),
-      company: internship.company.trim(),
-      description: internship.description.trim(),
-    },
-    project: {
-      name: experience.projectName.trim(),
-      about: withoutContact(experience.about.trim()),
-      personal: withoutContact(experience.personal.trim()),
-      results: withoutContact(experience.results.trim()),
-      resultsOwnership: experience.results.trim()
-        ? (ATTRIBUTION_OPTIONS.find((o) => o.value === experience.resultsAttribution)?.label ?? "")
-        : "",
-    },
-    resume: resumeForAi(data),
-    previous,
-  };
-}
-
-/** Identifies the information the questions were based on, so edits can mark them outdated. */
-export function clarifyFingerprint(input: ClarifyInput): string {
-  return JSON.stringify([input.internship, input.project, input.resume]);
-}
-
-/** Which inputs are over the limits the server accepts, in words the student can act on. */
-export function overLimit(input: ClarifyInput): string | null {
-  const L = CLARIFY_LIMITS;
-  if (input.internship.description.length > L.description)
-    return `The job description is too long (${input.internship.description.length.toLocaleString()} characters; the limit is ${L.description.toLocaleString()}). Remove anything that isn't part of the posting.`;
-  if (input.resume.length > L.resume)
-    return `Your resume text is too long (${input.resume.length.toLocaleString()} characters; the limit is ${L.resume.toLocaleString()}). Remove sections that aren't relevant on the first step.`;
-  for (const [label, value] of [
-    ["What the project was about", input.project.about],
-    ["What you personally did", input.project.personal],
-    ["Results", input.project.results],
-  ] as const) {
-    if (value.length > L.field)
-      return `“${label}” is too long (${value.length.toLocaleString()} characters; the limit is ${L.field.toLocaleString()}).`;
-  }
-  return null;
 }

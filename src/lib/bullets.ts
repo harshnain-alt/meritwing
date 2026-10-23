@@ -1,10 +1,11 @@
 import type { ApplicationData, ResultsAttribution } from "@/lib/application";
-import { overLimit, resumeForAi, withoutContact } from "@/lib/clarify";
+import { CLARIFY_LIMITS as L, resumeForAi, withoutContact } from "@/lib/clarify";
 import { splitItems } from "@/lib/resumePreview";
+import { ventureWork } from "@/lib/ventureEntry";
 
 /*
  * Shared between the browser and /api/bullets: what is sent to write AI resume bullets for
- * the project entry, the numbered facts the bullets must cite, and what comes back.
+ * the venture's Experience entry, the numbered facts the bullets must cite, and what comes back.
  * The student's name and contact details are never sent.
  */
 
@@ -17,7 +18,7 @@ export type BulletsInput = {
     results: string;
     resultsOwnership: ResultsAttribution;
   };
-  /** Follow-up questions the student answered (skipped ones are left out). */
+  /** Answers to follow-up questions. The app no longer asks any, so it always sends none. */
   followUps: { question: string; answer: string }[];
   /** Resume sections, contact details removed. Background only: never a source for a bullet. */
   resume: string;
@@ -57,9 +58,11 @@ export function bulletFacts(input: BulletsInput): BulletFact[] {
   return facts;
 }
 
-export function buildBulletsInput(data: ApplicationData, followUps: BulletsInput["followUps"]): BulletsInput {
+/** From the venture entry the student reviewed and added: their own work, and team results kept apart. */
+export function buildBulletsInput(data: ApplicationData): BulletsInput {
   const { experience, internship } = data;
-  const results = withoutContact(experience.results.trim());
+  const work = ventureWork(experience);
+  const results = withoutContact(work.results);
   return {
     internship: {
       title: internship.title.trim(),
@@ -67,16 +70,13 @@ export function buildBulletsInput(data: ApplicationData, followUps: BulletsInput
       description: internship.description.trim(),
     },
     project: {
-      name: experience.projectName.trim(),
-      about: withoutContact(experience.about.trim()),
-      personal: withoutContact(experience.personal.trim()),
+      name: (experience.entry?.heading ?? experience.projectName).trim(),
+      about: withoutContact((experience.entry?.description ?? experience.about).trim()),
+      personal: withoutContact(work.personal),
       results,
-      resultsOwnership: results ? experience.resultsAttribution : "",
+      resultsOwnership: results ? work.resultsAttribution : "",
     },
-    followUps: followUps
-      .filter((f) => f.answer.trim())
-      .slice(-BULLET_LIMITS.followUps)
-      .map((f) => ({ question: f.question.trim(), answer: withoutContact(f.answer.trim()) })),
+    followUps: [],
     resume: resumeForAi(data),
   };
 }
@@ -88,10 +88,16 @@ export function bulletsFingerprint(input: BulletsInput): string {
 
 /** Which inputs are over the limits the server accepts, in words the student can act on. */
 export function bulletsOverLimit(input: BulletsInput): string | null {
-  const shared = overLimit({ ...input, project: { ...input.project }, previous: [] });
-  if (shared) return shared;
-  const long = input.followUps.find((f) => f.answer.length > BULLET_LIMITS.answer);
-  return long
-    ? `Your answer to “${long.question}” is too long (${long.answer.length.toLocaleString()} characters; the limit is ${BULLET_LIMITS.answer.toLocaleString()}).`
-    : null;
+  if (input.internship.description.length > L.description)
+    return `The job description is too long (${input.internship.description.length.toLocaleString()} characters; the limit is ${L.description.toLocaleString()}). Remove anything that isn't part of the posting.`;
+  if (input.resume.length > L.resume)
+    return `Your resume text is too long (${input.resume.length.toLocaleString()} characters; the limit is ${L.resume.toLocaleString()}). Remove sections that aren't relevant on the first step.`;
+  for (const [label, value] of [
+    ["What the venture does", input.project.about],
+    ["What you personally did", input.project.personal],
+    ["Team results", input.project.results],
+  ] as const) {
+    if (value.length > L.field) return `“${label}” is too long (${value.length.toLocaleString()} characters; the limit is ${L.field.toLocaleString()}).`;
+  }
+  return null;
 }

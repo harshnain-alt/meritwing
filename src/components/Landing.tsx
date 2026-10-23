@@ -5,10 +5,10 @@ import { WingedTiger } from "@/components/brand/WingedTiger";
 
 const STEPS: [string, string][] = [
   ["Resume", "Upload a PDF or paste text. It's read with simple rules, not AI, and nothing is reworded."],
-  ["Your venture", "Describe something you built or ran, and what you personally did, in your own words."],
+  ["Your venture", "Three short answers: its name, what it does and what you personally did. We draft an Experience entry you can edit."],
   ["Profile", "Confirm a profile drawn from your resume and venture, then set role, location and work preferences."],
   ["Jobs for you", "Current openings from employer careers boards, ranked by evidence from your confirmed profile."],
-  ["Tailor", "Answer follow-up questions, review suggested bullets, and download a resume-only PDF."],
+  ["Tailor", "Check your resume for an opening, edit anything, and download a resume-only PDF."],
 ];
 
 const PRINCIPLES: { title: string; text: string; icon: ReactNode }[] = [

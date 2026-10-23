@@ -1,16 +1,11 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Checkbox } from "@/components/Field";
 import { ResumePreview } from "@/components/ResumePreview";
-import {
-  ATTRIBUTION_OPTIONS,
-  type ApplicationData,
-  type CheckChoice,
-  type StepId,
-} from "@/lib/application";
+import type { ApplicationData, CheckChoice, StepId } from "@/lib/application";
 import { choiceFor, type ResumeCheck } from "@/lib/resumeChecks";
 import { previewToText, type ResumePreviewModel } from "@/lib/resumePreview";
 import { BulletsPanel, type BulletsState } from "@/components/steps/BulletsPanel";
-import { OutdatedNotice, RelevantNotes, type Answer, type ClarifyState } from "@/components/steps/QuestionsView";
+import { bulletText } from "@/lib/ventureEntry";
 
 type DraftViewProps = {
   data: ApplicationData;
@@ -21,14 +16,9 @@ type DraftViewProps = {
   onConfirm: (confirmed: boolean) => void;
   onResolve: (check: ResumeCheck, choice: CheckChoice) => void;
   onEdit: (step: StepId) => void;
-  clarify: ClarifyState;
-  clarifyOutdated: boolean;
-  onAnswer: (id: string, answer: Answer) => void;
-  onEarlierAnswer: (index: number, answer: string | null) => void;
-  onRefreshQuestions: () => void;
   bullets: BulletsState;
   bulletsOutdated: boolean;
-  /** The preview's project entry uses AI bullets the student reviewed and added. */
+  /** The preview's venture entry uses AI bullets the student reviewed and added. */
   aiBulletsInPreview: boolean;
   onWriteBullets: () => void;
   onKeepBullets: () => void;
@@ -48,11 +38,6 @@ export function DraftView({
   onConfirm,
   onResolve,
   onEdit,
-  clarify,
-  clarifyOutdated,
-  onAnswer,
-  onEarlierAnswer,
-  onRefreshQuestions,
   bullets,
   bulletsOutdated,
   aiBulletsInPreview,
@@ -63,7 +48,6 @@ export function DraftView({
   const { about, experience, resume, internship } = data;
   const role = [internship.title.trim(), internship.company.trim()].filter(Boolean).join(" at ") || "this internship";
   const decisions = checks.filter((c) => c.needsDecision);
-  const attribution = ATTRIBUTION_OPTIONS.find((o) => o.value === experience.resultsAttribution)?.label ?? "";
   const resumeSource =
     resume.source?.kind === "pdf"
       ? `${resume.source.fileName} (uploaded)`
@@ -80,8 +64,8 @@ export function DraftView({
         <div>
           <p className="font-semibold text-ink">AI is used only where it&apos;s marked</p>
           <p className="mt-0.5 text-[15px] text-ink-soft">
-            The follow-up questions, the notes marked &ldquo;AI interpretation&rdquo; and any AI-written bullets you
-            choose to add come from AI. Everything else here is your own information, unchanged.
+            The notes marked &ldquo;AI interpretation&rdquo; and any AI-written bullets you choose to add come from AI.
+            Everything else here is your own information and the Experience entry you reviewed.
           </p>
         </div>
       </div>
@@ -118,21 +102,11 @@ export function DraftView({
               <Item label="Resume" value={resumeSource} />
             </SummaryCard>
 
-            <SummaryCard title="What you did" onEdit={() => onEdit(2)}>
-              <Item label="Project or venture" value={experience.projectName} />
-              <Item label="What it was about" value={experience.about} />
-              <Item label="What you personally did" value={experience.personal} />
-              <Item label="Results" value={experience.results} />
-              {experience.results.trim() && <Item label="Whose results" value={attribution} />}
+            <SummaryCard title="Your venture" onEdit={() => onEdit(2)}>
+              <Item label="Experience entry" value={experience.entry?.heading ?? ""} />
+              <Item label="Description" value={experience.entry?.description ?? ""} />
+              <Item label="Bullets" value={(experience.entry?.bullets ?? []).map((b) => `• ${bulletText(b)}`).join("\n")} />
             </SummaryCard>
-
-            <FollowUps
-              clarify={clarify}
-              outdated={clarifyOutdated}
-              onAnswer={onAnswer}
-              onEarlierAnswer={onEarlierAnswer}
-              onRefresh={onRefreshQuestions}
-            />
 
             <SummaryCard title="Job" onEdit={() => onEdit(3)}>
               <Item label="Title" value={internship.title} />
@@ -151,7 +125,7 @@ export function DraftView({
                   id="confirm"
                   checked={confirmed}
                   onChange={onConfirm}
-                  label="I've checked these facts. They're accurate, and results are attributed the way I described."
+                  label="I've checked these facts. They're accurate, and my own work and team results are marked the way I described."
                 />
               )}
             </div>
@@ -160,7 +134,7 @@ export function DraftView({
               state={bullets}
               outdated={bulletsOutdated}
               confirmed={confirmed}
-              projectName={experience.projectName.trim()}
+              projectName={(experience.entry?.heading ?? experience.projectName).trim()}
               role={role}
               onWrite={onWriteBullets}
               onKeep={onKeepBullets}
@@ -185,7 +159,7 @@ export function DraftView({
           <PreviewActions model={preview} confirmed={confirmed} aiBullets={aiBulletsInPreview} />
           <p className="text-sm text-muted">
             {aiBulletsInPreview
-              ? `The ${experience.projectName.trim() || "project"} bullets are AI-written from your confirmed facts and reviewed by you. Everything else is your own wording arranged as a resume.`
+              ? `The ${(experience.entry?.heading ?? experience.projectName).trim() || "venture"} bullets are AI-written from your confirmed facts and reviewed by you. Everything else is your own wording arranged as a resume.`
               : "Your own wording arranged as a resume. It is not AI-written, so some lines may read like notes."}{" "}
             Empty sections are left out.
           </p>
@@ -460,102 +434,5 @@ function PreviewActions({ model, confirmed, aiBullets }: { model: ResumePreviewM
         </div>
       )}
     </div>
-  );
-}
-
-/** The student's own follow-up answers (facts once confirmed), kept apart from the AI's reading. */
-function FollowUps({
-  clarify,
-  outdated,
-  onAnswer,
-  onEarlierAnswer,
-  onRefresh,
-}: {
-  clarify: ClarifyState;
-  outdated: boolean;
-  onAnswer: (id: string, answer: Answer) => void;
-  onEarlierAnswer: (index: number, answer: string | null) => void;
-  onRefresh: () => void;
-}) {
-  const button =
-    "rounded-lg border border-line-strong bg-surface px-3.5 py-2 text-sm font-semibold text-ink hover:bg-canvas focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
-
-  if (clarify.status !== "ready" || !clarify.result) {
-    return (
-      <section className="rounded-xl border border-line bg-surface px-5 py-4">
-        <h3 className="font-semibold text-ink">Follow-up questions</h3>
-        <p className="mt-1 text-sm text-muted">
-          {clarify.status === "loading"
-            ? "Preparing questions…"
-            : clarify.status === "error"
-              ? `Not prepared: ${clarify.error?.message ?? "something went wrong."}`
-              : "No follow-up questions have been prepared yet."}
-        </p>
-        {clarify.status !== "loading" && (
-          <button type="button" onClick={onRefresh} className={`mt-3 ${button}`}>
-            {clarify.status === "error" ? "Try again" : "Get follow-up questions"}
-          </button>
-        )}
-      </section>
-    );
-  }
-
-  const items = [
-    ...clarify.asked.map((a, index) => ({
-      key: `earlier-${index}`,
-      question: a.question,
-      answer: { text: a.answer ?? "", skipped: a.answer === null },
-      set: (next: Answer) => onEarlierAnswer(index, next.skipped ? null : next.text),
-    })),
-    ...clarify.result.questions.map((q) => ({
-      key: q.id,
-      question: q.question,
-      answer: clarify.answers[q.id] ?? { text: "", skipped: false },
-      set: (next: Answer) => onAnswer(q.id, next),
-    })),
-  ];
-
-  return (
-    <section aria-labelledby="followups-heading" className="space-y-3 rounded-xl border border-line bg-surface px-5 py-4">
-      <div>
-        <h3 id="followups-heading" className="font-semibold text-ink">
-          Your follow-up answers
-        </h3>
-        <p className="mt-0.5 text-xs text-muted">Your own words. They count as facts once you confirm below.</p>
-      </div>
-      {outdated && <OutdatedNotice onRefresh={onRefresh} />}
-      {items.length === 0 ? (
-        <p className="text-sm text-muted">No follow-up questions were needed.</p>
-      ) : (
-        <ul className="space-y-4">
-          {items.map((item) => (
-            <li key={item.key}>
-              <label htmlFor={`summary-${item.key}`} className="text-sm font-medium text-ink">
-                {item.question}
-              </label>
-              <textarea
-                id={`summary-${item.key}`}
-                rows={2}
-                value={item.answer.text}
-                disabled={item.answer.skipped}
-                placeholder={item.answer.skipped ? "Skipped" : "No answer yet"}
-                onChange={(e) => item.set({ text: e.target.value, skipped: false })}
-                className="mt-1.5 block w-full resize-y rounded-lg border border-line bg-surface px-3 py-2 text-sm leading-relaxed text-ink placeholder:text-faint focus:border-accent focus:outline-none focus:ring-3 focus:ring-accent/15 disabled:bg-canvas disabled:text-faint"
-              />
-              <label className="mt-1.5 inline-flex cursor-pointer items-center gap-2 text-xs text-ink-soft">
-                <input
-                  type="checkbox"
-                  checked={item.answer.skipped}
-                  onChange={(e) => item.set({ text: item.answer.text, skipped: e.target.checked })}
-                  className="size-3.5 rounded accent-accent"
-                />
-                I don&apos;t know / Skip
-              </label>
-            </li>
-          ))}
-        </ul>
-      )}
-      <RelevantNotes points={clarify.result.relevant} />
-    </section>
   );
 }

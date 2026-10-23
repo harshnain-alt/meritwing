@@ -8,13 +8,11 @@ import { ExperienceStep } from "@/components/steps/ExperienceStep";
 import { InternshipStep } from "@/components/steps/InternshipStep";
 import { JobsView, NO_JOBS, type JobsState } from "@/components/steps/JobsView";
 import { NO_PROFILE, ProfileView, type PreferenceErrors, type ProfileState } from "@/components/steps/ProfileView";
-import { NO_CLARIFY, QuestionsView, type Answer, type ClarifyState } from "@/components/steps/QuestionsView";
 import { StartStep } from "@/components/steps/StartStep";
 import {
   DRAFT_VIEW,
   JOBS_VIEW,
   PROFILE_VIEW,
-  QUESTIONS_VIEW,
   emptyApplication,
   hasErrors,
   validateExperience,
@@ -29,15 +27,8 @@ import {
   type StepId,
   type View,
 } from "@/lib/application";
-import { bulletFacts, bulletsFingerprint, bulletsOverLimit, buildBulletsInput, type BulletsInput } from "@/lib/bullets";
-import {
-  buildClarifyInput,
-  CLARIFY_LIMITS,
-  clarifyFingerprint,
-  overLimit,
-  type ClarifyError,
-  type ClarifyInput,
-} from "@/lib/clarify";
+import { bulletFacts, bulletsFingerprint, bulletsOverLimit, buildBulletsInput } from "@/lib/bullets";
+import type { ClarifyError } from "@/lib/clarify";
 import type { JobExplanation } from "@/lib/jobs/explain";
 import { rankJobs } from "@/lib/jobs/rank";
 import type { JobListing, JobPreferences, JobSearchResult } from "@/lib/jobs/types";
@@ -50,7 +41,7 @@ import {
   type ProfileFact,
   type ProfileResult,
 } from "@/lib/profile";
-import { computeChecks, unresolvedChecks, type ResumeCheck } from "@/lib/resumeChecks";
+import { computeChecks, resumeMention, unresolvedChecks, type ResumeCheck } from "@/lib/resumeChecks";
 import { detailsFromResume } from "@/lib/resumeExtract";
 import { parseResumeText } from "@/lib/resumeParser";
 import { buildPreview } from "@/lib/resumePreview";
@@ -63,8 +54,8 @@ const COPY: Record<View, { eyebrow: string; title: string; intro: string }> = {
   },
   2: {
     eyebrow: "Step 2 of 5",
-    title: "What did you do?",
-    intro: "Tell us about your venture or project in your own words: what it was, what you personally did, and any results.",
+    title: "Tell us about your venture",
+    intro: "Three short answers. We turn them into an Experience entry on your resume, using only what you write. You review and edit it before it’s added.",
   },
   profile: {
     eyebrow: "Step 3 of 5",
@@ -81,11 +72,6 @@ const COPY: Record<View, { eyebrow: string; title: string; intro: string }> = {
     title: "Check the job description",
     intro: "This is the job you’ll tailor your resume for. Check the description, or paste one you found elsewhere.",
   },
-  questions: {
-    eyebrow: "Tailor · Follow-up",
-    title: "A few quick questions",
-    intro: "These help us understand your own part in the project. Answer what you can; numbers are optional.",
-  },
   draft: {
     eyebrow: "Tailor · Your draft",
     title: "Your draft workspace",
@@ -101,16 +87,7 @@ const noopSubscribe = () => () => {};
 type Attempted = Record<StepId, boolean>;
 const NOT_ATTEMPTED: Attempted = { 1: false, 2: false, 3: false };
 
-/** Follow-up questions the student answered, earliest first. Skipped and blank ones are left out. */
-function answeredFollowUps(clarify: ClarifyState): BulletsInput["followUps"] {
-  const latest = (clarify.result?.questions ?? []).map((q) => {
-    const a = clarify.answers[q.id];
-    return { question: q.question, answer: a && !a.skipped ? a.text.trim() : "" };
-  });
-  return [...clarify.asked.map((a) => ({ question: a.question, answer: a.answer?.trim() ?? "" })), ...latest].filter((f) => f.answer);
-}
-
-const BACK: Record<View, View> = { 1: 1, 2: 1, profile: 2, jobs: PROFILE_VIEW, 3: JOBS_VIEW, questions: 3, draft: QUESTIONS_VIEW };
+const BACK: Record<View, View> = { 1: 1, 2: 1, profile: 2, jobs: PROFILE_VIEW, 3: JOBS_VIEW, draft: 3 };
 
 /** What still needs choosing on the profile step before jobs can be searched. */
 function preferenceErrors(profile: ProfileState, confirmedFacts: ProfileFact[], prefs: JobPreferences): PreferenceErrors {
@@ -149,10 +126,6 @@ export function Workspace() {
   // Buttons stay disabled until React has hydrated, so the form can never be
   // submitted natively by the browser.
   const hydrated = useSyncExternalStore(noopSubscribe, () => true, () => false);
-  const [clarify, setClarify] = useState<ClarifyState>(NO_CLARIFY);
-  // Guards against duplicate question requests from repeated clicks.
-  const clarifyBusy = useRef(false);
-  const clarifyAbort = useRef<AbortController | null>(null);
   const [bullets, setBullets] = useState<BulletsState>(NO_BULLETS);
   const bulletsBusy = useRef(false);
   const bulletsAbort = useRef<AbortController | null>(null);
@@ -184,10 +157,7 @@ export function Workspace() {
 
   const checks = useMemo(() => computeChecks(data), [data]);
   const unresolved = unresolvedChecks(data, checks).length;
-  const currentFingerprint = useMemo(() => clarifyFingerprint(buildClarifyInput(data)), [data]);
-  // Questions prepared from information that has since changed.
-  const clarifyOutdated = clarify.status === "ready" && clarify.fingerprint !== currentFingerprint;
-  const bulletsInput = useMemo(() => buildBulletsInput(data, answeredFollowUps(clarify)), [data, clarify]);
+  const bulletsInput = useMemo(() => buildBulletsInput(data), [data]);
   const currentBulletsFingerprint = useMemo(() => bulletsFingerprint(bulletsInput), [bulletsInput]);
   // Bullets written from facts or answers that have since changed.
   const bulletsOutdated = Boolean(bullets.written) && bullets.written!.fingerprint !== currentBulletsFingerprint;
@@ -448,69 +418,7 @@ export function Workspace() {
     return r;
   }
 
-  /** Asks the server for follow-up questions. Earlier questions are sent so they aren't repeated. */
-  async function requestClarify() {
-    if (clarifyBusy.current) return;
-    // Questions from earlier rounds: for the model (all of them) and for the summary (answered or skipped).
-    const lastRound = (clarify.result?.questions ?? []).map((q) => {
-      const a = clarify.answers[q.id];
-      return { question: q.question, answer: a && !a.skipped && a.text.trim() ? a.text.trim() : null, touched: Boolean(a) };
-    });
-    const asked = [
-      ...clarify.asked,
-      ...lastRound.filter((q) => q.touched).map(({ question, answer }) => ({ question, answer })),
-    ];
-    const previous: ClarifyInput["previous"] = [
-      ...clarify.asked,
-      ...lastRound.map(({ question, answer }) => ({ question, answer })),
-    ].slice(-CLARIFY_LIMITS.previous);
-
-    const input = buildClarifyInput(data, previous);
-    const fingerprint = clarifyFingerprint(input);
-    const tooLong = overLimit(input);
-    if (tooLong) {
-      setClarify((c) => ({ ...c, status: "error", fingerprint, error: { code: "too_long", message: tooLong, retryable: false } }));
-      return;
-    }
-
-    clarifyBusy.current = true;
-    const controller = new AbortController();
-    clarifyAbort.current = controller;
-    setClarify((c) => ({ ...c, status: "loading", fingerprint, error: null }));
-    try {
-      const res = await fetch("/api/clarify", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(input),
-        signal: controller.signal,
-      });
-      const json = await res.json().catch(() => null);
-      if (!res.ok || !json?.result) {
-        const error: ClarifyError = json?.error ?? {
-          code: "unavailable",
-          retryable: true,
-          message: res.status === 504 ? "The AI service took too long to answer. Try again." : "Something went wrong. Try again.",
-        };
-        setClarify((c) => ({ ...c, status: "error", error }));
-        return;
-      }
-      setClarify({ status: "ready", fingerprint, result: json.result, answers: {}, error: null, asked });
-    } catch (err) {
-      if ((err as Error).name === "AbortError") return;
-      setClarify((c) => ({
-        ...c,
-        status: "error",
-        error: { code: "unavailable", retryable: true, message: "We couldn't reach the server. Check your connection and try again." },
-      }));
-    } finally {
-      if (clarifyAbort.current === controller) {
-        clarifyAbort.current = null;
-        clarifyBusy.current = false;
-      }
-    }
-  }
-
-  /** Asks the server for resume bullets written only from the confirmed facts and answers. */
+  /** Asks the server for resume bullets written only from the confirmed facts. */
   async function requestBullets() {
     if (bulletsBusy.current || !confirmed) return;
     const input = bulletsInput;
@@ -564,29 +472,8 @@ export function Workspace() {
     }
   }
 
-  /** Opens the questions screen, fetching questions unless current ones still fit the information. */
-  function openQuestions() {
-    goTo(QUESTIONS_VIEW);
-    const current = clarify.status === "ready" && clarify.fingerprint === currentFingerprint;
-    if (clarify.status !== "loading" && !current) void requestClarify();
-  }
-
-  function setAnswer(id: string, answer: Answer) {
-    setConfirmed(false);
-    setClarify((c) => ({ ...c, answers: { ...c.answers, [id]: answer } }));
-  }
-
-  function setEarlierAnswer(index: number, answer: string | null) {
-    setConfirmed(false);
-    setClarify((c) => ({ ...c, asked: c.asked.map((a, i) => (i === index ? { ...a, answer } : a)) }));
-  }
-
   function handleContinue() {
     if (view === DRAFT_VIEW || view === JOBS_VIEW) return;
-    if (view === QUESTIONS_VIEW) {
-      if (clarify.status !== "loading") goTo(DRAFT_VIEW);
-      return;
-    }
     if (view === PROFILE_VIEW) {
       setPrefsAttempted(true);
       const first = Object.keys(prefErrors)[0];
@@ -601,7 +488,7 @@ export function Workspace() {
     }
     const resume = view === 1 ? prepareStart() : undefined;
     if (!check(view, resume)) return;
-    if (view === 3) openQuestions();
+    if (view === 3) goTo(DRAFT_VIEW);
     else if (view === 2) openProfile();
     else goTo(2);
   }
@@ -626,10 +513,6 @@ export function Workspace() {
   }
 
   function handleClear() {
-    clarifyAbort.current?.abort();
-    clarifyAbort.current = null;
-    clarifyBusy.current = false;
-    setClarify(NO_CLARIFY);
     bulletsAbort.current?.abort();
     bulletsAbort.current = null;
     bulletsBusy.current = false;
@@ -663,11 +546,7 @@ export function Workspace() {
     view === PROFILE_VIEW
       ? "Find matching jobs"
       : view === 3
-      ? "Create my application draft"
-      : view === QUESTIONS_VIEW
-        ? clarify.status === "error"
-          ? "Continue without questions"
-          : "Continue to draft"
+        ? "Create my application draft"
         : "Continue";
 
   return (
@@ -676,7 +555,7 @@ export function Workspace() {
         <StepIndicator
           current={view}
           onSelect={setView}
-          reachable={(step) => visited.includes(step) || (step === 3 && (visited.includes(QUESTIONS_VIEW) || visited.includes(DRAFT_VIEW)))}
+          reachable={(step) => visited.includes(step) || (step === 3 && visited.includes(DRAFT_VIEW))}
         />
       </div>
 
@@ -774,7 +653,8 @@ export function Workspace() {
           <ExperienceStep
             data={data.experience}
             errors={visibleErrors(2)}
-            onChange={(f, v) => update("experience", { [f]: v })}
+            onChange={(patch) => update("experience", patch)}
+            resumeMention={resumeMention(data.resume.proposed, data.experience.draft?.heading ?? data.experience.projectName)}
           />
         )}
         {view === PROFILE_VIEW && (
@@ -844,15 +724,6 @@ export function Workspace() {
             onChange={(f, v) => update("internship", { [f]: v })}
           />
         )}
-        {view === QUESTIONS_VIEW && (
-          <QuestionsView
-            clarify={clarify}
-            outdated={clarifyOutdated}
-            onAnswer={setAnswer}
-            onRetry={() => void requestClarify()}
-            onEdit={setView}
-          />
-        )}
         {view === DRAFT_VIEW && (
           <DraftView
             data={data}
@@ -867,11 +738,6 @@ export function Workspace() {
               }))
             }
             onEdit={setView}
-            clarify={clarify}
-            clarifyOutdated={clarifyOutdated}
-            onAnswer={setAnswer}
-            onEarlierAnswer={setEarlierAnswer}
-            onRefreshQuestions={openQuestions}
             bullets={bullets}
             bulletsOutdated={bulletsOutdated}
             aiBulletsInPreview={projectBullets !== null}
@@ -913,7 +779,7 @@ export function Workspace() {
               )}
               <button
                 type="submit"
-                disabled={!hydrated || (view === QUESTIONS_VIEW && clarify.status === "loading")}
+                disabled={!hydrated}
                 className="rounded-lg bg-accent-fill px-5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-accent-fill-hover disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
               >
                 {primaryLabel}

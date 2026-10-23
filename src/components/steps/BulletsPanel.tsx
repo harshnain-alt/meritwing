@@ -82,7 +82,7 @@ export function BulletsPanel({ state, outdated, confirmed, projectName, role, on
           <span className="rounded-full bg-line px-2 py-0.5 text-xs font-semibold text-ink-soft">AI-written</span>
         </div>
         <p className="mt-1 text-sm text-muted">
-          AI rewords your confirmed facts and follow-up answers as bullets for {role}. It can&apos;t add anything: a
+          AI rewords your confirmed venture entry as bullets for {role}. It can&apos;t add anything: a
           bullet with a number, tool, name or claim you didn&apos;t give, or one that changes a quantity, how often
           or who did it, is removed. Review and edit each one before adding it.
         </p>
@@ -244,7 +244,7 @@ export function BulletsPanel({ state, outdated, confirmed, projectName, role, on
   );
 }
 
-const FACT_LABEL = { context: "About the project", personal: "What you did", result: "Results", answer: "Your answer" } as const;
+const FACT_LABEL = { context: "What the venture does", personal: "What you did", result: "Team result", answer: "Your answer" } as const;
 
 function Sources({ ids, facts, teamResults }: { ids: string[]; facts: BulletFact[]; teamResults: boolean }) {
   const cited = ids.map((id) => facts.find((f) => f.id === id)).filter((f): f is BulletFact => Boolean(f));

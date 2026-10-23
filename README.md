@@ -13,8 +13,8 @@ contribution.
 **Live prototype:** <https://meritwing.vercel.app>
 
 > **Prototype status:** resume reading, the venture step, a confirmed candidate profile, job
-> preferences, real openings from employer careers boards with transparent matching, AI follow-up
-> questions, AI-written resume bullets and the review screen work. Job coverage is limited to the
+> preferences, real openings from employer careers boards with transparent matching, AI-written
+> resume bullets and the review screen work. Job coverage is limited to the
 > employer boards listed in [Job sources](#job-sources); it is not every job online. The app never
 > shows simulated jobs or AI output. The AI features need a Google Gemini API key on the server (see
 > [Environment variables](#environment-variables)); without one, the app explains that they aren't
@@ -28,8 +28,20 @@ contribution.
   1. **Resume** — full name, plus upload a resume (PDF), paste resume text, or continue
      without a resume. Optional *Additional details*: email, phone, State / Union Territory,
      business school, programme and graduation year.
-  2. **Your venture** — venture or project name, what it was about, and what you personally did.
-     Optional results, with whether they were yours or shared with the team.
+  2. **Your venture** — three questions only: *Venture name*, *What does the venture do?* and *What
+     did you personally do?* (no questions about revenue, team size, tools, metrics or results). From
+     the answers Meritwing drafts an **Experience entry** by simple rules, no AI
+     (`src/lib/ventureEntry.ts`): the venture name as the heading, the description as written, and a
+     bullet for each sentence of what the student did ("I collected…" becomes "Collected…"; sentences
+     about "we" or "our" become *Team result:* bullets, so personal work and team achievements stay
+     apart). It adds no job title, dates, numbers, tools, outcomes or leadership, and keeps details the
+     student wrote. The student reviews it: edits the heading, description and bullets, marks each
+     bullet *Your work* or *Team result*, removes or adds bullets, and sees how it will read on the
+     resume. Edits that add a number, leadership word or name not in their answers get a note (their
+     choice to keep). *Add to my resume* puts it first under Experience; adding again updates the same
+     entry, existing resume details stay as they are, and if the resume already describes the venture
+     the entry replaces those lines (with a choice in the draft), so it never appears twice. Continue
+     needs the entry added; if the answers change afterwards, the student can redraft.
   3. **Profile** — Gemini proposes short profile items from the resume and venture details, each
      showing the exact words it came from. The server drops items whose quoted words aren't in the
      student's text or that add to them (numbers, tools, leadership, changed quantities, or more than
@@ -58,8 +70,8 @@ contribution.
      and which sources weren't searched. When nothing matches it says so and never widens the search
      on its own.
   5. **Tailor** — choosing an opening fills the job description with the employer's own text
-     (credited and linked), then the existing follow-up questions, draft review, AI bullets, Copy as
-     text and Download PDF work as before. *Paste a job description instead* keeps the original route
+     (credited and linked), then the draft review, AI bullets, Copy as text and Download PDF work as
+     before. There are no follow-up questions. *Paste a job description instead* keeps the original route
      for a job found elsewhere, and choosing a listing never silently replaces a description the
      student typed.
 - **Resume reading** (no AI): text is extracted from text-based PDFs up to 5 MB, sorted into
@@ -71,23 +83,14 @@ contribution.
   text is listed under *Lines we couldn't place*.
 - **Searchable dropdowns** for State / Union Territory (all 36) and business school (129
   institutions from NIRF 2025 plus verified additions, with free entry for any other school).
-- **AI follow-up questions** after the job description (*A few quick questions*): Google Gemini reads the project
-  description, what the student personally did, any results, the resume sections and the job
-  description, and asks **at most three** short questions about the student's own contribution —
-  or none when nothing important is missing. Each question has an *I don't know / Skip* option;
-  numbers are never required. Answers are shown back as an editable summary, kept separate from
-  notes labelled *AI interpretation*, which are never added to the student's facts. If the student
-  edits their information afterwards, the questions are marked *Outdated* and can be refreshed
-  (earlier answers are sent along so questions aren't repeated). Failures show Retry where it can
-  help, and the student can always continue without questions.
-- **Draft workspace** after the questions: a notice saying exactly which parts come from AI, fact checks where
+- **Draft workspace** after the job description: a notice saying exactly which parts come from AI, fact checks where
   the resume and the answers disagree, a summary with Edit links, and a **resume layout preview**
   built from the student's own wording, labelled *Unconfirmed* until they confirm the facts.
-- **AI resume bullets** for the project entry, available once the student has confirmed their facts:
-  Gemini rewords the confirmed project details, results and follow-up answers into up to five bullets
+- **AI resume bullets** for the venture's Experience entry, available once the student has confirmed their facts:
+  Gemini rewords the confirmed entry (their own work and team results, kept apart) into up to five bullets
   for the target role, most relevant first. Each bullet cites the facts it is based on (shown under
-  *Based on*) and is marked *Your own work* or *Team achievement*; results the student marked as shared
-  are always team bullets. Without numbers, bullets stay qualitative. The server then **drops any bullet
+  *Based on*) and is marked *Your own work* or *Team achievement*; team results from the entry are always
+  team bullets. Without numbers, bullets stay qualitative. The server then **drops any bullet
   containing a number, capitalised name or tool, common tool word (e.g. "dashboard") or leadership
   claim ("led", "supervised") that isn't in the student's own facts**, or that **changes their meaning**:
   a number attached to a different thing ("quotes from three wholesalers each month" written as "three
@@ -96,7 +99,7 @@ contribution.
   told what was removed. The resume and job description are background only, so a skill listed on the resume (e.g.
   Excel) is never claimed for the project. Nothing reaches the resume until the student reviews, edits
   or excludes bullets and chooses *Add to my resume*; they can switch back to their own wording at any
-  time. If their facts or answers change afterwards, the bullets are marked *Outdated* and the resume
+  time. If their facts change afterwards, the bullets are marked *Outdated* and the resume
   shows their own wording until they write them again or keep them.
 - **One resume layout for the preview, the PDF and printing** (`src/lib/resume/layout.ts`): every
   line is positioned on an A4 page in points, measured with the PDF font's own character widths. The
@@ -234,18 +237,16 @@ AI fit notes are prepared when the student opens an opening's details, not for e
   the size (max 5 MB) and that the file really is a PDF, extracts the text in memory with
   [unpdf](https://github.com/unjs/unpdf) (Mozilla pdf.js), and returns it. The file is **not
   saved** to disk or storage, and neither the file nor its text is logged.
-- **AI follow-up questions** send, from the app's server to the configured AI provider (Google Gemini by default; requests set `store: false`, so the interaction isn't saved for later retrieval through the API): the resume's
-  education, experience, skills and additional sections, the project details, any results and the
-  job description. The student's **name, email and phone are not sent**; email addresses and phone
+- **AI resume bullets** send, from the app's server to the configured AI provider (Google Gemini by default; requests set `store: false`, so the interaction isn't saved for later retrieval through the API): the resume's
+  education, experience, skills and additional sections, the venture's Experience entry (own work and
+  team results kept apart) and the job description, only when the student asks for bullets after
+  confirming their facts. The student's **name, email and phone are not sent**; email addresses and phone
   numbers inside the text are replaced with placeholders first. The API key stays on the server,
   and neither the request nor the response is logged (only an error type and status on failure).
   Without a configured key, nothing is sent. **On the Gemini free tier, Google's terms allow it to
   use submitted content and responses to improve its products, and human reviewers may read them**;
   Step 3 tells students this before they continue. A paid Gemini project (billing enabled) is not used
   for product improvement.
-- **AI resume bullets** send the same information plus the student's answered follow-up questions,
-  under the same rules: no name or contact details, nothing logged, and only when the student asks
-  for bullets after confirming their facts.
 - **Profile reading** sends the resume sections and venture details; **fit notes** send only the
   confirmed profile items and the public listings. Same rules: no name or contact details, nothing
   logged.
@@ -293,10 +294,9 @@ free quota or a busy model), and let the student continue. Requests are never re
 
 ### Switching AI provider
 
-The follow-up questions and the resume bullets use AI, and all provider-specific code lives in
+The profile, fit notes and resume bullets use AI, and all provider-specific code lives in
 `src/lib/ai/providers/`. Each feature's prompt, output shape (a Zod schema) and server-side checks
-are provider-neutral: `src/lib/ai/clarifyPrompt.ts` (at most three new questions),
-`src/lib/ai/bulletsPrompt.ts` (up to five bullets, with the grounding checks), `profilePrompt.ts`
+are provider-neutral: `src/lib/ai/bulletsPrompt.ts` (up to five bullets, with the grounding checks), `profilePrompt.ts`
 (profile items with quoted evidence) and `matchPrompt.ts` (fit notes and unmet requirements). The AI
 routes share `src/lib/ai/route.ts`.
 
@@ -333,7 +333,7 @@ npx vercel --prod
 Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS 4 · unpdf for PDF text extraction ·
 jsPDF for resume PDF download (loaded only when used) ·
 Google Gen AI SDK (`@google/genai`, Interactions API) and the Anthropic TypeScript SDK behind a provider
-interface, with Zod-validated structured output for follow-up questions and resume bullets.
+interface, with Zod-validated structured output for the profile, fit notes and resume bullets.
 
 ## Data sources
 
@@ -346,7 +346,7 @@ interface, with Zod-validated structured output for follow-up questions and resu
 
 ```
 src/app/                      page, layout, the PDF extraction route, /api/profile, /api/jobs/search,
-                              /api/jobs/explain, /api/clarify and /api/bullets
+                              /api/jobs/explain and /api/bullets
 src/data/employers.json       the employer careers boards searched for jobs (configurable)
 src/lib/jobs/                 board readers, matching rules and filters, job types
 src/components/               app shell, landing, workspace, steps, bullets panel, searchable dropdown, resume preview

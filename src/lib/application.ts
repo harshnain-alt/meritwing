@@ -14,15 +14,27 @@ export type AboutData = {
 
 export type ResultsAttribution = "" | "individual" | "shared" | "mixed";
 
-/** Step 2. The student's own words; team work and personal work are kept apart. */
+/** A bullet of the venture's Experience entry: the student's own work, or something the team did together. */
+export type VentureBullet = { text: string; kind: "own" | "team" };
+
+/** The venture as an Experience entry on the resume, drafted from the three answers and edited by the student. */
+export type VentureEntry = { heading: string; description: string; bullets: VentureBullet[] };
+
+/**
+ * Step 2, "Your venture": three answers in the student's own words, the Experience entry drafted
+ * from them (being reviewed), and the version the student added to their resume.
+ */
 export type ExperienceData = {
+  /** The venture's name. */
   projectName: string;
-  /** What the project did and for whom (team or project level). */
+  /** What the venture does: the product or service and its customers. */
   about: string;
   /** What the student personally did. */
   personal: string;
-  results: string;
-  resultsAttribution: ResultsAttribution;
+  /** The entry under review; `from` identifies the answers it was drafted from. */
+  draft: (VentureEntry & { from: string }) | null;
+  /** The entry the student added to their resume. */
+  entry: VentureEntry | null;
 };
 
 /** Sections proposed from the resume. Editable; the original text is kept separately. */
@@ -92,8 +104,8 @@ export const emptyApplication: ApplicationData = {
     projectName: "",
     about: "",
     personal: "",
-    results: "",
-    resultsAttribution: "",
+    draft: null,
+    entry: null,
   },
   resume: {
     choice: "",
@@ -124,13 +136,12 @@ export type StepId = (typeof STEPS)[number]["id"];
 
 /**
  * Resume and venture, then the confirmed profile and preferences, matching jobs, the chosen
- * job's description, follow-up questions, and the draft view where facts are checked.
+ * job's description, and the draft view where facts are checked.
  */
-export type View = StepId | "profile" | "jobs" | "questions" | "draft";
+export type View = StepId | "profile" | "jobs" | "draft";
 
 export const PROFILE_VIEW = "profile";
 export const JOBS_VIEW = "jobs";
-export const QUESTIONS_VIEW = "questions";
 export const DRAFT_VIEW = "draft";
 
 /** The progress bar: each stage and the views it covers, in order. */
@@ -139,17 +150,11 @@ export const PROGRESS: { id: View; label: string; covers: View[] }[] = [
   { id: 2, label: "Your venture", covers: [2] },
   { id: PROFILE_VIEW, label: "Profile", covers: [PROFILE_VIEW] },
   { id: JOBS_VIEW, label: "Jobs", covers: [JOBS_VIEW] },
-  { id: 3, label: "Tailor", covers: [3, QUESTIONS_VIEW, DRAFT_VIEW] },
+  { id: 3, label: "Tailor", covers: [3, DRAFT_VIEW] },
 ];
 
 // Fixed range keeps the page free of the current date, so it prerenders identically.
 export const GRAD_YEARS = Array.from({ length: 2034 - 2018 + 1 }, (_, i) => String(2018 + i));
-
-export const ATTRIBUTION_OPTIONS: { value: Exclude<ResultsAttribution, "">; label: string }[] = [
-  { value: "individual", label: "Mine individually" },
-  { value: "shared", label: "Shared with the team" },
-  { value: "mixed", label: "A mix (I've explained which parts were mine)" },
-];
 
 /* ---------- Validation ---------- */
 
@@ -217,16 +222,26 @@ export function validatePasteText(text: string): string | undefined {
 }
 
 export function validateExperience(d: ExperienceData): FieldErrors<ExperienceData> {
+  const answered = d.projectName.trim() && d.about.trim() && d.personal.trim();
+  const edited = d.entry && d.draft && JSON.stringify(entryOf(d.draft)) !== JSON.stringify(d.entry);
   return compact<ExperienceData>({
-    projectName: required(d.projectName, "Give the project or venture a name."),
-    about: required(d.about, "Describe what the project did and for whom."),
+    projectName: required(d.projectName, "Add your venture's name."),
+    about: required(d.about, "Say what the venture does."),
     personal: required(d.personal, "Describe what you personally did."),
-    resultsAttribution:
-      d.results.trim() && !d.resultsAttribution
-        ? "Tell us whether these results were yours or shared."
-        : undefined,
+    entry: !answered
+      ? undefined
+      : !d.draft && !d.entry
+        ? "Draft your Experience entry, then review it and add it to your resume."
+        : !d.entry
+          ? "Review your Experience entry and add it to your resume."
+          : edited
+            ? "You've edited the entry since adding it. Update it in your resume first."
+            : undefined,
   });
 }
+
+/** The entry without the draft's bookkeeping. */
+export const entryOf = ({ heading, description, bullets }: VentureEntry): VentureEntry => ({ heading, description, bullets });
 
 export function validateInternship(d: InternshipData): FieldErrors<InternshipData> {
   const description = d.description.trim();

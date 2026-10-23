@@ -2,6 +2,7 @@ import type { ApplicationData, ResumeSections } from "@/lib/application";
 import { choiceFor, type ResumeCheck } from "@/lib/resumeChecks";
 import { continuesBullet, splitTrailingDate } from "@/lib/resume/lines";
 import { isBullet, stripBullet } from "@/lib/resumeParser";
+import { entryForResume } from "@/lib/ventureEntry";
 
 /*
  * Arranges the student's own wording into a resume layout.
@@ -35,8 +36,10 @@ export type ResumePreviewModel = {
 };
 
 /**
+ * The venture appears under Experience, first, as the entry the student reviewed and added in
+ * "Your venture" (replacing the resume's own lines about it unless they chose those instead).
  * projectBullets: AI-written bullets the student reviewed and chose to add. When given, they
- * replace the project's own-wording bullets; the copy text and the PDF use the same model.
+ * replace the entry's bullets; the copy text and the PDF use the same model.
  */
 export function buildPreview(data: ApplicationData, checks: ResumeCheck[], projectBullets?: string[] | null): ResumePreviewModel {
   const { about, experience, resume } = data;
@@ -84,27 +87,12 @@ export function buildPreview(data: ApplicationData, checks: ResumeCheck[], proje
       : [];
   sections.push({ heading: "Education", entries: educationEntries, lines: resumeLines("education") });
 
-  if (choice("project") !== "resume") {
-    const results = splitItems(experience.results);
-    sections.push({
-      heading: "Ventures and Projects",
-      entries: [
-        {
-          title: experience.projectName.trim(),
-          context: experience.about.trim(),
-          bullets: projectBullets?.length
-            ? projectBullets
-            : [
-                ...splitItems(experience.personal),
-                ...results.map((r) => (experience.resultsAttribution === "shared" ? `Team result: ${r}` : r)),
-              ],
-        },
-      ],
-      lines: [],
-    });
-  }
-
-  sections.push({ heading: "Experience", entries: [], lines: resumeLines("experience") });
+  const venture = experience.entry && choice("project") !== "resume" ? entryForResume(experience.entry) : null;
+  sections.push({
+    heading: "Experience",
+    entries: venture ? [{ ...venture, bullets: projectBullets?.length ? projectBullets : venture.bullets }] : [],
+    lines: resumeLines("experience"),
+  });
   sections.push({ heading: "Skills", entries: [], lines: resumeLines("skills") });
   sections.push({
     heading: "Additional Achievements and Responsibilities",

@@ -72,11 +72,11 @@ export function InternshipStep({ source, data, errors, onDescription, onChange }
         />
       </div>
       <p className="rounded-lg border border-line bg-surface px-4 py-3 text-xs leading-relaxed text-muted">
-        <span className="font-semibold text-ink">About the AI features:</span> for the follow-up questions and the
-        optional AI-written bullets, Meritwing sends your project details, your follow-up answers, your resume
-        sections and this job description to Google Gemini. Your name, email and phone are not sent. On
-        Gemini&apos;s free tier, Google may use what is sent to improve its products, and people may review it, so
-        leave out anything sensitive. You can skip both and still use everything else.
+        <span className="font-semibold text-ink">About the AI features:</span> for the optional AI-written bullets,
+        Meritwing sends your venture entry, your resume sections and this job description to Google Gemini. Your
+        name, email and phone are not sent. On Gemini&apos;s free tier, Google may use what is sent to improve its
+        products, and people may review it, so leave out anything sensitive. You can skip them and still use
+        everything else.
       </p>
     </div>
   );

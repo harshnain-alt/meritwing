@@ -1,5 +1,6 @@
 import type { ApplicationData, CheckChoice, ResumeSections } from "@/lib/application";
 import { findEntryBlock } from "@/lib/resumeParser";
+import { entryForResume } from "@/lib/ventureEntry";
 
 export type ResumeCheck = {
   id: "name" | "email" | "phone" | "school" | "project";
@@ -76,23 +77,22 @@ export function computeChecks(data: ApplicationData): ResumeCheck[] {
     });
   }
 
-  const projectMatch = findMention(proposed, ["experience", "additional"], experience.projectName);
-  if (projectMatch) {
-    const answersValue = [
-      experience.projectName.trim(),
-      `What I personally did: ${experience.personal.trim()}`,
-    ].join("\n");
+  // The venture's Experience entry replaces the resume's own lines about it, so it's never shown twice.
+  const projectMatch = experience.entry && findMention(proposed, ["experience", "additional"], experience.entry.heading);
+  if (projectMatch && experience.entry) {
+    const venture = entryForResume(experience.entry);
+    const answersValue = [venture.title, venture.context, ...venture.bullets.map((b) => `• ${b}`)].filter(Boolean).join("\n");
     checks.push({
       id: "project",
-      title: `${experience.projectName.trim()} appears in both`,
+      title: `${venture.title} appears in both`,
       explanation:
-        "Your resume already describes this project. Choose which version to use, so it isn't shown twice or with conflicting details.",
+        "Your resume already describes this venture. Choose which version to use, so it isn't shown twice or with conflicting details.",
       answersValue,
       resumeValue: projectMatch.text,
       differences: [
         "Responsibilities: compare what your resume says you did with what you told us you personally did.",
       ],
-      answersOption: "Use what I wrote in Meritwing",
+      answersOption: "Use my Experience entry from Meritwing",
       resumeOption: "Use my resume's version",
       signature: JSON.stringify([answersValue, projectMatch.text]),
       needsDecision: true,
@@ -128,6 +128,11 @@ function simpleCheck(id: ResumeCheck["id"], title: string, answersValue: string,
     needsDecision: true,
     defaultChoice: "answers",
   };
+}
+
+/** The resume's own lines about the venture, if it mentions it by name. */
+export function resumeMention(proposed: ResumeSections | null, name: string): string | null {
+  return proposed ? (findMention(proposed, ["experience", "additional"], name)?.text ?? null) : null;
 }
 
 function findMention(
