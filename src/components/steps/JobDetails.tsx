@@ -1,6 +1,7 @@
 import { useEffect, useRef, type ReactNode } from "react";
 import { ApplyLink, Badge, fmtTime, matchLine, TailorButton, TYPE_LABEL, WORKPLACE_LABEL, type ExplanationState } from "@/components/steps/JobsView";
 import type { RankedJob } from "@/lib/jobs/rank";
+import { fitBreakdown } from "@/lib/jobs/fit";
 import { jobSections } from "@/lib/jobs/sections";
 import type { JobListing } from "@/lib/jobs/types";
 
@@ -13,8 +14,6 @@ type JobDetailsProps = {
   onExplain: () => void;
   onSelect: (job: JobListing) => void;
 };
-
-const cap = (s: string) => `${s[0].toUpperCase()}${s.slice(1)}`;
 
 /** A readable panel with the full analysis for one opening. Dialog: Escape closes, focus stays inside. */
 export function JobDetails({ rank, explanation, selected, hasOwnDescription, onClose, onExplain, onSelect }: JobDetailsProps) {
@@ -52,13 +51,7 @@ export function JobDetails({ rank, explanation, selected, hasOwnDescription, onC
     };
   }, [onClose]);
 
-  const missing = [
-    ...(evidence.experience?.gap
-      ? [`Asks for ${evidence.experience.requiredYears}+ years of experience; your profile shows ${evidence.experience.profileMonths ? `about ${evidence.experience.profileMonths} months of dated work` : "no dated work experience"}.`]
-      : []),
-    ...evidence.skillsNotShown.map((s) => `${cap(s)} is named in the listing but not shown in your profile.`),
-    ...evidence.listedOnly.map((s) => `${cap(s)}: you list it, but your profile doesn't show you using it.`),
-  ];
+  const { missing } = fitBreakdown(evidence, []);
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end">

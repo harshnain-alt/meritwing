@@ -13,6 +13,9 @@ import { splitItems } from "@/lib/resumePreview";
 export type FactSource = "resume" | "venture";
 export type FactKind = "experience" | "achievement" | "skill" | "education";
 
+/** Where a profile item came from, as the student sees it. */
+export const FACT_SOURCE_LABEL = { resume: "From your resume", venture: "From your venture details", student: "Added by you" } as const;
+
 export type ProfileFact = {
   id: string;
   /** Short statement shown to the student. */

@@ -3,7 +3,7 @@ import { Checkbox, ErrorText } from "@/components/Field";
 import type { ClarifyError } from "@/lib/clarify";
 import { ANYWHERE_IN_INDIA, CITIES, FUNCTIONS } from "@/lib/jobs/taxonomy";
 import type { JobPreferences } from "@/lib/jobs/types";
-import type { FoundPreferences, ProfileFact } from "@/lib/profile";
+import { FACT_SOURCE_LABEL, type FoundPreferences, type ProfileFact } from "@/lib/profile";
 
 export type ProfileState = {
   status: "idle" | "loading" | "ready" | "error";
@@ -50,7 +50,6 @@ type ProfileViewProps = {
   onSkipSearch: () => void;
 };
 
-const SOURCE_LABEL = { resume: "From your resume", venture: "From your venture details", student: "Added by you" } as const;
 const chip =
   "inline-flex cursor-pointer items-center gap-2 rounded-full border px-3 py-1.5 text-sm has-[:checked]:border-accent has-[:checked]:bg-accent/25 has-[:checked]:font-medium has-[:checked]:text-ink has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-accent";
 
@@ -127,7 +126,7 @@ export function ProfileView({ profile, outdated, prefs, errors, onRetry, onUseOw
                   <li key={f.id} className="rounded-lg border border-line bg-surface px-4 py-3">
                     <div className="flex items-center justify-between gap-2">
                       <span className="text-xs font-semibold uppercase tracking-wide text-muted">
-                        {f.basis === "context" ? "About your venture (not counted as your own work)" : SOURCE_LABEL[f.source]}
+                        {f.basis === "context" ? "About your venture (not counted as your own work)" : FACT_SOURCE_LABEL[f.source]}
                       </span>
                       <button
                         type="button"

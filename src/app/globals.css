@@ -2,30 +2,30 @@
 
 @theme {
   /*
-   * Dark theme: near-black canvas, charcoal surfaces, white text, electric-blue accents.
+   * Dark theme A: navy canvas and surfaces, white text, electric-blue accents.
    * Text colours are at least 4.5:1 on canvas, surface and raise; "accent" is for text, icons and
    * lines, "accent-fill" for buttons with white text.
    */
-  --color-canvas: #0a0b0e;
-  --color-surface: #15171c;
-  --color-raise: #1b1e24;
-  --color-ink: #f3f5f8;
-  --color-ink-soft: #c9cfd8;
-  --color-muted: #9ba3b0;
-  --color-faint: #8a93a1;
-  --color-line: #262a32;
-  --color-line-strong: #383e4a;
+  --color-canvas: #0a1020;
+  --color-surface: #111a2e;
+  --color-raise: #172238;
+  --color-ink: #f2f5fb;
+  --color-ink-soft: #c7d0e1;
+  --color-muted: #98a4bb;
+  --color-faint: #8a96ad;
+  --color-line: #1f2b45;
+  --color-line-strong: #2c3a59;
   --color-accent: #5b95ff;
   --color-accent-strong: #8fb4ff;
   --color-accent-soft: #5b95ff1f;
   --color-accent-fill: #2563eb;
   --color-accent-fill-hover: #1d4ed8;
   --color-danger: #f87171;
-  --color-danger-soft: #2a1517;
+  --color-danger-soft: #2a1520;
   --color-danger-fill: #b42318;
   --color-danger-fill-hover: #9a1d14;
   --color-warn: #f5c04d;
-  --color-warn-soft: #2a2212;
+  --color-warn-soft: #2a2414;
   --color-warn-line: #6b5420;
 
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
@@ -103,6 +103,7 @@ body {
 @keyframes mw-rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
 @keyframes mw-fade { from { opacity: 0; } to { opacity: 1; } }
 @keyframes mw-slide-in { from { opacity: 0; transform: translateX(28px); } to { opacity: 1; transform: none; } }
+@keyframes mw-expand { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
 @keyframes mw-sheet-in { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: none; } }
 .mw-enter > * { animation: mw-rise 0.6s var(--ease-out) both; }
 .mw-enter > :nth-child(2) { animation-delay: 0.12s; }
@@ -112,10 +113,12 @@ body {
 .mw-enter > :nth-child(6) { animation-delay: 0.44s; }
 .mw-rise { animation: mw-rise 0.32s var(--ease-out) backwards; }
 .mw-fade { animation: mw-fade 0.22s ease-out both; }
+/* Replays each time a hidden section is shown again. */
+.mw-expand { animation: mw-expand 0.24s var(--ease-out) backwards; }
 .mw-panel { animation: mw-sheet-in 0.26s var(--ease-out) both; }
 @media (min-width: 640px) { .mw-panel { animation-name: mw-slide-in; } }
 .mw-card { transition: border-color 0.18s, box-shadow 0.18s, transform 0.18s var(--ease-out); }
-.mw-card:hover { border-color: #3d4350; transform: translateY(-2px); box-shadow: 0 12px 32px -18px #000, 0 0 0 1px #5b95ff1a; }
+.mw-card:hover { border-color: #3d4d70; transform: translateY(-2px); box-shadow: 0 12px 32px -18px #000, 0 0 0 1px #5b95ff1a; }
 .mw-glow { box-shadow: 0 0 0 1px #5b95ff59, 0 8px 24px -10px #2563ebcc; }
 .mw-reveal-on [data-reveal] { transition: opacity 0.5s var(--ease-out), transform 0.5s var(--ease-out); }
 .mw-reveal-on [data-reveal]:not(.in) { opacity: 0; transform: translateY(14px); }

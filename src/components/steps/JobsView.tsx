@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { JobDetails } from "@/components/steps/JobDetails";
 import type { ClarifyError } from "@/lib/clarify";
 import { GENERIC_LABELS } from "@/lib/jobs/evidence";
 import type { JobExplanation } from "@/lib/jobs/explain";
+import { fitBreakdown } from "@/lib/jobs/fit";
 import { RANKING_RULE, type RankedJob } from "@/lib/jobs/rank";
 import { ANYWHERE_IN_INDIA, CITIES, FUNCTIONS } from "@/lib/jobs/taxonomy";
 import { NOT_CONNECTED, type JobListing, type JobPreferences, type JobSearchResult } from "@/lib/jobs/types";
@@ -351,7 +352,7 @@ function Segmented({ label, value, options, onChange }: { label: string; value: 
   );
 }
 
-function JobCard({ index, rank, selectedJobId, hasOwnDescription, onSelect, onDetails }: JobsViewProps & { index: number; rank: RankedJob; onDetails: () => void }) {
+function JobCard({ index, rank, profile, selectedJobId, hasOwnDescription, onSelect, onDetails }: JobsViewProps & { index: number; rank: RankedJob; onDetails: () => void }) {
   const { job } = rank;
   const selected = selectedJobId === job.id;
   const facts = [
@@ -390,6 +391,7 @@ function JobCard({ index, rank, selectedJobId, hasOwnDescription, onSelect, onDe
         <span className="font-medium text-ink">Why it matches: </span>
         {matchLine(rank)}
       </p>
+      <WhyThisFits rank={rank} facts={profile.items} />
       <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
         <TailorButton job={job} hasOwnDescription={hasOwnDescription} onSelect={onSelect} />
         <ApplyLink job={job} />
@@ -398,6 +400,81 @@ function JobCard({ index, rank, selectedJobId, hasOwnDescription, onSelect, onDe
         </button>
       </div>
     </li>
+  );
+}
+
+/**
+ * "Why this fits": expands in the card to show the student's own items that match the listing,
+ * and what the listing asks for that their confirmed profile doesn't show. Rule-based, not AI.
+ */
+function WhyThisFits({ rank, facts }: { rank: RankedJob; facts: ProfileFact[] }) {
+  const [open, setOpen] = useState(false);
+  const id = useId();
+  const { matched, missing } = fitBreakdown(rank.evidence, facts);
+  return (
+    <div className="mt-2">
+      <button
+        type="button"
+        aria-expanded={open}
+        aria-controls={id}
+        onClick={() => setOpen((o) => !o)}
+        className="-ml-1.5 inline-flex items-center gap-1.5 rounded-md px-1.5 py-1 text-sm font-semibold text-accent hover:bg-accent-soft focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+      >
+        Why this fits{" "}
+        <span className="font-medium text-muted">
+          · {matched.length} matched, {missing.length} missing
+        </span>
+        <svg aria-hidden="true" viewBox="0 0 20 20" className={`size-4 fill-current transition-transform duration-200 ${open ? "rotate-180" : ""}`}>
+          <path d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.17l3.71-3.94a.75.75 0 1 1 1.08 1.04l-4.25 4.5a.75.75 0 0 1-1.08 0l-4.25-4.5a.75.75 0 0 1 .02-1.06Z" />
+        </svg>
+      </button>
+      <div id={id} role="region" aria-label={`Why ${rank.job.title} fits`} hidden={!open} className="mw-expand">
+        <div className="mt-2 grid gap-x-6 gap-y-4 rounded-xl border border-line bg-canvas/60 px-4 py-3.5 sm:grid-cols-2">
+          <div>
+            <h4 className="text-xs font-semibold uppercase tracking-[0.08em] text-muted">Your experience that fits</h4>
+            {matched.length === 0 ? (
+              <p className="mt-2 text-sm text-ink-soft">None of your confirmed profile items relate directly to this role yet.</p>
+            ) : (
+              <ul className="mt-2.5 space-y-3">
+                {matched.map((m) => (
+                  <li key={m.factId} className="grid grid-cols-[18px_1fr] gap-2 text-sm">
+                    <svg aria-hidden="true" viewBox="0 0 20 20" className="mt-0.5 size-4 fill-accent">
+                      <path d="M16.7 5.3a1 1 0 0 1 0 1.4l-8 8a1 1 0 0 1-1.4 0l-4-4a1 1 0 1 1 1.4-1.4L8 12.58l7.3-7.3a1 1 0 0 1 1.4 0Z" />
+                    </svg>
+                    <div>
+                      <q className="text-ink">{m.text}</q>
+                      <span className="mt-0.5 block text-[13px] text-muted">
+                        {m.source ? `${m.source} · ` : ""}the role also involves {m.terms.join(", ")}
+                      </span>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+          <div>
+            <h4 className="text-xs font-semibold uppercase tracking-[0.08em] text-muted">Missing evidence</h4>
+            {missing.length === 0 ? (
+              <p className="mt-2 text-sm text-ink-soft">None found by our checks. Read the requirements to be sure.</p>
+            ) : (
+              <ul className="mt-2.5 space-y-2.5">
+                {missing.map((m) => (
+                  <li key={m} className="grid grid-cols-[18px_1fr] gap-2 text-sm text-ink-soft">
+                    <svg aria-hidden="true" viewBox="0 0 20 20" className="mt-0.5 size-4 fill-none stroke-muted" strokeWidth="1.6" strokeDasharray="3 2.4">
+                      <circle cx="10" cy="10" r="6.5" />
+                    </svg>
+                    {m}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+          <p className="border-t border-line pt-2.5 text-[13px] text-muted sm:col-span-2">
+            Compared with your confirmed profile by simple rules, not AI. Add a missing item to your profile only if it&apos;s true.
+          </p>
+        </div>
+      </div>
+    </div>
   );
 }
 

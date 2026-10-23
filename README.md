@@ -117,8 +117,13 @@ contribution.
   *Save the PDF* link until the preview changes; if the PDF code fails to load or the PDF can't be
   created, it says which, with *Try again*, and nothing the student entered is lost.
 - **Clear my data** removes everything entered and read in the session.
+- **Why this fits** on every job card: a button showing how many profile items matched and how much
+  is missing expands the card to list the student's own matching items (with where they wrote them and
+  what the role also involves) and the evidence the listing asks for that their confirmed profile
+  doesn't show. It uses the same rule-based checks as the ranking, not AI, and the same list appears
+  under *Missing qualifications* in the details panel.
 - Responsive layout that works on mobile.
-- **Dark theme**: near-black background, charcoal surfaces, white text and electric-blue accents, with
+- **Dark theme (navy)**: navy background and surfaces, white text and electric-blue accents, with
   every text colour at least 4.5:1 against its background. The resume preview stays a white A4 page.
 - **Motion**: the landing mark's wings unfold once, then it floats and beats its wings gently; the
   header mark is still apart from a single wingbeat on hover. Elsewhere motion is brief and one-time
