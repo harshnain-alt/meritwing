@@ -198,7 +198,7 @@ export function ProfileView({ profile, outdated, prefs, errors, onRetry, onUseOw
               <label key={f.id} className={chip} title={suggested ? `Suggested: ${suggested.reason}` : undefined}>
                 <input type="checkbox" className="sr-only" checked={prefs.roles.includes(f.id)} onChange={() => onPrefs({ roles: toggle(prefs.roles, f.id) })} />
                 {f.label}
-                {suggested && <span className="rounded-full bg-line px-1.5 text-[11px] font-semibold text-ink-soft">Suggested</span>}
+                {suggested && <span className="rounded-full bg-line px-2 text-xs font-semibold text-ink-soft">Suggested</span>}
               </label>
             );
           })}

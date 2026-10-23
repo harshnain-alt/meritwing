@@ -28,6 +28,12 @@
   --color-warn-soft: #2a2414;
   --color-warn-line: #6b5420;
 
+  /* No interface text under 13px: text-xs is 13px. Cards are 16px round, controls 10px. */
+  --text-xs: 0.8125rem;
+  --text-xs--line-height: 1.25rem;
+  --radius-lg: 0.625rem;
+  --radius-xl: 1rem;
+
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-source-serif), ui-serif, Georgia, serif;
 }
@@ -123,15 +129,10 @@ body {
 .mw-reveal-on [data-reveal] { transition: opacity 0.5s var(--ease-out), transform 0.5s var(--ease-out); }
 .mw-reveal-on [data-reveal]:not(.in) { opacity: 0; transform: translateY(14px); }
 
-/* Landing hero: a soft blue glow and a faint grid behind the mark. */
-.mw-hero::before,
-.mw-hero::after { content: ""; position: absolute; inset: 0; pointer-events: none; }
-.mw-hero::before { background: radial-gradient(60% 50% at 50% 30%, #2f6bff29, transparent 70%); }
-.mw-hero::after {
-  background-image: linear-gradient(#ffffff09 1px, transparent 1px), linear-gradient(90deg, #ffffff09 1px, transparent 1px);
-  background-size: 48px 48px;
-  mask-image: radial-gradient(60% 60% at 50% 35%, #000 20%, transparent 75%);
-}
+/* Landing hero: one soft blue light behind the brand panel. */
+.mw-hero::before { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(55% 55% at 70% 40%, #2f6bff24, transparent 70%); }
+/* The brand panel: a quiet surface with a faint top highlight and one soft accent light. */
+.mw-brand { background: color-mix(in srgb, var(--color-surface) 72%, transparent); box-shadow: inset 0 1px 0 #ffffff0a, 0 30px 80px -40px #2563eb8c; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }

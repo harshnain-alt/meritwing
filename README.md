@@ -22,11 +22,14 @@ contribution.
 
 ## What works today
 
-- **Landing page** with the animated winged-tiger mark, what Meritwing does, the five steps and what
-  it won't do; *Start with your resume* opens step 1. Nothing is stored, so a refresh returns here.
+- **Landing page**: the headline *Your venture experience deserves its next opportunity.*, the line
+  *Find relevant openings and turn what you actually did into a professional application.* and
+  *Find my opportunities* (which opens step 1), beside the animated winged tiger and wordmark; then the
+  five steps and what Meritwing won't do. No statistics or testimonials. Nothing is stored, so a
+  refresh returns here.
 - **Five-stage flow**, with progress, Back/Continue and inputs kept between steps:
-  1. **Resume** — full name, plus upload a resume (PDF), paste resume text, or continue
-     without a resume. Optional *Additional details*: email, phone, State / Union Territory,
+  1. **Resume** — full name, plus an upload area for a resume PDF (drop it on the area or *Choose a
+     PDF*), *Paste resume text instead*, or *Continue without a resume*. Optional *Additional details*: email, phone, State / Union Territory,
      business school, programme and graduation year.
   2. **Your venture** — three questions only: *Venture name*, *What does the venture do?* and *What
      did you personally do?* (no questions about revenue, team size, tools, metrics or results). From

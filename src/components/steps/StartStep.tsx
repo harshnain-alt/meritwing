@@ -34,24 +34,31 @@ export function StartStep(props: StartStepProps) {
   const upload = usePdfUpload(props.onExtracted);
 
   return (
-    <div className="space-y-9">
-      <Field
-        id="fullName"
-        label="Full name"
-        autoComplete="name"
-        hint={filledHint(resume, about, "fullName")}
-        value={about.fullName}
-        onChange={(v) => onAbout("fullName", v)}
-        error={errors.fullName}
-      />
+    <div className="space-y-5">
+      <div className="rounded-xl border border-line bg-surface px-5 py-5">
+        <Field
+          id="fullName"
+          label="Full name"
+          autoComplete="name"
+          hint={filledHint(resume, about, "fullName")}
+          value={about.fullName}
+          onChange={(v) => onAbout("fullName", v)}
+          error={errors.fullName}
+        />
+      </div>
 
-      <section id="resumeOptions" tabIndex={-1} aria-labelledby="resume-heading" className="space-y-4 focus:outline-none">
+      <section
+        id="resumeOptions"
+        tabIndex={-1}
+        aria-labelledby="resume-heading"
+        className="space-y-4 rounded-xl border border-line bg-surface px-5 py-5 focus:outline-none"
+      >
         <div>
-          <h2 id="resume-heading" className="text-sm font-semibold text-ink">
+          <h2 id="resume-heading" className="text-[17px] font-semibold text-ink">
             Your resume
           </h2>
           <p className="mt-1 text-sm text-muted">
-            We&apos;ll pick out your contact, education and experience details so you don&apos;t type them again.
+            We&apos;ll pick out your contact, education and experience details so you don&apos;t type them again. Nothing is reworded.
           </p>
         </div>
         {resume.original && resume.proposed ? (
@@ -149,42 +156,49 @@ function FileInput({ id, upload, children, className }: { id: string; upload: Up
 function ResumeInput({ resume, upload, onResumeMode, onPasteDraft, onReadPaste, onContinueWithout }: StartStepProps & { upload: Upload }) {
   const mode = resume.choice === "paste" ? "paste" : "upload";
   const [pasteError, setPasteError] = useState<string>();
+  const [dragging, setDragging] = useState(false);
+  const link =
+    "rounded-md py-1 text-sm font-semibold text-accent underline decoration-accent/30 underline-offset-4 hover:decoration-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
 
   return (
     <div className="space-y-4">
-      <div role="group" aria-label="How to add your resume" className="grid grid-cols-2 gap-1 rounded-lg bg-line/60 p-1">
-        {(["upload", "paste"] as const).map((m) => (
-          <button
-            key={m}
-            type="button"
-            aria-pressed={mode === m}
-            onClick={() => onResumeMode(m)}
-            className={`rounded-md px-3 py-2.5 text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-accent ${
-              mode === m ? "bg-surface text-ink shadow-xs" : "text-muted hover:text-ink"
-            }`}
-          >
-            {m === "upload" ? "Upload resume" : "Paste resume text"}
-          </button>
-        ))}
-      </div>
-
       {mode === "upload" ? (
         <div className="space-y-3">
           <div
-            className={`rounded-xl border border-dashed bg-surface px-5 py-7 text-center ${
-              upload.error ? "border-danger" : "border-line-strong"
+            onDragEnter={(e) => {
+              e.preventDefault();
+              setDragging(true);
+            }}
+            onDragOver={(e) => e.preventDefault()}
+            onDragLeave={(e) => {
+              if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setDragging(false);
+            }}
+            onDrop={(e) => {
+              e.preventDefault();
+              setDragging(false);
+              if (upload.status !== "uploading") void upload.handleFile(e.dataTransfer.files[0]);
+            }}
+            className={`grid justify-items-center gap-2.5 rounded-2xl border-[1.5px] border-dashed px-5 py-9 text-center transition-colors ${
+              dragging ? "border-accent bg-accent-soft" : upload.error ? "border-danger bg-canvas/50" : "border-line-strong bg-canvas/50"
             }`}
           >
+            <span aria-hidden="true" className="grid size-12 place-items-center rounded-[14px] bg-accent-soft text-accent">
+              <svg viewBox="0 0 24 24" className="size-6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 15V4m0 0-4 4m4-4 4 4" />
+                <path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" />
+              </svg>
+            </span>
+            <p className="text-[17px] font-semibold text-ink">{upload.status === "uploading" ? "Reading your PDF…" : "Drop your resume PDF here"}</p>
+            <p id="resumeFile-hint" className="text-sm text-muted">
+              Text-based PDF, up to 5 MB. Scanned images can&apos;t be read.
+            </p>
             <FileInput
               id="resumeFile"
               upload={upload}
-              className="inline-flex items-center gap-2 rounded-lg bg-accent-fill px-4 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-accent-fill-hover"
+              className="mw-glow mt-1.5 inline-flex items-center gap-2 rounded-lg bg-accent-fill px-5 py-2.5 text-sm font-semibold text-white hover:bg-accent-fill-hover"
             >
-              {upload.status === "uploading" ? "Reading your PDF…" : "Choose PDF file"}
+              {upload.status === "uploading" ? "Reading…" : "Choose a PDF"}
             </FileInput>
-            <p id="resumeFile-hint" className="mt-3 text-sm text-muted">
-              Text-based PDF, up to 5 MB. Scanned images can&apos;t be read.
-            </p>
             <p role="status" className="sr-only">
               {upload.status === "uploading" ? "Reading your PDF" : ""}
             </p>
@@ -208,6 +222,9 @@ function ResumeInput({ resume, upload, onResumeMode, onPasteDraft, onReadPaste, 
             Your PDF is sent to Meritwing&apos;s server only to extract its text. It&apos;s processed in memory and
             not saved, and no AI service sees it at this step.
           </p>
+          <button type="button" onClick={() => onResumeMode("paste")} className={link}>
+            Paste resume text instead
+          </button>
         </div>
       ) : (
         <div className="space-y-3">
@@ -234,15 +251,14 @@ function ResumeInput({ resume, upload, onResumeMode, onPasteDraft, onReadPaste, 
               Read my resume
             </button>
           </div>
+          <button type="button" onClick={() => onResumeMode("upload")} className={link}>
+            Upload a PDF instead
+          </button>
         </div>
       )}
 
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-line pt-4">
-        <button
-          type="button"
-          onClick={onContinueWithout}
-          className="rounded-md py-1 text-sm font-semibold text-accent underline decoration-accent/30 underline-offset-4 hover:decoration-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-        >
+        <button type="button" onClick={onContinueWithout} className={link}>
           Continue without a resume
         </button>
         <span className="text-sm text-muted">

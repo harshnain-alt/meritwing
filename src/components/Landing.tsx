@@ -4,7 +4,7 @@ import { useEffect, useRef, type ReactNode } from "react";
 import { WingedTiger } from "@/components/brand/WingedTiger";
 
 const STEPS: [string, string][] = [
-  ["Resume", "Upload a PDF or paste text. It's read with simple rules, not AI, and nothing is reworded."],
+  ["Resume", "Upload your resume PDF or paste the text. It's read with simple rules, not AI, and nothing is reworded."],
   ["Your venture", "Three short answers: its name, what it does and what you personally did. We draft an Experience entry you can edit."],
   ["Profile", "Confirm a profile drawn from your resume and venture, then set role, location and work preferences."],
   ["Jobs for you", "Current openings from employer careers boards, ranked by evidence from your confirmed profile."],
@@ -61,34 +61,40 @@ export function Landing({ onStart }: { onStart: () => void }) {
 
   return (
     <div ref={ref}>
-      <section aria-labelledby="hero-title" className="mw-hero relative overflow-hidden pb-18 pt-10 text-center sm:pt-14">
-        <div className="mw-enter relative z-10 mx-auto flex max-w-3xl flex-col items-center px-4 sm:px-6">
-          <div className="flex flex-col items-center">
-            <WingedTiger variant="hero" className="w-[min(300px,68vw)]" />
-            <h1 id="hero-title" className="-mt-1 font-display text-[clamp(3.25rem,9vw,5.75rem)] font-semibold leading-none tracking-tight text-ink">
-              Merit<span className="text-accent">wing</span>
+      <section aria-labelledby="hero-title" className="mw-hero relative overflow-hidden pb-14 pt-8 sm:pb-20 sm:pt-16">
+        <div className="relative z-10 mx-auto grid max-w-6xl items-center gap-7 px-4 sm:px-6 lg:grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)] lg:gap-12">
+          <div className="mw-enter text-center lg:text-left">
+            <p className="text-[13px] font-semibold uppercase tracking-[0.12em] text-accent">For business-school students in India</p>
+            <h1 id="hero-title" className="mt-3 text-[clamp(2.25rem,5.2vw,3.625rem)] font-bold leading-[1.06] tracking-[-0.025em] text-balance text-ink">
+              Your venture experience deserves its next opportunity.
             </h1>
+            <p className="mx-auto mt-5 max-w-[34ch] text-[clamp(1.0625rem,1.6vw,1.1875rem)] leading-relaxed text-ink-soft lg:mx-0">
+              Find relevant openings and turn what you actually did into a professional application.
+            </p>
+            <div className="mt-8 flex flex-wrap justify-center gap-3 lg:justify-start">
+              <button type="button" onClick={onStart} className={primaryLg}>
+                Find my opportunities
+                <svg viewBox="0 0 20 20" aria-hidden="true" className="size-4 fill-current">
+                  <path d="M3 10a.75.75 0 0 1 .75-.75h10.64l-4.2-3.96a.75.75 0 1 1 1.03-1.09l5.5 5.25a.75.75 0 0 1 0 1.09l-5.5 5.25a.75.75 0 1 1-1.03-1.09l4.2-3.95H3.75A.75.75 0 0 1 3 10Z" />
+                </svg>
+              </button>
+              <a
+                href="#how"
+                className="inline-flex min-h-12 items-center rounded-xl border border-line-strong bg-raise px-6 py-3 text-[15px] font-semibold text-ink hover:border-faint/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+              >
+                How it works
+              </a>
+            </div>
+            <p className="mt-4 text-sm text-muted">No account needed. Your answers stay in this browser tab.</p>
           </div>
-          <p className="mt-4 text-[clamp(1.125rem,2.4vw,1.375rem)] font-medium text-ink-soft">Your experience. Your next move.</p>
-          <p className="mt-4 max-w-xl text-base text-muted">
-            Turn what you&apos;ve actually done into a resume for a real opening. Meritwing reads your resume and venture, finds current
-            openings on employer careers boards, and helps you tailor your resume in your own words.
-          </p>
-          <div className="mt-7 flex flex-wrap justify-center gap-3">
-            <button type="button" onClick={onStart} className={primaryLg}>
-              Start with your resume
-              <svg viewBox="0 0 20 20" aria-hidden="true" className="size-4 fill-current">
-                <path d="M3 10a.75.75 0 0 1 .75-.75h10.64l-4.2-3.96a.75.75 0 1 1 1.03-1.09l5.5 5.25a.75.75 0 0 1 0 1.09l-5.5 5.25a.75.75 0 1 1-1.03-1.09l4.2-3.95H3.75A.75.75 0 0 1 3 10Z" />
-              </svg>
-            </button>
-            <a
-              href="#how"
-              className="inline-flex min-h-12 items-center rounded-xl border border-line-strong bg-raise px-6 py-3 text-[15px] font-semibold text-ink hover:border-faint/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-            >
-              See how it works
-            </a>
+          {/* The brand: the animated winged tiger and the wordmark, on a quiet panel. */}
+          <div className="mw-brand -order-1 flex flex-col items-center rounded-[1.75rem] border border-line px-4 pb-6 pt-4 sm:px-6 lg:order-none lg:pb-8 lg:pt-7">
+            <WingedTiger variant="hero" className="w-[min(220px,58vw)] lg:w-[min(300px,62vw)]" />
+            <p aria-hidden="true" className="-mt-0.5 font-display text-[clamp(2.5rem,5vw,3.5rem)] font-semibold leading-none tracking-tight text-ink">
+              Merit<span className="text-accent">wing</span>
+            </p>
+            <p className="mt-2.5 text-base font-medium text-muted">Your experience. Your next move.</p>
           </div>
-          <p className="mt-4 text-[13px] text-muted">No account needed. Your answers stay in this browser tab.</p>
         </div>
       </section>
 
@@ -97,7 +103,7 @@ export function Landing({ onStart }: { onStart: () => void }) {
           <div data-reveal className="max-w-2xl">
             <p className="text-xs font-semibold uppercase tracking-[0.12em] text-accent">How it works</p>
             <h2 id="how-title" className="mt-2 text-[clamp(1.625rem,3.4vw,2.125rem)] font-semibold leading-tight tracking-tight text-ink">
-              Five steps, from your resume to a tailored application
+              From what you did to where you apply
             </h2>
           </div>
           <ol className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
@@ -141,11 +147,11 @@ export function Landing({ onStart }: { onStart: () => void }) {
       <section aria-labelledby="cta-title" className="border-t border-line px-4 py-16 text-center sm:py-18">
         <div data-reveal>
           <h2 id="cta-title" className="text-[clamp(1.5rem,3vw,1.875rem)] font-semibold tracking-tight text-ink">
-            Start with what you&apos;ve already done
+            Bring your resume and three answers about your venture
           </h2>
-          <p className="mx-auto mt-2.5 max-w-lg text-muted">Bring your resume, or paste it, and confirm a profile before you see any openings.</p>
+          <p className="mx-auto mt-2.5 max-w-lg text-muted">We&apos;ll show current openings and help you turn your work into an application, in your own words.</p>
           <button type="button" onClick={onStart} className={`${primaryLg} mt-6`}>
-            Start with your resume
+            Find my opportunities
           </button>
         </div>
       </section>

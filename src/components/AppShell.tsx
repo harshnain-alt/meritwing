@@ -50,9 +50,9 @@ export function AppShell() {
               <button
                 type="button"
                 onClick={start}
-                className="mw-glow rounded-lg bg-accent-fill px-4 py-2 text-sm font-semibold text-white hover:bg-accent-fill-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                className="mw-glow rounded-lg bg-accent-fill px-4 py-2 text-sm font-semibold whitespace-nowrap text-white hover:bg-accent-fill-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
               >
-                Start
+                Find my opportunities
               </button>
             </nav>
           )}

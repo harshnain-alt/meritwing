@@ -49,7 +49,7 @@ import { buildPreview } from "@/lib/resumePreview";
 const COPY: Record<View, { eyebrow: string; title: string; intro: string }> = {
   1: {
     eyebrow: "Step 1 of 5",
-    title: "Let’s start",
+    title: "Start with your resume",
     intro: "Add your name and resume. We’ll fill in what we can from it, so you don’t type it twice.",
   },
   2: {

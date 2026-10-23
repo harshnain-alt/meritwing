@@ -19,7 +19,7 @@ export function StepIndicator({ current, onSelect, reachable }: StepIndicatorPro
             <>
               <span className={`block h-1 rounded-full ${isCurrent || isDone ? "bg-accent" : "bg-line"}`} />
               <span
-                className={`mt-2 block text-[11px] leading-tight sm:text-[13px] ${
+                className={`mt-2 block text-[13px] leading-tight ${
                   isCurrent ? "font-semibold text-ink" : isDone ? "font-medium text-ink" : "text-muted"
                 }`}
               >
