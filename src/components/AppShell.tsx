@@ -47,6 +47,9 @@ export function AppShell() {
               <a href="#principles" className="hidden text-ink-soft hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent md:inline">
                 What we won&apos;t do
               </a>
+              <a href="#contact" className="hidden text-ink-soft hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent sm:inline">
+                Contact
+              </a>
               <button
                 type="button"
                 onClick={start}

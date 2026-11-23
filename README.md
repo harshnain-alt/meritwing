@@ -123,6 +123,16 @@ contribution.
   *Save the PDF* link until the preview changes; if the PDF code fails to load or the PDF can't be
   created, it says which, with *Try again*, and nothing the student entered is lost.
 - **Clear my data** removes everything entered and read in the session.
+- **Contact form** on the landing page (*Ask us a question*): name, email and question. Each message
+  is saved as a row in Supabase (`contact_messages`, created by
+  [`supabase/contact_messages.sql`](supabase/contact_messages.sql)) with Row-Level Security on: the
+  site's public key may insert rows and nothing else, so it can never read, change or delete
+  submissions. The owner then gets an email with the message (replying goes straight to the sender),
+  and the sender gets an automatic acknowledgement that repeats nothing they typed except their first
+  name, so the form can't be used to send someone else arbitrary text. Email goes through Gmail with an
+  app password, or Resend with a verified domain. If saving fails the visitor is asked to try again
+  and no email is sent; if an email fails the message is still saved. A hidden field stops simple
+  bots, and each address can send five messages per ten minutes (per server instance).
 - **Why this fits** on every job card: a button showing how many profile items matched and how much
   is missing expands the card to list the student's own matching items (with where they wrote them and
   what the role also involves) and the evidence the listing asks for that their confirmed profile
@@ -256,6 +266,9 @@ AI fit notes are prepared when the student opens an opening's details, not for e
 - **Job searches** send nothing about the student anywhere: the server downloads the employers'
   public boards and filters them itself, using only the chosen preferences.
 - All answers live only in the open browser tab and are cleared on refresh or with *Clear my data*.
+- **Contact form messages** are the one thing stored: name, email and message go to the Supabase
+  table `contact_messages` and to the owner's inbox, and the sender gets a confirmation email. The
+  form says so. Logs record only the error type when something fails, never the message or address.
 - On Vercel, request bodies are limited to 4.5 MB, so PDFs between 4.5 MB and 5 MB are rejected
   there; the app then suggests pasting the text instead.
 
@@ -285,6 +298,11 @@ See [`.env.example`](.env.example). All are **server-side only** — never prefi
 | `GEMINI_MODEL` | No | Gemini model for the questions and bullets; defaults to `gemini-3.8-flash`, which has a free tier. `gemini-3.5-flash-lite` is a free-tier alternative if the daily free quota runs out |
 | `ANTHROPIC_API_KEY` | Only if `AI_PROVIDER=anthropic` | Anthropic API key; the account needs API credit |
 | `ANTHROPIC_MODEL` | No | Claude model when using Anthropic; defaults to `claude-opus-5-5` |
+| `SUPABASE_URL` | For the contact form | Supabase project URL (Project Settings → API) |
+| `SUPABASE_ANON_KEY` | For the contact form | Supabase anon / publishable key; Row-Level Security limits it to inserting messages |
+| `CONTACT_OWNER_EMAIL` | For the contact form | Where new-message notifications go |
+| `GMAIL_USER`, `GMAIL_APP_PASSWORD` | For the contact form (Gmail) | The Gmail address that sends the emails, and an app password for it |
+| `RESEND_API_KEY`, `RESEND_FROM` | Instead of Gmail | A Resend key and a sender on a domain verified in Resend |
 
 - **Locally:** create `.env.local` in this folder (ignored by Git) with
   `GEMINI_API_KEY=…`, then restart `npm run dev`.
@@ -349,7 +367,8 @@ interface, with Zod-validated structured output for the profile, fit notes and r
 
 ```
 src/app/                      page, layout, the PDF extraction route, /api/profile, /api/jobs/search,
-                              /api/jobs/explain and /api/bullets
+                              /api/jobs/explain, /api/bullets and /api/contact
+supabase/contact_messages.sql the contact form's table and Row-Level Security policy
 src/data/employers.json       the employer careers boards searched for jobs (configurable)
 src/lib/jobs/                 board readers, matching rules and filters, job types
 src/components/               app shell, landing, workspace, steps, bullets panel, searchable dropdown, resume preview

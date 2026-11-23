@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, type ReactNode } from "react";
 import { WingedTiger } from "@/components/brand/WingedTiger";
+import { ContactSection } from "@/components/ContactSection";
 
 const STEPS: [string, string][] = [
   ["Resume", "Upload your resume PDF or paste the text. It's read with simple rules, not AI, and nothing is reworded."],
@@ -24,7 +25,7 @@ const PRINCIPLES: { title: string; text: string; icon: ReactNode }[] = [
   },
   {
     title: "Nothing kept after you leave",
-    text: "Your answers stay in your browser tab. Uploaded PDFs are read in memory on our server and not stored.",
+    text: "Your resume and answers stay in your browser tab. Uploaded PDFs are read in memory on our server and not stored. Only messages you send us below are saved, so we can reply.",
     icon: <path d="M10 1a4.5 4.5 0 0 0-4.5 4.5V8H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2h-.5V5.5A4.5 4.5 0 0 0 10 1Zm3 7V5.5a3 3 0 1 0-6 0V8h6Z" />,
   },
 ];
@@ -155,6 +156,8 @@ export function Landing({ onStart }: { onStart: () => void }) {
           </button>
         </div>
       </section>
+
+      <ContactSection />
 
       <footer className="border-t border-line px-4 py-6 text-center text-[13px] text-muted sm:px-6">
         Meritwing · for business-school students in India
