@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Meritwing · class build submission</title>
+<meta name="description" content="Meritwing submissions for the Basic Track in-class build, 23 November 2026.">
+<style>
+  :root { color-scheme: dark; --bg: #0a1020; --surface: #111a2e; --line: #1f2b45; --text: #f2f5fb; --soft: #c7d0e1; --muted: #98a4bb; --accent: #5b95ff; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  main { max-width: 820px; margin: 0 auto; padding: 48px 20px 64px; }
+  .eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); margin: 0; }
+  h1 { font-size: clamp(28px, 5vw, 40px); line-height: 1.15; letter-spacing: -0.02em; margin: 8px 0 6px; }
+  .lede { color: var(--muted); margin: 0 0 28px; }
+  ol { list-style: none; padding: 0; margin: 0; display: grid; gap: 14px; }
+  li { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 18px 20px; }
+  h2 { font-size: 17px; margin: 0 0 4px; }
+  p { margin: 0; color: var(--soft); }
+  a { color: var(--accent); font-weight: 600; text-underline-offset: 3px; word-break: break-word; }
+  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+  video { display: block; width: 100%; height: auto; margin-top: 12px; border-radius: 12px; border: 1px solid var(--line); background: #000; }
+  .note { margin-top: 6px; font-size: 14px; color: var(--muted); }
+  footer { margin-top: 32px; font-size: 14px; color: var(--muted); }
+</style>
+</head>
+<body>
+<main>
+  <p class="eyebrow">Basic Track · in-class build · 23 November 2026</p>
+  <h1>Meritwing: class build submission</h1>
+  <p class="lede">Every submission in one place. All links open without signing in.</p>
+
+  <ol>
+    <li>
+      <h2>1. Live website</h2>
+      <p><a href="https://meritwing.vercel.app">https://meritwing.vercel.app</a></p>
+      <p class="note">The contact form is on the landing page: <a href="https://meritwing.vercel.app/#contact">meritwing.vercel.app/#contact</a>. Each message is saved as a Supabase row (Row-Level Security on), I get an email notification, and the sender gets an automatic reply.</p>
+    </li>
+    <li>
+      <h2>2. Motion-graphics video (60 seconds, MP4)</h2>
+      <p><a href="https://meritwing.vercel.app/class-build/meritwing-explainer.mp4">meritwing.vercel.app/class-build/meritwing-explainer.mp4</a></p>
+      <video controls preload="metadata" poster="poster.jpg" src="meritwing-explainer.mp4">
+        <a href="meritwing-explainer.mp4">Download the video</a>
+      </video>
+      <p class="note">Made with Claude Code: an animated Meritwing explainer, 1920×1080, no sound track.</p>
+    </li>
+    <li>
+      <h2>3. Reflection (PDF)</h2>
+      <p><a href="https://meritwing.vercel.app/class-build/reflection.pdf">meritwing.vercel.app/class-build/reflection.pdf</a></p>
+      <p class="note">What broke and how I fixed it.</p>
+    </li>
+    <li>
+      <h2>4. Screenshots and Loom video</h2>
+      <p>The Supabase row, the email notification and the automatic reply: shared as a Google Drive link on Nexus.</p>
+    </li>
+    <li>
+      <h2>5. Code</h2>
+      <p><a href="https://github.com/harshnain-alt/meritwing">github.com/harshnain-alt/meritwing</a></p>
+      <p class="note">Contact form: <a href="https://github.com/harshnain-alt/meritwing/blob/master/src/app/api/contact/route.ts">src/app/api/contact/route.ts</a> · table and RLS policy: <a href="https://github.com/harshnain-alt/meritwing/blob/master/supabase/contact_messages.sql">supabase/contact_messages.sql</a></p>
+    </li>
+  </ol>
+
+  <footer>Meritwing · for business-school students in India</footer>
+</main>
+</body>
+</html>
